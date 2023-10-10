@@ -3,8 +3,8 @@ import express, { Application } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
-import errorHandler from './middlewares/ErrorHandler';
-import Controller from './abstracts/Controller';
+import errorHandler from './middlewares/errorHandler';
+import Controller from './abstracts/controller';
 import process from 'process';
 import * as mongoose from 'mongoose';
 
