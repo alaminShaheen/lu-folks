@@ -29,15 +29,6 @@ function DtoValidator<T>(dtoClass: ClassConstructor<T>) {
 				},
 				{} as Record<string, string>,
 			);
-			// const validationErrors = (errors as ValidationError[]).map(
-			// 	(validationError) => {
-			// 		const errorMessage =
-			// 			Object.values(validationError.constraints || {})[0] || '';
-			// 		return {
-			// 			[validationError.property]: errorMessage,
-			// 		};
-			// 	},
-			// );
 			errorHandler(
 				new FieldValidationException(
 					httpStatus.BAD_REQUEST,
