@@ -1,5 +1,4 @@
 import httpStatus from "http-status";
-import { autoInjectable } from "tsyringe";
 import { NextFunction, Request, Response } from "express";
 import Controller from "@/abstracts/controller";
 import UserService from "@/resources/users/user.service";
@@ -7,7 +6,6 @@ import errorHandler from "@/middlewares/errorHandler";
 import DtoValidator from "@/middlewares/dtoValidator";
 import CreateUserDto from "@/dtos/create-user.dto";
 
-@autoInjectable()
 class UserController extends Controller {
 	constructor(private readonly userService: UserService) {
 		super("/users");
