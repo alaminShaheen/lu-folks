@@ -1,10 +1,10 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString } from "class-validator";
 
 class CreateUserDto {
 	@IsString()
 	name: string;
 
-	@IsEmail()
+	@IsEmail({}, { message: "Invalid email." })
 	email: string;
 
 	@IsString()

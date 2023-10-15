@@ -1,13 +1,15 @@
 import httpStatus from "http-status";
+import { inject, injectable } from "tsyringe";
 import { NextFunction, Request, Response } from "express";
 import Controller from "@/abstracts/controller";
-import UserService from "@/resources/users/user.service";
 import errorHandler from "@/middlewares/errorHandler";
 import DtoValidator from "@/middlewares/dtoValidator";
+import IUserService from "@/models/IUserService";
 import CreateUserDto from "@/dtos/create-user.dto";
 
+@injectable()
 class UserController extends Controller {
-	constructor(private readonly userService: UserService) {
+	constructor(@inject("IUserService") private readonly userService: IUserService) {
 		super("/users");
 		this.initialiseRoutes();
 	}
@@ -28,9 +30,14 @@ class UserController extends Controller {
 		}
 	};
 
-	private createUser = (request: Request, response: Response, nextFunction: NextFunction) => {
+	private createUser = async (
+		request: Request,
+		response: Response,
+		nextFunction: NextFunction,
+	) => {
 		try {
-			return response.status(httpStatus.OK).send(request.body);
+			const newUser = await this.userService.createUser(request.body);
+			return response.status(httpStatus.OK).send(newUser);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);
 		}
