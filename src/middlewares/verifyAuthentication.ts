@@ -1,0 +1,25 @@
+import { NextFunction, Request, Response } from "express";
+import HttpException from "@/exceptions/httpException";
+import httpStatus from "http-status";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import process from "process";
+
+function VerifyAuthentication(request: Request, response: Response, nextFunction: NextFunction) {
+	const authHeader = request.headers.authorization;
+
+	if (!authHeader)
+		return nextFunction(new HttpException(httpStatus.FORBIDDEN, "User is unauthorized"));
+	console.log(authHeader);
+
+	// authHeader = "Bearer <<token>>
+	const token = authHeader.split(" ")[1];
+	jwt.verify(token, String(process.env.ACCESS_TOKEN_SECRET), (error, decoded) => {
+		if (error) {
+			return nextFunction(new HttpException(httpStatus.FORBIDDEN, "User is unauthorized"));
+		}
+		request.user = (decoded as JwtPayload)["user"];
+		nextFunction();
+	});
+}
+
+export default VerifyAuthentication;

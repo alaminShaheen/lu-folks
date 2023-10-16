@@ -1,9 +1,9 @@
-import CreateUserDto from "@/dtos/create-user.dto";
+import RegisterUserDto from "@/dtos/registerUser.dto";
 
 interface IUserService {
 	getUsers(): Promise<unknown>;
 
-	createUser(newUserInfo: CreateUserDto): Promise<unknown>;
+	createUser(newUserInfo: RegisterUserDto): Promise<unknown>;
 }
 
 export default IUserService;

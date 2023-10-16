@@ -5,6 +5,7 @@ import process from "process";
 import HttpException from "@/exceptions/httpException";
 import httpStatus from "http-status";
 import { Lifecycle, scoped } from "tsyringe";
+import SessionEntity from "@/database/entities/session.entity";
 
 @scoped(Lifecycle.ContainerScoped)
 class PostgresDatabase extends Database {
@@ -13,9 +14,16 @@ class PostgresDatabase extends Database {
 		void this.connect();
 	}
 
-	get getUserRepository(): Repository<UserEntity> | null {
+	get userRepository(): Repository<UserEntity> | null {
 		if (this.dataSource) {
 			return this.dataSource.getRepository<UserEntity>(UserEntity);
+		}
+		return null;
+	}
+
+	get sessionRepository(): Repository<SessionEntity> | null {
+		if (this.dataSource) {
+			return this.dataSource.getRepository<SessionEntity>(SessionEntity);
 		}
 		return null;
 	}

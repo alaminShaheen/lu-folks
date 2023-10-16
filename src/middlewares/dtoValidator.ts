@@ -1,21 +1,14 @@
-import { ClassConstructor, plainToInstance } from 'class-transformer';
-import { NextFunction, Request, Response } from 'express';
-import { validateOrReject, ValidationError } from 'class-validator';
-import httpStatus from 'http-status';
-import errorHandler from './errorHandler';
-import FieldValidationException from '@/exceptions/fieldValidationException';
+import { ClassConstructor, plainToInstance } from "class-transformer";
+import { NextFunction, Request, Response } from "express";
+import { validateOrReject, ValidationError } from "class-validator";
+import httpStatus from "http-status";
+import errorHandler from "./errorHandler";
+import FieldValidationException from "@/exceptions/fieldValidationException";
 
 function DtoValidator<T>(dtoClass: ClassConstructor<T>) {
-	return async (
-		request: Request,
-		response: Response,
-		nextFunction: NextFunction,
-	) => {
+	return async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
-			request.body = Object.setPrototypeOf(
-				request.body,
-				dtoClass.prototype,
-			);
+			request.body = Object.setPrototypeOf(request.body, dtoClass.prototype);
 			await validateOrReject(request.body, { stopAtFirstError: true });
 			request.body = plainToInstance(dtoClass, request.body);
 			nextFunction();
@@ -30,11 +23,7 @@ function DtoValidator<T>(dtoClass: ClassConstructor<T>) {
 				{} as Record<string, string>,
 			);
 			errorHandler(
-				new FieldValidationException(
-					httpStatus.BAD_REQUEST,
-					'Field validation error',
-					validationErrors,
-				),
+				new FieldValidationException(httpStatus.BAD_REQUEST, validationErrors),
 				request,
 				response,
 				nextFunction,

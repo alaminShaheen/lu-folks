@@ -11,20 +11,16 @@ function ErrorHandler(
 	_: NextFunction,
 ) {
 	if (error instanceof FieldValidationException) {
-		return response
-			.status(error.status || httpStatus.INTERNAL_SERVER_ERROR)
-			.send({
-				type: ApiErrorType.FIELD_VALIDATION,
-				validationErrors: error.fieldErrors,
-				message: error.message,
-			});
+		return response.status(error.status || httpStatus.INTERNAL_SERVER_ERROR).send({
+			type: ApiErrorType.FIELD_VALIDATION,
+			validationErrors: error.fieldErrors,
+			message: error.message,
+		});
 	} else {
-		return response
-			.status(error.status || httpStatus.INTERNAL_SERVER_ERROR)
-			.send({
-				type: ApiErrorType.FIELD_VALIDATION,
-				message: error.message,
-			});
+		return response.status(error.status || httpStatus.INTERNAL_SERVER_ERROR).send({
+			type: ApiErrorType.GENERAL,
+			message: error.messag,
+		});
 	}
 }
 

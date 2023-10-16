@@ -7,12 +7,19 @@ import validateEnv from "@/utils/validateEnv";
 import UserController from "@/resources/users/user.controller";
 import PostgresDatabase from "./database/postgres.database";
 import UserService from "@/resources/users/user.service";
+import AuthService from "@/resources/auth/auth.service";
+import AuthController from "@/resources/auth/auth.controller";
 
 validateEnv();
 const database = container.resolve(PostgresDatabase);
 const userService = container.resolve(UserService);
-container.register("IUserService", { useClass: UserService });
-const userController = container.resolve(UserController);
+const authService = container.resolve(AuthService);
 
-const app = new App([userController], Number(process.env.PORT));
+container.register("IUserService", { useClass: UserService });
+container.register("IAuthService", { useClass: AuthService });
+
+const userController = container.resolve(UserController);
+const authController = container.resolve(AuthController);
+
+const app = new App([userController, authController], Number(process.env.PORT));
 app.listen();

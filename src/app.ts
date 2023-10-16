@@ -5,6 +5,7 @@ import morgan from "morgan";
 import compression from "compression";
 import errorHandler from "./middlewares/errorHandler";
 import Controller from "./abstracts/controller";
+import cookieParser from "cookie-parser";
 
 class App {
 	public expressInstance: Application;
@@ -32,6 +33,7 @@ class App {
 		this.expressInstance.use(express.json());
 		this.expressInstance.use(express.urlencoded({ extended: false }));
 		this.expressInstance.use(compression());
+		this.expressInstance.use(cookieParser());
 	}
 
 	private initialiseErrorHandling() {

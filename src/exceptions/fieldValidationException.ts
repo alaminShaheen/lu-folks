@@ -1,12 +1,12 @@
-import HttpException from '@/exceptions/httpException';
+import HttpException from "@/exceptions/httpException";
 
 class FieldValidationException extends HttpException {
 	constructor(
 		status: number,
-		message: string,
 		public fieldErrors: { [key: string]: string },
+		message?: string,
 	) {
-		super(status, message);
+		super(status, message || "Field validation errors.");
 	}
 }
 

@@ -5,7 +5,8 @@ import Controller from "@/abstracts/controller";
 import errorHandler from "@/middlewares/errorHandler";
 import DtoValidator from "@/middlewares/dtoValidator";
 import IUserService from "@/models/IUserService";
-import CreateUserDto from "@/dtos/create-user.dto";
+import RegisterUserDto from "@/dtos/registerUser.dto";
+import verifyAuthentication from "@/middlewares/verifyAuthentication";
 
 @injectable()
 class UserController extends Controller {
@@ -17,8 +18,8 @@ class UserController extends Controller {
 	protected initialiseRoutes = () => {
 		this.router
 			.route(this.path)
-			.get(this.getUsers)
-			.post(DtoValidator(CreateUserDto), this.createUser);
+			.get(verifyAuthentication, this.getUsers)
+			.post(DtoValidator(RegisterUserDto), this.createUser);
 	};
 
 	private getUsers = async (request: Request, response: Response, nextFunction: NextFunction) => {
