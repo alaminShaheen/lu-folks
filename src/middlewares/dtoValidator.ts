@@ -1,8 +1,8 @@
-import { ClassConstructor, plainToInstance } from "class-transformer";
+import httpStatus from "http-status";
 import { NextFunction, Request, Response } from "express";
 import { validateOrReject, ValidationError } from "class-validator";
-import httpStatus from "http-status";
-import errorHandler from "./errorHandler";
+import { ClassConstructor, plainToInstance } from "class-transformer";
+import errorHandler from "@/middlewares/errorHandler";
 import FieldValidationException from "@/exceptions/fieldValidationException";
 
 function DtoValidator<T>(dtoClass: ClassConstructor<T>) {

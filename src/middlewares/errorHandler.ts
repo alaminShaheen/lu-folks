@@ -19,7 +19,7 @@ function ErrorHandler(
 	} else {
 		return response.status(error.status || httpStatus.INTERNAL_SERVER_ERROR).send({
 			type: ApiErrorType.GENERAL,
-			message: error.messag,
+			message: error.message,
 		});
 	}
 }

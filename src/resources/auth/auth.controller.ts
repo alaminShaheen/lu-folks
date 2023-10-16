@@ -2,8 +2,9 @@ import httpStatus from "http-status";
 import { inject, injectable } from "tsyringe";
 import { NextFunction, Request, Response } from "express";
 import Controller from "@/abstracts/controller";
-import dtoValidator from "@/middlewares/dtoValidator";
+import LoginUserDto from "@/dtos/loginUser.dto";
 import IAuthService from "@/models/IAuthService";
+import dtoValidator from "@/middlewares/dtoValidator";
 import HttpException from "@/exceptions/httpException";
 import RegisterUserDto from "@/dtos/registerUser.dto";
 import verifyAuthentication from "@/middlewares/verifyAuthentication";
@@ -20,7 +21,7 @@ class AuthController extends Controller {
 			.route(`${this.path}/register`)
 			.post(dtoValidator(RegisterUserDto), this.register);
 
-		this.router.route(`${this.path}/login`).post(dtoValidator(RegisterUserDto), this.login);
+		this.router.route(`${this.path}/login`).post(dtoValidator(LoginUserDto), this.login);
 		this.router.route(`${this.path}/logout`).delete(verifyAuthentication, this.logout);
 
 		this.router.route(`${this.path}/refresh-token`).post(verifyAuthentication, this.register);

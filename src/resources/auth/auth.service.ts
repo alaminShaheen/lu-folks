@@ -16,7 +16,7 @@ import FieldValidationException from "@/exceptions/fieldValidationException";
 class AuthService implements IAuthService {
 	constructor(private readonly databaseInstance: PostgresDatabase) {}
 
-	refreshToken = async (
+	public refreshToken = async (
 		cookies: Record<string, string>,
 		userId: number,
 	): Promise<Omit<TokenDto, "refreshToken">> => {
@@ -63,11 +63,7 @@ class AuthService implements IAuthService {
 		}
 	};
 
-	createToken(tokenPayload: TokenPayload, secret: string, expiresIn: string | number) {
-		return jwt.sign(tokenPayload, secret, { expiresIn: expiresIn });
-	}
-
-	login = async (userInfo: LoginUserDto): Promise<TokenDto> => {
+	public login = async (userInfo: LoginUserDto): Promise<TokenDto> => {
 		const { username, password } = userInfo;
 
 		try {
@@ -84,9 +80,9 @@ class AuthService implements IAuthService {
 				throw new HttpException(httpStatus.BAD_REQUEST, "Incorrect login credentials");
 			}
 
-			const correctPassword = await bcrypt.compare(password, user.password);
+			const isCorrectPassword = await bcrypt.compare(password, user.password);
 
-			if (!correctPassword) {
+			if (!isCorrectPassword) {
 				throw new HttpException(httpStatus.BAD_REQUEST, "Incorrect login credentials");
 			}
 
@@ -102,13 +98,23 @@ class AuthService implements IAuthService {
 				"1d",
 			);
 
+			const session = sessionRepository.create({
+				refreshToken,
+			});
+
+			await sessionRepository.save(session);
+
+			user.session = session;
+
+			await userRepository.save(user);
+
 			return { accessToken, refreshToken };
 		} catch (error) {
 			throw error;
 		}
 	};
 
-	logout = async (userId: number) => {
+	public logout = async (userId: number) => {
 		try {
 			const user = await this.databaseInstance.userRepository?.findOne({
 				relations: { session: true },
@@ -124,7 +130,7 @@ class AuthService implements IAuthService {
 		}
 	};
 
-	register = async (userInfo: RegisterUserDto): Promise<TokenDto> => {
+	public register = async (userInfo: RegisterUserDto): Promise<TokenDto> => {
 		const { confirmPassword, email, password, username } = userInfo;
 
 		if (password !== confirmPassword)
@@ -189,6 +195,10 @@ class AuthService implements IAuthService {
 			throw error;
 		}
 	};
+
+	private createToken(tokenPayload: TokenPayload, secret: string, expiresIn: string | number) {
+		return jwt.sign(tokenPayload, secret, { expiresIn: expiresIn });
+	}
 }
 
 export default AuthService;
