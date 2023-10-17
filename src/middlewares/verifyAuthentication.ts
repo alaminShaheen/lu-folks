@@ -9,7 +9,6 @@ function VerifyAuthentication(request: Request, response: Response, nextFunction
 
 	if (!authHeader)
 		return nextFunction(new HttpException(httpStatus.FORBIDDEN, "User is unauthorized"));
-	console.log(authHeader);
 
 	// authHeader = "Bearer <<token>>
 	const token = authHeader.split(" ")[1];
@@ -17,6 +16,7 @@ function VerifyAuthentication(request: Request, response: Response, nextFunction
 		if (error) {
 			return nextFunction(new HttpException(httpStatus.FORBIDDEN, "User is unauthorized"));
 		}
+
 		request.user = (decoded as JwtPayload)["user"];
 		nextFunction();
 	});

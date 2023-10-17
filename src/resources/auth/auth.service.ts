@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import process from "process";
-import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
 import httpStatus from "http-status";
 import { injectable } from "tsyringe";
+import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
 import TokenDto from "@/dtos/token.dto";
 import IAuthService from "@/models/IAuthService";
 import TokenPayload from "@/models/types/tokenPayload";
@@ -16,39 +16,73 @@ import FieldValidationException from "@/exceptions/fieldValidationException";
 class AuthService implements IAuthService {
 	constructor(private readonly databaseInstance: PostgresDatabase) {}
 
+	public checkValidity = async (
+		authorizationHeader: string | undefined,
+	): Promise<TokenValidityDto> => {
+		try {
+			if (!authorizationHeader) {
+				console.error("No authorization header present in request.");
+				throw new HttpException(httpStatus.FORBIDDEN, "User is unauthorized");
+			}
+
+			// authHeader = "Bearer <<token>>
+			const token = authorizationHeader.split(" ")[1];
+
+			const decodedToken = jwt.verify(token, String(process.env.ACCESS_TOKEN_SECRET));
+
+			const currentTimestamp = Math.floor(Date.now() / 1000);
+
+			if ((decodedToken as JwtPayload)?.exp) {
+				const expiresIn = (decodedToken as JwtPayload).exp! - currentTimestamp;
+				return { hasExpired: false, time_left: `${expiresIn / 60} minutes` };
+			} else {
+				console.error("Access token expired.");
+				throw new HttpException(httpStatus.UNAUTHORIZED, "Access token expired.");
+			}
+		} catch (error) {
+			throw error;
+		}
+	};
+
 	public refreshToken = async (
 		cookies: Record<string, string>,
-		userId: number,
 	): Promise<Omit<TokenDto, "refreshToken">> => {
 		const refreshToken = cookies.jwt;
 
 		if (!refreshToken) {
-			throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthenticated.");
+			console.error("No refresh token present.");
+			throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthorized.");
 		}
 
 		try {
-			const user = await this.databaseInstance.userRepository?.findOne({
-				where: { id: userId },
-				relations: {
-					session: true,
-				},
+			const session = await this.databaseInstance.sessionRepository?.findOne({
+				where: { refreshToken },
+				relations: { user: true },
 			});
 
-			if (!user || !user.session) {
-				throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthenticated");
+			if (!session || !session.user) {
+				console.error("No session or user associated with refresh token.");
+				throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthorized.");
 			}
 
-			const jwtPayload = jwt.verify(
+			const dbUser = session.user;
+
+			const decodedUserInfo = jwt.verify(
 				refreshToken,
 				String(process.env.REFRESH_TOKEN_SECRET),
-			) as JwtPayload;
-			const userInfo = jwtPayload["user"] as TokenPayload;
-			if (!userInfo || userInfo.userId !== user.id || userInfo.username !== user.username) {
+			) as TokenPayload;
+
+			if (
+				!decodedUserInfo ||
+				decodedUserInfo.userId !== dbUser.id ||
+				decodedUserInfo.username !== dbUser.username
+			) {
+				console.error("Refresh token tampered as not identical with user in db.");
 				throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthorized.");
 			}
 
 			const accessToken = this.createToken(
-				{ username: userInfo.username, userId: userInfo.userId },
+				{ username: decodedUserInfo.username, userId: decodedUserInfo.userId },
 				String(process.env.ACCESS_TOKEN_SECRET),
 				60 * 3,
 			);
@@ -56,6 +90,7 @@ class AuthService implements IAuthService {
 			return { accessToken };
 		} catch (error) {
 			if (error instanceof TokenExpiredError || error instanceof JsonWebTokenError) {
+				console.error("Refresh token has expired.");
 				throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthorized.");
 			} else {
 				throw error;
@@ -71,18 +106,21 @@ class AuthService implements IAuthService {
 			const sessionRepository = this.databaseInstance.sessionRepository;
 
 			if (!userRepository || !sessionRepository) {
+				console.error("Database repositories not initialized.");
 				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
 			}
 
 			const user = await userRepository.findOneBy({ username });
 
 			if (!user) {
+				console.error("Incorrect credentials provided.");
 				throw new HttpException(httpStatus.BAD_REQUEST, "Incorrect login credentials");
 			}
 
 			const isCorrectPassword = await bcrypt.compare(password, user.password);
 
 			if (!isCorrectPassword) {
+				console.error("Password did not match.");
 				throw new HttpException(httpStatus.BAD_REQUEST, "Incorrect login credentials");
 			}
 
@@ -122,6 +160,7 @@ class AuthService implements IAuthService {
 			});
 
 			if (!user || !user.session) {
+				console.error(`User is unauthenticated as no user with ${userId} found.`);
 				throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthenticated");
 			}
 			await this.databaseInstance.sessionRepository?.remove(user.session);
@@ -133,31 +172,38 @@ class AuthService implements IAuthService {
 	public register = async (userInfo: RegisterUserDto): Promise<TokenDto> => {
 		const { confirmPassword, email, password, username } = userInfo;
 
-		if (password !== confirmPassword)
+		if (password !== confirmPassword) {
+			console.error("Password and Confirm password don't match.");
 			throw new FieldValidationException(httpStatus.BAD_REQUEST, {
 				confirmPassword: "Passwords do not match.",
 			});
+		}
 
 		try {
 			const userRepository = this.databaseInstance.userRepository;
 			const sessionRepository = this.databaseInstance.sessionRepository;
 
-			if (!userRepository || !sessionRepository)
+			if (!userRepository || !sessionRepository) {
+				console.error("Database repositories not initialized.");
 				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
+			}
 
 			const userWithSameEntries = await userRepository.find({
 				where: [{ username }, { email }],
 			});
 
 			if (userWithSameEntries && userWithSameEntries.length > 0) {
-				if (userWithSameEntries[0].email === email)
+				if (userWithSameEntries[0].email === email) {
+					console.error("Email already in user");
 					throw new FieldValidationException(httpStatus.BAD_REQUEST, {
 						email: "Email already in use.",
 					});
-				else
+				} else {
+					console.error("Username already in user.");
 					throw new FieldValidationException(httpStatus.BAD_REQUEST, {
 						username: "Username already in user.",
 					});
+				}
 			}
 
 			const hashedPassword = await bcrypt.hash(password, 10);

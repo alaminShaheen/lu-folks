@@ -20,11 +20,12 @@ class AuthController extends Controller {
 		this.router
 			.route(`${this.path}/register`)
 			.post(dtoValidator(RegisterUserDto), this.register);
-
+		this.router.route(`${this.path}/refresh-token`).post(this.refreshToken);
 		this.router.route(`${this.path}/login`).post(dtoValidator(LoginUserDto), this.login);
 		this.router.route(`${this.path}/logout`).delete(verifyAuthentication, this.logout);
-
-		this.router.route(`${this.path}/refresh-token`).post(verifyAuthentication, this.register);
+		this.router
+			.route(`${this.path}/check-validity`)
+			.get(verifyAuthentication, this.checkValidity);
 	}
 
 	private register = async (request: Request, response: Response, nextFunction: NextFunction) => {
@@ -77,11 +78,26 @@ class AuthController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const { accessToken } = await this.authService.refreshToken(
-				request.cookies,
-				request.user?.userId!,
-			);
+			const { accessToken } = await this.authService.refreshToken(request.cookies);
 			return response.status(httpStatus.CREATED).send({ accessToken });
+		} catch (error) {
+			if (error instanceof Error) nextFunction(error);
+			else {
+				nextFunction(
+					new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred."),
+				);
+			}
+		}
+	};
+
+	private checkValidity = async (
+		request: Request,
+		response: Response,
+		nextFunction: NextFunction,
+	) => {
+		try {
+			const data = await this.authService.checkValidity(request.headers.authorization);
+			return response.status(httpStatus.OK).send(data);
 		} catch (error) {
 			if (error instanceof Error) nextFunction(error);
 			else {
