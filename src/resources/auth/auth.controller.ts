@@ -55,7 +55,7 @@ class AuthController extends Controller {
 				httpOnly: true,
 				maxAge: 24 * 60 * 60 * 1000,
 				secure: true,
-				sameSite: "none,
+				sameSite: "none",
 			});
 			return response.status(httpStatus.CREATED).send({ accessToken });
 		} catch (error) {
@@ -74,7 +74,7 @@ class AuthController extends Controller {
 			response.clearCookie("jwt", {
 				httpOnly: true,
 				secure: true,
-				sameSite: "none"
+				sameSite: "none",
 			});
 			return response.sendStatus(httpStatus.OK);
 		} catch (error) {
