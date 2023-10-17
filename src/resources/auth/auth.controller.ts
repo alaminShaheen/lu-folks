@@ -31,7 +31,12 @@ class AuthController extends Controller {
 	private register = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
 			const { accessToken, refreshToken } = await this.authService.register(request.body);
-			response.cookie("jwt", refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+			response.cookie("jwt", refreshToken, {
+				httpOnly: true,
+				maxAge: 24 * 60 * 60 * 1000,
+				secure: true,
+				sameSite: "none",
+			});
 			return response.status(httpStatus.CREATED).send({ accessToken });
 		} catch (error) {
 			if (error instanceof Error) nextFunction(error);
@@ -46,7 +51,12 @@ class AuthController extends Controller {
 	private login = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
 			const { accessToken, refreshToken } = await this.authService.login(request.body);
-			response.cookie("jwt", refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+			response.cookie("jwt", refreshToken, {
+				httpOnly: true,
+				maxAge: 24 * 60 * 60 * 1000,
+				secure: true,
+				sameSite: "none,
+			});
 			return response.status(httpStatus.CREATED).send({ accessToken });
 		} catch (error) {
 			if (error instanceof Error) nextFunction(error);
@@ -61,6 +71,11 @@ class AuthController extends Controller {
 	private logout = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
 			await this.authService.logout(request.user?.userId!);
+			response.clearCookie("jwt", {
+				httpOnly: true,
+				secure: true,
+				sameSite: "none"
+			});
 			return response.sendStatus(httpStatus.OK);
 		} catch (error) {
 			if (error instanceof Error) nextFunction(error);
