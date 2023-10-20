@@ -5,10 +5,11 @@ import { FcGoogle } from "react-icons/fc";
 import { Input } from "../components/ui/input.tsx";
 import { useForm } from "react-hook-form";
 import { Label } from "../components/ui/label.tsx";
+import RegisterFormType from "../models/form/RegisterFormType.ts";
 
 const Register = () => {
 	const [isLoading, setIsLoading] = useState(false);
-	const { register, handleSubmit } = useForm<RegisterFormTypes>({
+	const { register, handleSubmit } = useForm<RegisterFormType>({
 		defaultValues: {
 			email: "",
 			confirmPassword: "",
@@ -17,7 +18,7 @@ const Register = () => {
 		},
 	});
 
-	const onSubmit = (formValues: RegisterFormTypes) => {
+	const onSubmit = (formValues: RegisterFormType) => {
 		try {
 			setIsLoading(true);
 			console.log(formValues);
