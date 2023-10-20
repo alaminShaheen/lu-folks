@@ -1,10 +1,17 @@
-import "./App.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Login from "@/pages/Login.tsx";
+import Register from "@/pages/Register.tsx";
+import LandingPage from "@/pages/LandingPage.tsx";
 
 function App() {
 	return (
-		<div className="text-7xl font-bold text-blue-700 h-screen flex justify-center items-center">
-			<span>Landing page of LU Folks</span>
-		</div>
+		<BrowserRouter>
+			<Routes>
+				<Route index Component={LandingPage} />
+				<Route path="/login" Component={Login} />
+				<Route path="/register" Component={Register} />
+			</Routes>
+		</BrowserRouter>
 	);
 }
 
