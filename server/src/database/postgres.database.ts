@@ -39,7 +39,7 @@ class PostgresDatabase extends Database {
 				password: process.env.POSTGRES_PASSWORD,
 				synchronize: true,
 				logging: false,
-				database: "postgres",
+				database: process.env.POSTGRES_DATABASE_NAME,
 				entities: ["dist/database/entities/*.entity.js"],
 			});
 			await this.dataSource.initialize();

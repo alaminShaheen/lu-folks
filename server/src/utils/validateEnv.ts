@@ -8,6 +8,7 @@ function validateEnv() {
 		POSTGRES_USER: str(),
 		POSTGRES_PASSWORD: str(),
 		POSTGRES_DATABASE_PORT: port({ default: 5432 }),
+		POSTGRES_DATABASE_NAME: str({ default: "lu-folks-db-dev" }),
 		ACCESS_TOKEN_SECRET: str(),
 		REFRESH_TOKEN_SECRET: str(),
 	});
