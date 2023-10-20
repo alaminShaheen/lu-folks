@@ -6,6 +6,7 @@ import { FcGoogle } from "react-icons/fc";
 import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
 import LoginFormType from "../models/form/LoginFormType.ts";
+import { Link } from "react-router-dom";
 
 const Login = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -92,15 +93,22 @@ const Login = () => {
 							</Button>
 						</div>
 						<p className="px-8 text-center text-sm text-muted-foreground">
-							By clicking continue, you agree to our{" "}
-							<span className="underline underline-offset-4 hover:text-primary">
-								Terms of Service
-							</span>{" "}
-							and{" "}
-							<span className="underline underline-offset-4 hover:text-primary">
-								Privacy Policy
-							</span>
-							.
+							{/*By clicking continue, you agree to our{" "}*/}
+							{/*<span className="underline underline-offset-4 hover:text-primary">*/}
+							{/*	Terms of Service*/}
+							{/*</span>{" "}*/}
+							{/*and{" "}*/}
+							{/*<span className="underline underline-offset-4 hover:text-primary">*/}
+							{/*	Privacy Policy*/}
+							{/*</span>*/}
+							{/*.*/}
+							Don't have an account?{" "}
+							<Link
+								to="/register"
+								className="underline underline-offset-4 hover:text-primary"
+							>
+								Sign up!
+							</Link>
 						</p>
 					</div>
 				</div>

@@ -6,6 +6,7 @@ import { Input } from "../components/ui/input.tsx";
 import { useForm } from "react-hook-form";
 import { Label } from "../components/ui/label.tsx";
 import RegisterFormType from "../models/form/RegisterFormType.ts";
+import { Link } from "react-router-dom";
 
 const Register = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -148,15 +149,22 @@ const Register = () => {
 							</Button>
 						</div>
 						<p className="px-8 text-center text-sm text-muted-foreground">
-							By clicking continue, you agree to our{" "}
-							<span className="underline underline-offset-4 hover:text-primary">
-								Terms of Service
-							</span>{" "}
-							and{" "}
-							<span className="underline underline-offset-4 hover:text-primary">
-								Privacy Policy
-							</span>
-							.
+							{/*By clicking continue, you agree to our{" "}*/}
+							{/*<span className="underline underline-offset-4 hover:text-primary">*/}
+							{/*	Terms of Service*/}
+							{/*</span>{" "}*/}
+							{/*and{" "}*/}
+							{/*<span className="underline underline-offset-4 hover:text-primary">*/}
+							{/*	Privacy Policy*/}
+							{/*</span>*/}
+							{/*.*/}
+							Already have an account?{" "}
+							<Link
+								to="/login"
+								className="underline underline-offset-4 hover:text-primary"
+							>
+								Sign in!
+							</Link>
 						</p>
 					</div>
 				</div>
