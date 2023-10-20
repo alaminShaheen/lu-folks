@@ -33,7 +33,7 @@ class PostgresDatabase extends Database {
 			this.dataSource = new DataSource({
 				applicationName: "lu_folks_dev",
 				type: "postgres",
-				host: "localhost",
+				host: process.env.POSTGRES_HOST,
 				port: Number(process.env.POSTGRES_DATABASE_PORT),
 				username: process.env.POSTGRES_USER,
 				password: process.env.POSTGRES_PASSWORD,
