@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsc-watch --onSuccess \"npm run start\"",
     "start": "node --inspect dist/index.js",
-    "build": "tsc"
+    "build": "npm i && tsc"
   },
   "type": "commonjs",
   "keywords": [],
