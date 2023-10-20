@@ -1,7 +1,9 @@
 import Controller from "@/abstracts/controller";
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
+import { injectable } from "tsyringe";
 
+@injectable()
 class HealthcheckController extends Controller {
 	constructor() {
 		super("/healthcheck");
@@ -9,7 +11,7 @@ class HealthcheckController extends Controller {
 	}
 
 	protected initialiseRoutes = (): void => {
-		this.router.get("/", this.healthcheck);
+		this.router.route(this.path).get(this.healthcheck);
 	};
 
 	private healthcheck(request: Request, response: Response, nextFunction: NextFunction) {
