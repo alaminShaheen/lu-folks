@@ -6,6 +6,8 @@ import compression from "compression";
 import errorHandler from "./middlewares/errorHandler";
 import Controller from "./abstracts/controller";
 import cookieParser from "cookie-parser";
+import process from "process";
+import httpStatus from "http-status";
 
 class App {
 	public expressInstance: Application;
@@ -28,7 +30,13 @@ class App {
 
 	private initialiseMiddlewares() {
 		this.expressInstance.use(helmet());
-		this.expressInstance.use(cors());
+		this.expressInstance.use(
+			cors({
+				origin: process.env.CLIENT_ORIGIN_URL,
+				credentials: true,
+				optionsSuccessStatus: httpStatus.OK,
+			}),
+		);
 		this.expressInstance.use(morgan("dev"));
 		this.expressInstance.use(express.json());
 		this.expressInstance.use(express.urlencoded({ extended: false }));
