@@ -1,10 +1,9 @@
-import { Fragment, useCallback, useState } from "react";
 import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { Eye, EyeOff } from "lucide-react";
-import axios from "@/api/Axios.ts";
+import { Link, useNavigate } from "react-router-dom";
+import { Fragment, useCallback, useState } from "react";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -12,9 +11,11 @@ import InputWithIcon from "@/components/ui/InputWithIcon.tsx";
 import Authentication from "@/models/Authentication.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
 import { AUTH_ROUTES } from "@/constants/ApiRoutes";
+import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import RegisterFormType from "@/models/form/RegisterFormType.ts";
 import { useAppContext } from "@/context/AppContext.tsx";
 import FieldValidationError from "@/models/FieldValidationError.ts";
+import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 
 const Register = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -36,26 +37,34 @@ const Register = () => {
 	});
 	const { setAuthentication } = useAppContext();
 	const navigate = useNavigate();
+	const { publicAxiosInstance: axiosInstance } = useAxiosInstance();
 
-	const onSubmit = async (formValues: RegisterFormType) => {
+	const onSubmit = useCallback(async (formValues: RegisterFormType) => {
 		try {
 			setIsLoading(true);
-			const { data } = await axios.post<Authentication>(AUTH_ROUTES.REGISTER, formValues);
+			const { data } = await axiosInstance.post<Authentication>(
+				AUTH_ROUTES.REGISTER,
+				formValues,
+			);
 			setAuthentication(data);
-			toast.success("You have signed up successfully!");
-			navigate("../news-feed", { relative: "route" });
+			toast.dismiss();
+			toast.success("You have registered successfully!");
+			navigate("/news-feed");
 		} catch (error: any) {
-			if (error instanceof FieldValidationError) {
-				Object.entries(error.validationErrors).forEach(([key, value]) => {
+			if (error.response.data.type === ApiErrorType.FIELD_VALIDATION) {
+				Object.entries(
+					(error.response.data as FieldValidationError).validationErrors,
+				).forEach(([key, value]) => {
 					setError(key as keyof RegisterFormType, { message: value, type: "server" });
 				});
 			} else {
-				toast.error(error.message);
+				toast.dismiss();
+				toast.error(error.response.data.message);
 			}
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, []);
 
 	const toggleConfirmPasswordVisibility = useCallback(() => {
 		setShowConfirmPassword((prev) => !prev);

@@ -1,32 +1,71 @@
-import { Label } from "../components/ui/label.tsx";
-import { Input } from "../components/ui/input.tsx";
-import { Button } from "../components/ui/button.tsx";
-import LoadingSpinner from "../components/LoadingSpinner.tsx";
-import { FcGoogle } from "react-icons/fc";
-import { Fragment, useState } from "react";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import LoginFormType from "../models/form/LoginFormType.ts";
-import { Link } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import { Eye, EyeOff } from "lucide-react";
+import { Fragment, useCallback, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Label } from "@/components/ui/label.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import LoginFormType from "@/models/form/LoginFormType.ts";
+import InputWithIcon from "@/components/ui/InputWithIcon.tsx";
+import LoadingSpinner from "@/components/LoadingSpinner.tsx";
+import Authentication from "@/models/Authentication.ts";
+import { AUTH_ROUTES } from "@/constants/ApiRoutes.ts";
+import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
+import { useAppContext } from "@/context/AppContext.tsx";
+import FieldValidationError from "@/models/FieldValidationError.ts";
+import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 
 const Login = () => {
-	const [isLoading, setIsLoading] = useState(false);
-	const { register, handleSubmit } = useForm<LoginFormType>({
+	const { setAuthentication } = useAppContext();
+	const navigate = useNavigate();
+	const location = useLocation();
+	const { publicAxiosInstance: axiosInstance } = useAxiosInstance();
+	const {
+		register,
+		handleSubmit,
+		setError,
+		formState: { errors },
+	} = useForm<LoginFormType>({
 		defaultValues: {
 			password: "",
 			username: "",
 		},
 	});
+	const [showPassword, setShowPassword] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
-	const onSubmit = (formValues: LoginFormType) => {
+	const onSubmit = useCallback(async (formValues: LoginFormType) => {
 		try {
 			setIsLoading(true);
-			console.log(formValues);
-		} catch (error) {
-			console.error(error);
+			const { data } = await axiosInstance.post<Authentication>(
+				AUTH_ROUTES.LOGIN,
+				formValues,
+			);
+			setAuthentication(data);
+			toast.dismiss();
+			toast.success("You have logged in successfully!");
+			navigate(location.state?.from || "/news-feed", { replace: true });
+		} catch (error: any) {
+			if (error.response.data.type === ApiErrorType.FIELD_VALIDATION) {
+				Object.entries(
+					(error.response.data as FieldValidationError).validationErrors,
+				).forEach(([key, value]) => {
+					setError(key as keyof LoginFormType, { message: value, type: "server" });
+				});
+			} else {
+				toast.dismiss();
+				toast.error(error.response.data.message);
+			}
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, []);
+
+	const togglePasswordVisibility = useCallback(() => {
+		setShowPassword((prev) => !prev);
+	}, []);
 
 	return (
 		<Fragment>
@@ -44,7 +83,9 @@ const Login = () => {
 									<div className="grid gap-1">
 										<Label htmlFor="username">Username</Label>
 										<Input
-											{...register("username")}
+											{...register("username", {
+												required: "Username is require",
+											})}
 											id="username"
 											placeholder="Bruce Wayne"
 											type="text"
@@ -52,19 +93,44 @@ const Login = () => {
 											autoCorrect="off"
 											disabled={isLoading}
 										/>
+										{errors.username?.message && (
+											<span className="text-xs text-red-500 my-2">
+												{errors.username.message}
+											</span>
+										)}
 									</div>
 
 									<div className="grid gap-1">
 										<Label htmlFor="password">Password</Label>
-										<Input
-											{...register("password")}
+										<InputWithIcon
+											{...register("password", {
+												required: "Password is required",
+											})}
 											id="password"
-											type="password"
+											type={showPassword ? "text" : "password"}
 											autoCapitalize="none"
 											autoComplete="email"
 											autoCorrect="off"
 											disabled={isLoading}
+											icon={
+												showPassword ? (
+													<EyeOff
+														className="h-4 w-4"
+														onClick={togglePasswordVisibility}
+													/>
+												) : (
+													<Eye
+														className="h-4 w-4"
+														onClick={togglePasswordVisibility}
+													/>
+												)
+											}
 										/>
+										{errors.password?.message && (
+											<span className="text-xs text-red-500 my-2">
+												{errors.password.message}
+											</span>
+										)}
 									</div>
 
 									<Button disabled={isLoading} form="register-form">
