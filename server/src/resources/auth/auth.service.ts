@@ -194,9 +194,9 @@ class AuthService implements IAuthService {
 
 			if (userWithSameEntries && userWithSameEntries.length > 0) {
 				if (userWithSameEntries[0].email === email) {
-					console.error("Email already in user");
+					console.error("Email already in use.");
 					throw new FieldValidationException(httpStatus.BAD_REQUEST, {
-						email: "Email already in use.",
+						email: "User with email already exists.",
 					});
 				} else {
 					console.error("Username already in user.");

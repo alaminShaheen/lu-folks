@@ -13,7 +13,7 @@ function ErrorHandler(
 	if (error instanceof FieldValidationException) {
 		return response.status(error.status || httpStatus.INTERNAL_SERVER_ERROR).send({
 			type: ApiErrorType.FIELD_VALIDATION,
-			validationErrors: error.fieldErrors,
+			validationErrors: error.validationErrors,
 			message: error.message,
 		});
 	} else {
