@@ -1,16 +1,32 @@
-import { Fragment, useState } from "react";
-import { Button } from "../components/ui/button.tsx";
-import LoadingSpinner from "../components/LoadingSpinner.tsx";
-import { FcGoogle } from "react-icons/fc";
-import { Input } from "../components/ui/input.tsx";
+import { Fragment, useCallback, useState } from "react";
+import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { Label } from "../components/ui/label.tsx";
-import RegisterFormType from "../models/form/RegisterFormType.ts";
-import { Link } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import { Eye, EyeOff } from "lucide-react";
+import axios from "@/api/Axios.ts";
+import { Label } from "@/components/ui/label.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import InputWithIcon from "@/components/ui/InputWithIcon.tsx";
+import Authentication from "@/models/Authentication.ts";
+import LoadingSpinner from "@/components/LoadingSpinner.tsx";
+import { AUTH_ROUTES } from "@/constants/ApiRoutes";
+import RegisterFormType from "@/models/form/RegisterFormType.ts";
+import { useAppContext } from "@/context/AppContext.tsx";
+import FieldValidationError from "@/models/FieldValidationError.ts";
 
 const Register = () => {
 	const [isLoading, setIsLoading] = useState(false);
-	const { register, handleSubmit } = useForm<RegisterFormType>({
+	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		watch,
+		setError,
+	} = useForm<RegisterFormType>({
 		defaultValues: {
 			email: "",
 			confirmPassword: "",
@@ -18,17 +34,36 @@ const Register = () => {
 			username: "",
 		},
 	});
+	const { setAuthentication } = useAppContext();
+	const navigate = useNavigate();
 
-	const onSubmit = (formValues: RegisterFormType) => {
+	const onSubmit = async (formValues: RegisterFormType) => {
 		try {
 			setIsLoading(true);
-			console.log(formValues);
-		} catch (error) {
-			console.error(error);
+			const { data } = await axios.post<Authentication>(AUTH_ROUTES.REGISTER, formValues);
+			setAuthentication(data);
+			toast.success("You have signed up successfully!");
+			navigate("../news-feed", { relative: "route" });
+		} catch (error: any) {
+			if (error instanceof FieldValidationError) {
+				Object.entries(error.validationErrors).forEach(([key, value]) => {
+					setError(key as keyof RegisterFormType, { message: value, type: "server" });
+				});
+			} else {
+				toast.error(error.message);
+			}
 		} finally {
 			setIsLoading(false);
 		}
 	};
+
+	const toggleConfirmPasswordVisibility = useCallback(() => {
+		setShowConfirmPassword((prev) => !prev);
+	}, []);
+
+	const togglePasswordVisibility = useCallback(() => {
+		setShowPassword((prev) => !prev);
+	}, []);
 
 	return (
 		<Fragment>
@@ -73,7 +108,9 @@ const Register = () => {
 									<div className="grid gap-1">
 										<Label htmlFor="email">Email</Label>
 										<Input
-											{...register("email", {})}
+											{...register("email", {
+												required: "Email is required",
+											})}
 											id="email"
 											placeholder="name@example.com"
 											type="email"
@@ -82,12 +119,19 @@ const Register = () => {
 											autoCorrect="off"
 											disabled={isLoading}
 										/>
+										{errors.email?.message && (
+											<span className="text-xs text-red-500 my-2">
+												{errors.email.message}
+											</span>
+										)}
 									</div>
 
 									<div className="grid gap-1">
 										<Label htmlFor="username">Username</Label>
 										<Input
-											{...register("username")}
+											{...register("username", {
+												required: "Username is required",
+											})}
 											id="username"
 											placeholder="Bruce Wayne"
 											type="text"
@@ -95,32 +139,80 @@ const Register = () => {
 											autoCorrect="off"
 											disabled={isLoading}
 										/>
+										{errors.username?.message && (
+											<span className="text-xs text-red-500 my-2">
+												{errors.username.message}
+											</span>
+										)}
 									</div>
 
 									<div className="grid gap-1">
 										<Label htmlFor="password">Password</Label>
-										<Input
-											{...register("password")}
+										<InputWithIcon
+											{...register("password", {
+												required: "Password is required",
+											})}
 											id="password"
-											type="password"
+											type={showPassword ? "text" : "password"}
 											autoCapitalize="none"
 											autoComplete="email"
 											autoCorrect="off"
 											disabled={isLoading}
+											icon={
+												showPassword ? (
+													<EyeOff
+														className="h-4 w-4"
+														onClick={togglePasswordVisibility}
+													/>
+												) : (
+													<Eye
+														className="h-4 w-4"
+														onClick={togglePasswordVisibility}
+													/>
+												)
+											}
 										/>
+										{errors.password?.message && (
+											<span className="text-xs text-red-500 my-2">
+												{errors.password.message}
+											</span>
+										)}
 									</div>
 
 									<div className="grid gap-1">
 										<Label htmlFor="confirmPassword">Confirm Password</Label>
-										<Input
-											{...register("confirmPassword")}
+										<InputWithIcon
+											{...register("confirmPassword", {
+												required: "Confirm password is required",
+												validate: (value) =>
+													value === watch("password") ||
+													"Passwords don't match",
+											})}
 											id="confirmPassword"
-											type="password"
+											type={showConfirmPassword ? "text" : "password"}
 											autoCapitalize="none"
 											autoComplete="email"
 											autoCorrect="off"
 											disabled={isLoading}
+											icon={
+												showPassword ? (
+													<EyeOff
+														className="h-4 w-4"
+														onClick={toggleConfirmPasswordVisibility}
+													/>
+												) : (
+													<Eye
+														className="h-4 w-4"
+														onClick={toggleConfirmPasswordVisibility}
+													/>
+												)
+											}
 										/>
+										{errors.confirmPassword?.message && (
+											<span className="text-xs text-red-500 my-2">
+												{errors.confirmPassword.message}
+											</span>
+										)}
 									</div>
 
 									<Button disabled={isLoading} form="register-form">

@@ -1,17 +1,27 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "@/pages/Login.tsx";
-import Register from "@/pages/Register.tsx";
 import LandingPage from "@/pages/LandingPage.tsx";
+import { AppContextProvider } from "@/context/AppContext.tsx";
+import Register from "@/pages/Register";
+import Toast from "@/components/Toast.tsx";
+import NewsFeed from "@/pages/NewsFeed.tsx";
+import ProtectedRoutesWrapper from "@/components/ProtectedRoutesWrapper.tsx";
 
 function App() {
 	return (
-		<BrowserRouter>
-			<Routes>
-				<Route index Component={LandingPage} />
-				<Route path="/login" Component={Login} />
-				<Route path="/register" Component={Register} />
-			</Routes>
-		</BrowserRouter>
+		<AppContextProvider>
+			<BrowserRouter>
+				<Toast />
+				<Routes>
+					<Route index Component={LandingPage} />
+					<Route path="/login" Component={Login} />
+					<Route path="/register" Component={Register} />
+					<Route Component={ProtectedRoutesWrapper}>
+						<Route path="/news-feed" Component={NewsFeed} />
+					</Route>
+				</Routes>
+			</BrowserRouter>
+		</AppContextProvider>
 	);
 }
 

@@ -27,7 +27,28 @@
 		"pages/*"
 	  ],
 	  "@/components/*": [
-		"pages/*"
+		"components/*"
+	  ],
+	  "@/services/*": [
+		"services/*"
+	  ],
+	  "@/models/*": [
+		"models/*"
+	  ],
+	  "@/lib/*": [
+		"lib/*"
+	  ],
+	  "@/context/*": [
+		"context/*"
+	  ],
+	  "@/assets/*": [
+		"assets/*"
+	  ],
+	  "@/constants/*": [
+		"constants/*"
+	  ],
+	  "@/api/*": [
+		"api/*"
 	  ]
 	}
   },

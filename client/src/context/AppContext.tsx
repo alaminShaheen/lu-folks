@@ -1,18 +1,32 @@
-import { createContext, ReactNode } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
+import Authentication from "@/models/Authentication.ts";
 
-type AppContextType = { auth: string };
+type AppContextType = {
+	authentication: Authentication;
+	setAuthentication: Dispatch<SetStateAction<Authentication>>;
+};
 
-const APP_CONTEXT_DEFAULT_VALUES: AppContextType = { auth: "" };
-export const AppContext = createContext<AppContextType | null>(APP_CONTEXT_DEFAULT_VALUES);
+const APP_CONTEXT_DEFAULT_VALUES: AppContextType = {
+	authentication: Authentication.EMPTY,
+	setAuthentication: () => {},
+};
+export const AppContext = createContext<AppContextType>(APP_CONTEXT_DEFAULT_VALUES);
 
 type AppContextProviderProps = {
 	children: ReactNode;
 };
 
-const AppContextProvider = (props: AppContextProviderProps) => {
+export const AppContextProvider = (props: AppContextProviderProps) => {
 	const { children } = props;
+	const [authentication, setAuthentication] = useState(APP_CONTEXT_DEFAULT_VALUES.authentication);
 
-	return <AppContext.Provider value={{ auth: "" }}>{children}</AppContext.Provider>;
+	return (
+		<AppContext.Provider value={{ authentication, setAuthentication }}>
+			{children}
+		</AppContext.Provider>
+	);
 };
 
-export default AppContextProvider;
+export const useAppContext = () => {
+	return useContext(AppContext);
+};
