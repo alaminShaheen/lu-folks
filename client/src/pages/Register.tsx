@@ -2,8 +2,8 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { Eye, EyeOff } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { Fragment, useCallback, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -22,6 +22,8 @@ const Register = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+	const [searchParams, setSearchParams] = useSearchParams();
+
 	const {
 		register,
 		handleSubmit,
@@ -39,6 +41,29 @@ const Register = () => {
 	const { setAuthentication } = useAppContext();
 	const navigate = useNavigate();
 	const { publicAxiosInstance: axiosInstance } = useAxiosInstance();
+
+	useEffect(() => {
+		if (searchParams.get("accessToken")) {
+			setAuthentication((prev) => ({
+				...prev,
+				accessToken: searchParams.get("accessToken")!,
+			}));
+			setSearchParams((prev) => {
+				prev.delete("accessToken");
+				return { ...prev };
+			});
+			toast.dismiss();
+			toast.success("You have registered successfully!");
+			navigate("/news-feed");
+		} else if (searchParams.get("message")) {
+			toast.dismiss();
+			toast.error(searchParams.get("message"));
+			setSearchParams((prev) => {
+				prev.delete("message");
+				return { ...prev };
+			});
+		}
+	}, [searchParams]);
 
 	const onSubmit = useCallback(async (formValues: RegisterFormType) => {
 		try {
@@ -244,7 +269,7 @@ const Register = () => {
 							<Button variant="outline" type="button" disabled={isLoading}>
 								<a
 									href={generateGoogleOAuthConsentUrl()}
-									className="inline-flex items-center justify-center"
+									className="inline-flex items-center justify-center w-full"
 								>
 									{isLoading ? (
 										<LoadingSpinner />

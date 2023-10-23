@@ -12,9 +12,6 @@ function GenerateGoogleOAuthConsentUrl() {
 			"https://www.googleapis.com/auth/userinfo.email",
 		].join(" "),
 	});
-
-	console.log(`${AppConstants.GOOGLE_OAUTH_ROOT_URL}?${googleOauthSearchParams.toString()}`);
-
 	return `${AppConstants.GOOGLE_OAUTH_ROOT_URL}?${googleOauthSearchParams.toString()}`;
 }
 

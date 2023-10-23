@@ -143,10 +143,16 @@ class AuthController extends Controller {
 			const searchParams = new URLSearchParams({ accessToken });
 			return response
 				.status(httpStatus.CREATED)
-				.redirect(`${process.env.CLIENT_ORIGIN_URL}/news-feed?${searchParams.toString()}`);
-		} catch (error) {
-			if (error instanceof Error) nextFunction(error);
-			else {
+				.redirect(`${process.env.CLIENT_ORIGIN_URL}/register?${searchParams.toString()}`);
+		} catch (error: any) {
+			if (error instanceof HttpException) {
+				const searchParams = new URLSearchParams({ message: error.message });
+				return response
+					.status(error.status)
+					.redirect(
+						`${process.env.CLIENT_ORIGIN_URL}/register?${searchParams.toString()}`,
+					);
+			} else {
 				nextFunction(
 					new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred."),
 				);

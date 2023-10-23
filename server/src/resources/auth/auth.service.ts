@@ -232,7 +232,7 @@ class AuthService implements IAuthService {
 			const refreshToken = this.createToken(
 				{ username, userId: finalUser.id },
 				String(process.env.REFRESH_TOKEN_SECRET),
-				AppConstants.JWT_REFRESH_TOKEN_DURATIO,
+				AppConstants.JWT_REFRESH_TOKEN_DURATION,
 			);
 
 			const newUserSession = sessionRepository.create({
@@ -333,15 +333,15 @@ class AuthService implements IAuthService {
 
 	private getGoogleUser = async (
 		id_token: string,
-		google_access_tokn: string,
+		google_access_token: strin,
 	): Promise<GoogleOAuthUserResponse> => {
 		try {
 			const response = await axios.get<GoogleOAuthUserResponse>(
 				`${AppConstants.GOOGLE_OAUTH_GET_USER_URL}?alt=json&access_token=${google_access_token}`,
 				{
 					headers: {
-						Authorization: `Bearer ${d_token`,
-				},
+						Authorization: `Bearer ${id_token}`,
+					},
 				},
 			);
 			return response.data;

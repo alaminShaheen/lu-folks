@@ -37,7 +37,7 @@ class UserService implements IUserService {
 				console.log("User could not be saved to database.");
 				throw new HttpException(
 					httpStatus.INTERNAL_SERVER_ERROR,
-					"An internal server error occurred.,
+					"An internal server error occurred.",
 				);
 			}
 			return newUser;
