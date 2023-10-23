@@ -16,6 +16,7 @@ import RegisterFormType from "@/models/form/RegisterFormType.ts";
 import { useAppContext } from "@/context/AppContext.tsx";
 import FieldValidationError from "@/models/FieldValidationError.ts";
 import ApiErrorType from "@/models/enums/ApiErrorType.ts";
+import generateGoogleOAuthConsentUrl from "@/utils/GenerateGoogleOAuthConsentUrl.ts";
 
 const Register = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -241,12 +242,17 @@ const Register = () => {
 								</div>
 							</div>
 							<Button variant="outline" type="button" disabled={isLoading}>
-								{isLoading ? (
-									<LoadingSpinner />
-								) : (
-									<FcGoogle className="mr-2 h-4 w-4" />
-								)}{" "}
-								Google
+								<a
+									href={generateGoogleOAuthConsentUrl()}
+									className="inline-flex items-center justify-center"
+								>
+									{isLoading ? (
+										<LoadingSpinner />
+									) : (
+										<FcGoogle className="mr-2 h-4 w-4" />
+									)}{" "}
+									Google
+								</a>
 							</Button>
 						</div>
 						<p className="px-8 text-center text-sm text-muted-foreground">
