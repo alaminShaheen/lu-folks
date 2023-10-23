@@ -10,7 +10,7 @@ class SessionEntity {
 	refreshToken: string;
 
 	// on deletion of user, cascade delete this entity
-	@OneToOne(() => UserEntity, (user) => user.session, { onDelete: "CASCADE" })
+	@OneToOne(() => UserEntity, (user) => user.session, { onDelete: "CASCADE", cascade: true })
 	user: UserEntity;
 }
 

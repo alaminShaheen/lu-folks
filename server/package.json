@@ -14,6 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+	"@paralleldrive/cuid2": "^2.2.2",
+	"axios": "^1.5.1",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -63,7 +65,8 @@
     "@/exceptions": "dist/exceptions",
     "@/abstracts": "dist/abstracts",
     "@/dtos": "dist/dtos",
-    "@/database": "dist/database"
+	"@/database": "dist/database",
+	"@/constants": "dist/constants"
   },
   "lint-staged": {
     "*.ts": [

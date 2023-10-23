@@ -1,9 +1,9 @@
-import RegisterUserDto from "@/dtos/registerUser.dto";
+import UserEntity from "@/database/entities/user.entity";
 
 interface IUserService {
 	getUsers(): Promise<unknown>;
 
-	createUser(newUserInfo: RegisterUserDto): Promise<unknown>;
+	createUser(userInfo: Partial<UserEntity>): Promise<Partial<UserEntity>>;
 }
 
 export default IUserService;

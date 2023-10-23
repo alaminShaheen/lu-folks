@@ -7,11 +7,13 @@ interface IAuthService {
 
 	login(userInfo: LoginUserDto): Promise<TokenDto>;
 
-	logout(userId: number): Promise<void>;
+	logout(userId: string): Promise<void>;
 
 	refreshToken(cookies: Record<string, string>): Promise<Omit<TokenDto, "refreshToken">>;
 
 	checkValidity(authorizationHeader: string | undefined): Promise<TokenValidityDto>;
+
+	googleOAuthHandler(code: string): Promise<TokenDto>;
 }
 
 export default IAuthService;

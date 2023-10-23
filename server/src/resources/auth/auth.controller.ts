@@ -8,6 +8,8 @@ import dtoValidator from "@/middlewares/dtoValidator";
 import HttpException from "@/exceptions/httpException";
 import RegisterUserDto from "@/dtos/registerUser.dto";
 import verifyAuthentication from "@/middlewares/verifyAuthentication";
+import AppConstants from "@/constants/AppConstants";
+import process from "process";
 
 @injectable()
 class AuthController extends Controller {
@@ -26,14 +28,15 @@ class AuthController extends Controller {
 		this.router
 			.route(`${this.path}/check-validity`)
 			.get(verifyAuthentication, this.checkValidity);
+		this.router.route(`${this.path}/oauth/google`).get(this.googleOAuth);
 	}
 
 	private register = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
 			const { accessToken, refreshToken } = await this.authService.register(request.body);
-			response.cookie("jwt", refreshToken, {
+			response.cookie(AppConstants.JWT_COOKIE_NAME, refreshToken, {
 				httpOnly: true,
-				maxAge: 24 * 60 * 60 * 1000,
+				maxAge: AppConstants.JWT_REFRESH_TOKEN_DURATION,
 				secure: true,
 				sameSite: "none",
 			});
@@ -51,9 +54,9 @@ class AuthController extends Controller {
 	private login = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
 			const { accessToken, refreshToken } = await this.authService.login(request.body);
-			response.cookie("jwt", refreshToken, {
+			response.cookie(AppConstants.JWT_COOKIE_NAME, refreshToken, {
 				httpOnly: true,
-				maxAge: 24 * 60 * 60 * 1000,
+				maxAge: AppConstants.JWT_REFRESH_TOKEN_DURATION,
 				secure: true,
 				sameSite: "none",
 			});
@@ -71,7 +74,7 @@ class AuthController extends Controller {
 	private logout = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
 			await this.authService.logout(request.user?.userId!);
-			response.clearCookie("jwt", {
+			response.clearCookie(AppConstants.JWT_COOKIE_NAME, {
 				httpOnly: true,
 				secure: true,
 				sameSite: "none",
@@ -113,6 +116,34 @@ class AuthController extends Controller {
 		try {
 			const data = await this.authService.checkValidity(request.headers.authorization);
 			return response.status(httpStatus.OK).send(data);
+		} catch (error) {
+			if (error instanceof Error) nextFunction(error);
+			else {
+				nextFunction(
+					new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred."),
+				);
+			}
+		}
+	};
+
+	private googleOAuth = async (
+		request: Request,
+		response: Response,
+		nextFunction: NextFunction,
+	) => {
+		try {
+			const code = request.query.code as string;
+			const { accessToken, refreshToken } = await this.authService.googleOAuthHandler(code);
+			response.cookie(AppConstants.JWT_COOKIE_NAME, refreshToken, {
+				httpOnly: true,
+				maxAge: AppConstants.JWT_REFRESH_TOKEN_DURATION,
+				secure: true,
+				sameSite: "none",
+			});
+			const searchParams = new URLSearchParams({ accessToken });
+			return response
+				.status(httpStatus.CREATED)
+				.redirect(`${process.env.CLIENT_ORIGIN_URL}/news-feed?${searchParams.toString()}`);
 		} catch (error) {
 			if (error instanceof Error) nextFunction(error);
 			else {

@@ -2,8 +2,8 @@ import httpStatus from "http-status";
 import { injectable } from "tsyringe";
 import IUserService from "@/models/IUserService";
 import HttpException from "@/exceptions/httpException";
-import RegisterUserDto from "@/dtos/registerUser.dto";
 import PostgresDatabase from "@/database/postgres.database";
+import UserEntity from "@/database/entities/user.entity";
 
 @injectable()
 class UserService implements IUserService {
@@ -20,19 +20,27 @@ class UserService implements IUserService {
 		}
 	};
 
-	public createUser = async (newUserInfo: RegisterUserDto) => {
+	public createUser = async (newUserInfo: Partial<UserEntity>): Promise<UserEntity> => {
 		try {
-			const user = this.databaseInstance.userRepository?.create({
-				email: newUserInfo.email,
-			});
+			const user = this.databaseInstance.userRepository?.create(newUserInfo);
 
-			if (!user)
+			if (!user) {
+				console.log("User could not be created.");
 				throw new HttpException(
 					httpStatus.INTERNAL_SERVER_ERROR,
-					"User could not be created",
+					"An internal server error occurred.",
 				);
-			this.databaseInstance.userRepository?.save(user);
-			return user;
+			}
+			const newUser = await this.databaseInstance.userRepository?.save(user);
+
+			if (!newUser) {
+				console.log("User could not be saved to database.");
+				throw new HttpException(
+					httpStatus.INTERNAL_SERVER_ERROR,
+					"An internal server error occurred.,
+				);
+			}
+			return newUser;
 		} catch (error) {
 			throw error;
 		}

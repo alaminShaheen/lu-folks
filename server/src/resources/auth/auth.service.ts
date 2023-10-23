@@ -1,20 +1,30 @@
+import qs from "qs";
+import axios from "axios";
 import bcrypt from "bcrypt";
 import process from "process";
 import httpStatus from "http-status";
 import { injectable } from "tsyringe";
 import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
 import TokenDto from "@/dtos/token.dto";
-import IAuthService from "@/models/IAuthService";
-import TokenPayload from "@/models/types/tokenPayload";
 import LoginUserDto from "@/dtos/loginUser.dto";
+import IAuthService from "@/models/IAuthService";
+import AppConstants from "@/constants/AppConstants";
+import TokenPayload from "@/models/types/tokenPayload";
+import AuthProvider from "@/models/enums/AuthProvider";
 import HttpException from "@/exceptions/httpException";
 import RegisterUserDto from "@/dtos/registerUser.dto";
 import PostgresDatabase from "@/database/postgres.database";
+import GoogleOAuthTokenResponse from "@/models/GoogleOAuthTokenResponse";
 import FieldValidationException from "@/exceptions/fieldValidationException";
+import GoogleOAuthUserResponse from "@/models/GoogleOAuthUserResponse";
+import UserService from "@/resources/users/user.service";
 
 @injectable()
 class AuthService implements IAuthService {
-	constructor(private readonly databaseInstance: PostgresDatabase) {}
+	constructor(
+		private readonly databaseInstance: PostgresDatabase,
+		private readonly userService: UserService,
+	) {}
 
 	public checkValidity = async (
 		authorizationHeader: string | undefined,
@@ -84,7 +94,7 @@ class AuthService implements IAuthService {
 			const accessToken = this.createToken(
 				{ username: decodedUserInfo.username, userId: decodedUserInfo.userId },
 				String(process.env.ACCESS_TOKEN_SECRET),
-				60 * 3,
+				AppConstants.JWT_ACCESS_TOKEN_DURATION,
 			);
 
 			return { accessToken };
@@ -99,7 +109,7 @@ class AuthService implements IAuthService {
 	};
 
 	public login = async (userInfo: LoginUserDto): Promise<TokenDto> => {
-		const { username, password } = userInfo;
+		const { email, password } = userInfo;
 
 		try {
 			const userRepository = this.databaseInstance.userRepository;
@@ -110,30 +120,29 @@ class AuthService implements IAuthService {
 				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
 			}
 
-			const user = await userRepository.findOneBy({ username });
+			const user = await userRepository.findOneBy({ email });
 
-			if (!user) {
+			if (!user || user.authProvider === AuthProvider.GOOGLE) {
 				console.error("Incorrect credentials provided.");
 				throw new HttpException(httpStatus.BAD_REQUEST, "Incorrect login credentials");
-			}
-
-			const isCorrectPassword = await bcrypt.compare(password, user.password);
-
-			if (!isCorrectPassword) {
-				console.error("Password did not match.");
-				throw new HttpException(httpStatus.BAD_REQUEST, "Incorrect login credentials");
+			} else if (user.authProvider === AuthProvider.VANILLA) {
+				const isCorrectPassword = await bcrypt.compare(password, user.password);
+				if (!isCorrectPassword) {
+					console.error("Password did not match.");
+					throw new HttpException(httpStatus.BAD_REQUEST, "Incorrect login credentials");
+				}
 			}
 
 			const accessToken = this.createToken(
-				{ username, userId: user.id },
+				{ username: user.username, userId: user.id },
 				String(process.env.ACCESS_TOKEN_SECRET),
-				60,
+				AppConstants.JWT_ACCESS_TOKEN_DURATION,
 			);
 
 			const refreshToken = this.createToken(
-				{ username, userId: user.id },
+				{ username: user.username, userId: user.id },
 				String(process.env.REFRESH_TOKEN_SECRET),
-				"1d",
+				AppConstants.JWT_REFRESH_TOKEN_DURATION,
 			);
 
 			const session = sessionRepository.create({
@@ -152,7 +161,7 @@ class AuthService implements IAuthService {
 		}
 	};
 
-	public logout = async (userId: number) => {
+	public logout = async (userId: string) => {
 		try {
 			const user = await this.databaseInstance.userRepository?.findOne({
 				relations: { session: true },
@@ -199,33 +208,31 @@ class AuthService implements IAuthService {
 						email: "User with email already exists.",
 					});
 				} else {
-					console.error("Username already in user.");
+					console.error("Username already exists.");
 					throw new FieldValidationException(httpStatus.BAD_REQUEST, {
-						username: "Username already in user.",
+						username: "Username not available.",
 					});
 				}
 			}
 
 			const hashedPassword = await bcrypt.hash(password, 10);
 
-			const newUser = userRepository.create({
+			const finalUser = await this.userService.createUser({
 				email,
 				password: hashedPassword,
 				username,
 			});
 
-			const finalUser = await userRepository.save(newUser);
-
 			const accessToken = this.createToken(
 				{ username, userId: finalUser.id },
 				String(process.env.ACCESS_TOKEN_SECRET),
-				60 * 3,
+				AppConstants.JWT_ACCESS_TOKEN_DURATION,
 			);
 
 			const refreshToken = this.createToken(
 				{ username, userId: finalUser.id },
 				String(process.env.REFRESH_TOKEN_SECRET),
-				"1d",
+				AppConstants.JWT_REFRESH_TOKEN_DURATIO,
 			);
 
 			const newUserSession = sessionRepository.create({
@@ -242,9 +249,107 @@ class AuthService implements IAuthService {
 		}
 	};
 
+	public googleOAuthHandler = async (code: string): Promise<TokenDto> => {
+		try {
+			const userRepository = this.databaseInstance.userRepository;
+			const sessionRepository = this.databaseInstance.sessionRepository;
+
+			if (!userRepository || !sessionRepository) {
+				console.error("Database repositories not initialized.");
+				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
+			}
+
+			const response = await axios.post<GoogleOAuthTokenResponse>(
+				AppConstants.GOOGLE_OAUTH_TOKEN_URL,
+				qs.stringify({
+					code,
+					client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
+					client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+					redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT_URL,
+					grant_type: "authorization_code",
+				}),
+				{
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+					},
+				},
+			);
+			const { access_token, id_token } = response.data;
+			const googleUser = await this.getGoogleUser(id_token, access_token);
+
+			const existingUser = await this.databaseInstance.userRepository?.findOneBy([
+				{ email: googleUser.email },
+				{ id: googleUser.sub },
+			]);
+
+			if (!googleUser.verified_email) {
+				console.log("Google email unverified.");
+				throw new HttpException(httpStatus.FORBIDDEN, "Google account is unverified.");
+			} else if (existingUser) {
+				console.log("User already registered with email.");
+				throw new HttpException(
+					httpStatus.BAD_REQUEST,
+					"User is already registered with the email.",
+				);
+			}
+
+			const finalUser = await this.userService.createUser({
+				email: googleUser.email,
+				username: googleUser.name,
+				authProvider: AuthProvider.GOOGLE,
+				id: googleUser.sub,
+			});
+
+			const accessToken = this.createToken(
+				{ username: finalUser.username, userId: finalUser.id },
+				String(process.env.ACCESS_TOKEN_SECRET),
+				AppConstants.JWT_ACCESS_TOKEN_DURATION,
+			);
+
+			const refreshToken = this.createToken(
+				{ username: finalUser.username, userId: finalUser.id },
+				String(process.env.REFRESH_TOKEN_SECRET),
+				AppConstants.JWT_REFRESH_TOKEN_DURATION,
+			);
+
+			const newUserSession = sessionRepository.create({
+				refreshToken,
+			});
+
+			finalUser.session = await sessionRepository.save(newUserSession);
+
+			await userRepository.save(finalUser);
+
+			return { accessToken, refreshToken };
+		} catch (error) {
+			console.log("Failed to authenticate with google.");
+			throw error;
+		}
+	};
+
 	private createToken(tokenPayload: TokenPayload, secret: string, expiresIn: string | number) {
 		return jwt.sign(tokenPayload, secret, { expiresIn: expiresIn });
 	}
+
+	private getGoogleUser = async (
+		id_token: string,
+		google_access_tokn: string,
+	): Promise<GoogleOAuthUserResponse> => {
+		try {
+			const response = await axios.get<GoogleOAuthUserResponse>(
+				`${AppConstants.GOOGLE_OAUTH_GET_USER_URL}?alt=json&access_token=${google_access_token}`,
+				{
+					headers: {
+						Authorization: `Bearer ${d_token`,
+				},
+				},
+			);
+			return response.data;
+		} catch (error) {
+			console.log("Failed to fetch Google user.");
+			throw error;
+		}
+	};
 }
 
 export default AuthService;

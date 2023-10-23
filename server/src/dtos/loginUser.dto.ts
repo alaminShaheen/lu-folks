@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 import { Transform } from "class-transformer";
 
 class LoginUserDto {
-	@IsString({ message: "Username must be a string." })
-	@IsNotEmpty({ message: "Username cannot be empty." })
+	@IsEmail({}, { message: "Invalid email" })
+	@IsNotEmpty({ message: "Email cannot be empty" })
 	@Transform((params) => params.value.trim())
-	username: string;
+	email: string;
 
 	@IsString({ message: "Password must be a string." })
 	@IsNotEmpty({ message: "Password cannot be empty." })

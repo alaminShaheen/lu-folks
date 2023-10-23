@@ -1,18 +1,30 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+	Column,
+	CreateDateColumn,
+	Entity,
+	Index,
+	JoinColumn,
+	OneToOne,
+	PrimaryColumn,
+	UpdateDateColumn,
+} from "typeorm";
 import SessionEntity from "@/database/entities/session.entity";
+import AuthProvider from "@/models/enums/AuthProvider";
+import { createId } from "@paralleldrive/cuid2";
 
 @Entity()
 class UserEntity {
-	@PrimaryGeneratedColumn()
-	id: number;
+	@PrimaryColumn({ type: "varchar", default: createId() })
+	id: string;
 
-	@Column()
+	@Column({ unique: true })
 	username: string;
 
-	@Column()
+	@Index({ unique: true })
+	@Column({ unique: true })
 	email: string;
 
-	@Column()
+	@Column({ nullable: true })
 	password: string;
 
 	// on deletion of session, set session in this entity as null
@@ -23,6 +35,15 @@ class UserEntity {
 	// creates a sessionId in this table referencing to session table
 	@JoinColumn()
 	session: SessionEntity;
+
+	@Column({ type: "enum", enum: AuthProvider, default: AuthProvider.VANILLA })
+	authProvider: AuthProvider;
+
+	@CreateDateColumn()
+	createdAt: Date;
+
+	@UpdateDateColumn()
+	updatedAt: Date;
 }
 
 export default UserEntity;
