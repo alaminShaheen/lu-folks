@@ -178,7 +178,7 @@ const Login = () => {
 							<Button variant="outline" type="button" disabled={isLoading}>
 								<a
 									href={generateGoogleOAuthConsentUrl(
-										AppConstants.GOOGLE_OAUTH_LOGIN_REDIRECT_UR,
+										AppConstants.GOOGLE_OAUTH_LOGIN_REDIRECT_URL,
 									)}
 									className="inline-flex items-center justify-center w-full"
 								>
