@@ -134,7 +134,7 @@ class AuthService implements IAuthService {
 
 			const accessToken = this.createAccessToken({
 				username: user.username,
-				userId: user.i,
+				userId: user.id,
 			});
 
 			const refreshToken = this.createRefreshToken({
@@ -287,7 +287,7 @@ class AuthService implements IAuthService {
 
 			const refreshToken = this.createRefreshToken({
 				username: finalUser.username,
-				userId: finalUser.i,
+				userId: finalUser.id,
 			});
 
 			const newUserSession = sessionRepository.create({
