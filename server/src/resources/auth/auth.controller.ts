@@ -1,15 +1,15 @@
+import process from "process";
 import httpStatus from "http-status";
 import { inject, injectable } from "tsyringe";
 import { NextFunction, Request, Response } from "express";
 import Controller from "@/abstracts/controller";
 import LoginUserDto from "@/dtos/loginUser.dto";
 import IAuthService from "@/models/IAuthService";
+import AppConstants from "@/constants/AppConstants";
 import dtoValidator from "@/middlewares/dtoValidator";
 import HttpException from "@/exceptions/httpException";
 import RegisterUserDto from "@/dtos/registerUser.dto";
 import verifyAuthentication from "@/middlewares/verifyAuthentication";
-import AppConstants from "@/constants/AppConstants";
-import process from "process";
 
 @injectable()
 class AuthController extends Controller {
