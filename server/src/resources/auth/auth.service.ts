@@ -333,7 +333,7 @@ class AuthService implements IAuthService {
 
 	private getGoogleUser = async (
 		id_token: string,
-		google_access_token: strin,
+		google_access_token: string,
 	): Promise<GoogleOAuthUserResponse> => {
 		try {
 			const response = await axios.get<GoogleOAuthUserResponse>(
