@@ -32,7 +32,7 @@ const Login = () => {
 	} = useForm<LoginFormType>({
 		defaultValues: {
 			password: "",
-			username: "",
+			email: "",
 		},
 	});
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -51,6 +51,7 @@ const Login = () => {
 			toast.success("You have logged in successfully!");
 			navigate(location.state?.from || "/news-feed", { replace: true });
 		} catch (error: any) {
+			console.log(error);
 			if (error.response.data.type === ApiErrorType.FIELD_VALIDATION) {
 				Object.entries(
 					(error.response.data as FieldValidationError).validationErrors,
@@ -59,6 +60,7 @@ const Login = () => {
 				});
 			} else {
 				toast.dismiss();
+				console.log(error.response);
 				toast.error(error.response.data.message);
 			}
 		} finally {
@@ -107,21 +109,22 @@ const Login = () => {
 							<form id="register-form" onSubmit={handleSubmit(onSubmit)}>
 								<div className="grid gap-3">
 									<div className="grid gap-1">
-										<Label htmlFor="username">Username</Label>
+										<Label htmlFor="email">Email</Label>
 										<Input
-											{...register("username", {
-												required: "Username is require",
+											{...register("email", {
+												required: "Email is required",
 											})}
-											id="username"
-											placeholder="Bruce Wayne"
-											type="text"
+											id="email"
+											placeholder="name@example.com"
+											type="email"
 											autoCapitalize="none"
+											autoComplete="email"
 											autoCorrect="off"
 											disabled={isLoading}
 										/>
-										{errors.username?.message && (
+										{errors.email?.message && (
 											<span className="text-xs text-red-500 my-2">
-												{errors.username.message}
+												{errors.email.message}
 											</span>
 										)}
 									</div>
@@ -135,7 +138,7 @@ const Login = () => {
 											id="password"
 											type={showPassword ? "text" : "password"}
 											autoCapitalize="none"
-											autoComplete="email"
+											autoComplete="password"
 											autoCorrect="off"
 											disabled={isLoading}
 											icon={
