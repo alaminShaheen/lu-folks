@@ -37,7 +37,7 @@ class UserController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const newUser = await this.userService.createUser(request.body);
+			const newUser = await this.userService.createAndSaveUser(request.body);
 			return response.status(httpStatus.OK).send(newUser);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);

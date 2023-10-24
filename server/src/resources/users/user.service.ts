@@ -20,7 +20,7 @@ class UserService implements IUserService {
 		}
 	};
 
-	public createUser = async (newUserInfo: Partial<UserEntity>): Promise<UserEntity> => {
+	public createAndSaveUser = async (newUserInfo: Partial<UserEntity>): Promise<UserEntity> => {
 		try {
 			const user = this.databaseInstance.userRepository?.create(newUserInfo);
 

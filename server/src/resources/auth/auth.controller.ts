@@ -29,6 +29,7 @@ class AuthController extends Controller {
 			.route(`${this.path}/check-validity`)
 			.get(verifyAuthentication, this.checkValidity);
 		this.router.route(`${this.path}/oauth/google/register`).get(this.googleOAuthRegistration);
+		this.router.route(`${this.path}/oauth/google/login`).get(this.googleOAuthRegistration);
 	}
 
 	private register = async (request: Request, response: Response, nextFunction: NextFunction) => {
@@ -153,6 +154,39 @@ class AuthController extends Controller {
 					.redirect(
 						`${process.env.CLIENT_ORIGIN_URL}/register?${searchParams.toString()}`,
 					);
+			} else {
+				nextFunction(
+					new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred."),
+				);
+			}
+		}
+	};
+
+	private googleOAuthLogin = async (
+		request: Request,
+		response: Response,
+		nextFunction: NextFunction,
+	) => {
+		try {
+			const code = request.query.code as string;
+			const { accessToken, refreshToken } =
+				await this.authService.googleOAuthRegistration(code);
+			response.cookie(AppConstants.JWT_COOKIE_NAME, refreshToken, {
+				httpOnly: true,
+				maxAge: AppConstants.JWT_REFRESH_TOKEN_DURATION,
+				secure: true,
+				sameSite: "none",
+			});
+			const searchParams = new URLSearchParams({ accessToken });
+			return response
+				.status(httpStatus.OK)
+				.redirect(`${process.env.CLIENT_ORIGIN_URL}/login?${searchParams.toString()}`);
+		} catch (error: any) {
+			if (error instanceof HttpException) {
+				const searchParams = new URLSearchParams({ message: error.message });
+				return response
+					.status(error.status)
+					.redirect(`${process.env.CLIENT_ORIGIN_URL}/login?${searchParams.toString()}`);
 			} else {
 				nextFunction(
 					new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred."),

@@ -6,6 +6,7 @@ import httpStatus from "http-status";
 import { injectable } from "tsyringe";
 import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
 import TokenDto from "@/dtos/token.dto";
+import UserService from "@/resources/users/user.service";
 import LoginUserDto from "@/dtos/loginUser.dto";
 import IAuthService from "@/models/IAuthService";
 import AppConstants from "@/constants/AppConstants";
@@ -17,7 +18,6 @@ import PostgresDatabase from "@/database/postgres.database";
 import GoogleOAuthTokenResponse from "@/models/GoogleOAuthTokenResponse";
 import FieldValidationException from "@/exceptions/fieldValidationException";
 import GoogleOAuthUserResponse from "@/models/GoogleOAuthUserResponse";
-import UserService from "@/resources/users/user.service";
 
 @injectable()
 class AuthService implements IAuthService {
@@ -91,11 +91,10 @@ class AuthService implements IAuthService {
 				throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthorized.");
 			}
 
-			const accessToken = this.createToken(
-				{ username: decodedUserInfo.username, userId: decodedUserInfo.userId },
-				String(process.env.ACCESS_TOKEN_SECRET),
-				AppConstants.JWT_ACCESS_TOKEN_DURATION,
-			);
+			const accessToken = this.createAccessToken({
+				username: decodedUserInfo.username,
+				userId: decodedUserInfo.userId,
+			});
 
 			return { accessToken };
 		} catch (error) {
@@ -133,17 +132,15 @@ class AuthService implements IAuthService {
 				}
 			}
 
-			const accessToken = this.createToken(
-				{ username: user.username, userId: user.id },
-				String(process.env.ACCESS_TOKEN_SECRET),
-				AppConstants.JWT_ACCESS_TOKEN_DURATION,
-			);
+			const accessToken = this.createAccessToken({
+				username: user.username,
+				userId: user.i,
+			});
 
-			const refreshToken = this.createToken(
-				{ username: user.username, userId: user.id },
-				String(process.env.REFRESH_TOKEN_SECRET),
-				AppConstants.JWT_REFRESH_TOKEN_DURATION,
-			);
+			const refreshToken = this.createRefreshToken({
+				username: user.username,
+				userId: user.id,
+			});
 
 			const session = sessionRepository.create({
 				refreshToken,
@@ -217,23 +214,21 @@ class AuthService implements IAuthService {
 
 			const hashedPassword = await bcrypt.hash(password, 10);
 
-			const finalUser = await this.userService.createUser({
+			const finalUser = await this.userService.createAndSaveUser({
 				email,
 				password: hashedPassword,
 				username,
 			});
 
-			const accessToken = this.createToken(
-				{ username, userId: finalUser.id },
-				String(process.env.ACCESS_TOKEN_SECRET),
-				AppConstants.JWT_ACCESS_TOKEN_DURATION,
-			);
+			const accessToken = this.createAccessToken({
+				username: finalUser.username,
+				userId: finalUser.id,
+			});
 
-			const refreshToken = this.createToken(
-				{ username, userId: finalUser.id },
-				String(process.env.REFRESH_TOKEN_SECRET),
-				AppConstants.JWT_REFRESH_TOKEN_DURATION,
-			);
+			const refreshToken = this.createRefreshToken({
+				username: finalUser.username,
+				userId: finalUser.i,
+			});
 
 			const newUserSession = sessionRepository.create({
 				refreshToken,
@@ -278,24 +273,22 @@ class AuthService implements IAuthService {
 				);
 			}
 
-			const finalUser = await this.userService.createUser({
+			const finalUser = await this.userService.createAndSaveUser({
 				email: googleUser.email,
 				username: googleUser.name,
 				authProvider: AuthProvider.GOOGLE,
 				id: googleUser.sub,
 			});
 
-			const accessToken = this.createToken(
-				{ username: finalUser.username, userId: finalUser.id },
-				String(process.env.ACCESS_TOKEN_SECRET),
-				AppConstants.JWT_ACCESS_TOKEN_DURATION,
-			);
+			const accessToken = this.createAccessToken({
+				username: finalUser.username,
+				userId: finalUser.id,
+			});
 
-			const refreshToken = this.createToken(
-				{ username: finalUser.username, userId: finalUser.id },
-				String(process.env.REFRESH_TOKEN_SECRET),
-				AppConstants.JWT_REFRESH_TOKEN_DURATION,
-			);
+			const refreshToken = this.createRefreshToken({
+				username: finalUser.username,
+				userId: finalUser.i,
+			});
 
 			const newUserSession = sessionRepository.create({
 				refreshToken,
@@ -312,8 +305,69 @@ class AuthService implements IAuthService {
 		}
 	};
 
-	private createToken(tokenPayload: TokenPayload, secret: string, expiresIn: string | number) {
-		return jwt.sign(tokenPayload, secret, { expiresIn: expiresIn });
+	public googleOAuthLogin = async (code: string): Promise<TokenDto> => {
+		try {
+			const userRepository = this.databaseInstance.userRepository;
+			const sessionRepository = this.databaseInstance.sessionRepository;
+
+			if (!userRepository || !sessionRepository) {
+				console.error("Database repositories not initialized.");
+				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
+			}
+
+			const { access_token, id_token } = await this.getGoogleAuthToken(code);
+			const googleUser = await this.getGoogleAuthUser(id_token, access_token);
+
+			const user = await this.databaseInstance.userRepository?.findOneBy([
+				{ email: googleUser.email },
+				{ id: googleUser.sub },
+			]);
+
+			if (!googleUser.verified_email) {
+				console.log("Google email unverified.");
+				throw new HttpException(httpStatus.FORBIDDEN, "Google account is unverified.");
+			} else if (!user) {
+				console.log("User not registered with email.");
+				throw new HttpException(
+					httpStatus.BAD_REQUEST,
+					"You need to register with the account first.",
+				);
+			}
+
+			const accessToken = this.createAccessToken({
+				username: user.username,
+				userId: user.id,
+			});
+
+			const refreshToken = this.createRefreshToken({
+				username: user.username,
+				userId: user.id,
+			});
+
+			const session = sessionRepository.create({
+				refreshToken,
+			});
+
+			user.session = await sessionRepository.save(session);
+
+			await userRepository.save(user);
+
+			return { accessToken, refreshToken };
+		} catch (error: any) {
+			throw error;
+		}
+	};
+
+	private createAccessToken(tokenPayload: TokenPayload) {
+		return jwt.sign(tokenPayload, String(process.env.ACCESS_TOKEN_SECRET), {
+			expiresIn: AppConstants.JWT_ACCESS_TOKEN_DURATION,
+		});
+	}
+
+	private createRefreshToken(tokenPayload: TokenPayload) {
+		return jwt.sign(tokenPayload, String(process.env.REFRESH_TOKEN_SECRET), {
+			expiresIn: AppConstants.JWT_REFRESH_TOKEN_DURATION,
+		});
 	}
 
 	private getGoogleAuthUser = async (
