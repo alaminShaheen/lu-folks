@@ -191,7 +191,7 @@ const Register = () => {
 											id="password"
 											type={showPassword ? "text" : "password"}
 											autoCapitalize="none"
-											autoComplete="email"
+											autoComplete="password"
 											autoCorrect="off"
 											disabled={isLoading}
 											icon={
@@ -227,7 +227,7 @@ const Register = () => {
 											id="confirmPassword"
 											type={showConfirmPassword ? "text" : "password"}
 											autoCapitalize="none"
-											autoComplete="email"
+											autoComplete="password"
 											autoCorrect="off"
 											disabled={isLoading}
 											icon={
