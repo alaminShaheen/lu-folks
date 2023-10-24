@@ -249,7 +249,7 @@ class AuthService implements IAuthService {
 		}
 	};
 
-	public googleOAuthHandler = async (code: string): Promise<TokenDto> => {
+	public googleOAuthRegistration = async (code: string): Promise<TokenDto> => {
 		try {
 			const userRepository = this.databaseInstance.userRepository;
 			const sessionRepository = this.databaseInstance.sessionRepository;
@@ -259,23 +259,8 @@ class AuthService implements IAuthService {
 				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
 			}
 
-			const response = await axios.post<GoogleOAuthTokenResponse>(
-				AppConstants.GOOGLE_OAUTH_TOKEN_URL,
-				qs.stringify({
-					code,
-					client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
-					client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-					redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT_URL,
-					grant_type: "authorization_code",
-				}),
-				{
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded",
-					},
-				},
-			);
-			const { access_token, id_token } = response.data;
-			const googleUser = await this.getGoogleUser(id_token, access_token);
+			const { access_token, id_token } = await this.getGoogleAuthToken(code);
+			const googleUser = await this.getGoogleAuthUser(id_token, access_token);
 
 			const existingUser = await this.databaseInstance.userRepository?.findOneBy([
 				{ email: googleUser.email },
@@ -331,7 +316,7 @@ class AuthService implements IAuthService {
 		return jwt.sign(tokenPayload, secret, { expiresIn: expiresIn });
 	}
 
-	private getGoogleUser = async (
+	private getGoogleAuthUser = async (
 		id_token: string,
 		google_access_token: string,
 	): Promise<GoogleOAuthUserResponse> => {
@@ -347,7 +332,37 @@ class AuthService implements IAuthService {
 			return response.data;
 		} catch (error) {
 			console.log("Failed to fetch Google user.");
-			throw error;
+			throw new HttpException(
+				httpStatus.INTERNAL_SERVER_ERROR,
+				"An unexpected error occurred.",
+			);
+		}
+	};
+
+	private getGoogleAuthToken = async (code: string) => {
+		try {
+			const response = await axios.post<GoogleOAuthTokenResponse>(
+				AppConstants.GOOGLE_OAUTH_TOKEN_URL,
+				qs.stringify({
+					code,
+					client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
+					client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+					redirect_uri: AppConstants.GOOGLE_OAUTH_REGISTRATION_REDIRECT_URL,
+					grant_type: "authorization_code",
+				}),
+				{
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+					},
+				},
+			);
+			return response.data;
+		} catch (error) {
+			console.log("Failed to fetch Google token.");
+			throw new HttpException(
+				httpStatus.INTERNAL_SERVER_ERROR,
+				"An unexpected error occurred.",
+			);
 		}
 	};
 }

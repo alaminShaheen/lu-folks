@@ -1,8 +1,8 @@
 import AppConstants from "@/constants/AppConstants.ts";
 
-function GenerateGoogleOAuthConsentUrl() {
+function GenerateGoogleOAuthConsentUrl(redirectUri: string) {
 	const googleOauthSearchParams = new URLSearchParams({
-		redirect_uri: import.meta.env.VITE_GOOGLE_OAUTH_REDIRECT_URL,
+		redirect_uri: redirectUri,
 		client_id: import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID,
 		access_type: "offline",
 		response_type: "code",

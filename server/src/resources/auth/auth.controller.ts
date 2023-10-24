@@ -28,7 +28,7 @@ class AuthController extends Controller {
 		this.router
 			.route(`${this.path}/check-validity`)
 			.get(verifyAuthentication, this.checkValidity);
-		this.router.route(`${this.path}/oauth/google`).get(this.googleOAuth);
+		this.router.route(`${this.path}/oauth/google/register`).get(this.googleOAuthRegistration);
 	}
 
 	private register = async (request: Request, response: Response, nextFunction: NextFunction) => {
@@ -126,14 +126,15 @@ class AuthController extends Controller {
 		}
 	};
 
-	private googleOAuth = async (
+	private googleOAuthRegistration = async (
 		request: Request,
 		response: Response,
 		nextFunction: NextFunction,
 	) => {
 		try {
 			const code = request.query.code as string;
-			const { accessToken, refreshToken } = await this.authService.googleOAuthHandler(code);
+			const { accessToken, refreshToken } =
+				await this.authService.googleOAuthRegistration(code);
 			response.cookie(AppConstants.JWT_COOKIE_NAME, refreshToken, {
 				httpOnly: true,
 				maxAge: AppConstants.JWT_REFRESH_TOKEN_DURATION,

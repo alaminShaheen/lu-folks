@@ -13,7 +13,7 @@ interface IAuthService {
 
 	checkValidity(authorizationHeader: string | undefined): Promise<TokenValidityDto>;
 
-	googleOAuthHandler(code: string): Promise<TokenDto>;
+	googleOAuthRegistration(code: string): Promise<TokenDto>;
 }
 
 export default IAuthService;

@@ -7,6 +7,8 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import AppConstants from "@/constants/AppConstants.ts";
+import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import InputWithIcon from "@/components/ui/InputWithIcon.tsx";
 import Authentication from "@/models/Authentication.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
@@ -15,7 +17,6 @@ import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import RegisterFormType from "@/models/form/RegisterFormType.ts";
 import { useAppContext } from "@/context/AppContext.tsx";
 import FieldValidationError from "@/models/FieldValidationError.ts";
-import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import generateGoogleOAuthConsentUrl from "@/utils/GenerateGoogleOAuthConsentUrl.ts";
 
 const Register = () => {
@@ -268,7 +269,9 @@ const Register = () => {
 							</div>
 							<Button variant="outline" type="button" disabled={isLoading}>
 								<a
-									href={generateGoogleOAuthConsentUrl()}
+									href={generateGoogleOAuthConsentUrl(
+										AppConstants.GOOGLE_OAUTH_REGISTRATION_REDIRECT_URL,
+									)}
 									className="inline-flex items-center justify-center w-full"
 								>
 									{isLoading ? (

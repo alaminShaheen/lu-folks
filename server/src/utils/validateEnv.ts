@@ -4,6 +4,7 @@ function validateEnv() {
 	cleanEnv(process.env, {
 		NODE_ENV: str({ choices: ["development", "production"], default: "development" }),
 		PORT: port({ default: 1337 }),
+		SERVER_HOST_NAME: str(),
 
 		POSTGRES_HOST: str({ default: "localhost" }),
 		POSTGRES_USER: str(),
@@ -18,7 +19,6 @@ function validateEnv() {
 
 		GOOGLE_OAUTH_CLIENT_ID: str(),
 		GOOGLE_OAUTH_CLIENT_SECRET: str(),
-		GOOGLE_OAUTH_REDIRECT_URL: str(),
 	});
 }
 

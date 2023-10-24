@@ -2,9 +2,9 @@ import httpStatus from "http-status";
 import { inject, injectable } from "tsyringe";
 import { NextFunction, Request, Response } from "express";
 import Controller from "@/abstracts/controller";
+import IUserService from "@/models/IUserService";
 import errorHandler from "@/middlewares/errorHandler";
 import DtoValidator from "@/middlewares/dtoValidator";
-import IUserService from "@/models/IUserService";
 import RegisterUserDto from "@/dtos/registerUser.dto";
 import verifyAuthentication from "@/middlewares/verifyAuthentication";
 
