@@ -14,8 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-	"@paralleldrive/cuid2": "^2.2.2",
-	"axios": "^1.5.1",
+    "axios": "^1.5.1",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -34,7 +33,8 @@
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.8.0",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "uuid4": "^2.0.3"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
@@ -45,6 +45,7 @@
     "@types/jsonwebtoken": "^9.0.3",
     "@types/morgan": "^1.9.6",
     "@types/node": "^20.8.2",
+    "@types/uuid4": "^2.0.2",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "concurrently": "^8.2.1",
@@ -65,8 +66,8 @@
     "@/exceptions": "dist/exceptions",
     "@/abstracts": "dist/abstracts",
     "@/dtos": "dist/dtos",
-	"@/database": "dist/database",
-	"@/constants": "dist/constants"
+    "@/database": "dist/database",
+    "@/constants": "dist/constants"
   },
   "lint-staged": {
     "*.ts": [

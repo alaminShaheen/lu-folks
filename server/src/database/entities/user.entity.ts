@@ -10,11 +10,11 @@ import {
 } from "typeorm";
 import SessionEntity from "@/database/entities/session.entity";
 import AuthProvider from "@/models/enums/AuthProvider";
-import { createId } from "@paralleldrive/cuid2";
+import uuid4 from "uuid4";
 
 @Entity()
 class UserEntity {
-	@PrimaryColumn({ type: "varchar", default: createId() })
+	@PrimaryColumn({ type: "varchar", default: uuid4() })
 	id: string;
 
 	@Column({ unique: true })
