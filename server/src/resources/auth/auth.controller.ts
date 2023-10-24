@@ -171,12 +171,14 @@ class AuthController extends Controller {
 			const code = request.query.code as string;
 			const { accessToken, refreshToken } =
 				await this.authService.googleOAuthRegistration(code);
+
 			response.cookie(AppConstants.JWT_COOKIE_NAME, refreshToken, {
 				httpOnly: true,
 				maxAge: AppConstants.JWT_REFRESH_TOKEN_DURATION,
 				secure: true,
 				sameSite: "none",
 			});
+
 			const searchParams = new URLSearchParams({ accessToken });
 			return response
 				.status(httpStatus.OK)
