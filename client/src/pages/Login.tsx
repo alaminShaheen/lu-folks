@@ -2,8 +2,8 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { Eye, EyeOff } from "lucide-react";
-import { Fragment, useCallback, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Fragment, useCallback, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -16,6 +16,8 @@ import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import FieldValidationError from "@/models/FieldValidationError.ts";
 import ApiErrorType from "@/models/enums/ApiErrorType.ts";
+import generateGoogleOAuthConsentUrl from "@/utils/GenerateGoogleOAuthConsentUrl.ts";
+import AppConstants from "@/constants/AppConstants.ts";
 
 const Login = () => {
 	const { setAuthentication } = useAppContext();
@@ -33,6 +35,7 @@ const Login = () => {
 			username: "",
 		},
 	});
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -66,6 +69,29 @@ const Login = () => {
 	const togglePasswordVisibility = useCallback(() => {
 		setShowPassword((prev) => !prev);
 	}, []);
+
+	useEffect(() => {
+		if (searchParams.get("accessToken")) {
+			setAuthentication((prev) => ({
+				...prev,
+				accessToken: searchParams.get("accessToken")!,
+			}));
+			setSearchParams((prev) => {
+				prev.delete("accessToken");
+				return { ...prev };
+			});
+			toast.dismiss();
+			toast.success("You have registered successfully!");
+			navigate("/news-feed");
+		} else if (searchParams.get("message")) {
+			toast.dismiss();
+			toast.error(searchParams.get("message"));
+			setSearchParams((prev) => {
+				prev.delete("message");
+				return { ...prev };
+			});
+		}
+	}, [searchParams, setAuthentication]);
 
 	return (
 		<Fragment>
@@ -150,12 +176,19 @@ const Login = () => {
 								</div>
 							</div>
 							<Button variant="outline" type="button" disabled={isLoading}>
-								{isLoading ? (
-									<LoadingSpinner />
-								) : (
-									<FcGoogle className="mr-2 h-4 w-4" />
-								)}{" "}
-								Google
+								<a
+									href={generateGoogleOAuthConsentUrl(
+										AppConstants.GOOGLE_OAUTH_LOGIN_REDIRECT_UR,
+									)}
+									className="inline-flex items-center justify-center w-full"
+								>
+									{isLoading ? (
+										<LoadingSpinner />
+									) : (
+										<FcGoogle className="mr-2 h-4 w-4" />
+									)}{" "}
+									Google
+								</a>
 							</Button>
 						</div>
 						<p className="px-8 text-center text-sm text-muted-foreground">

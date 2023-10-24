@@ -254,7 +254,10 @@ class AuthService implements IAuthService {
 				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
 			}
 
-			const { access_token, id_token } = await this.getGoogleAuthToken(code);
+			const { access_token, id_token } = await this.getGoogleAuthToken(
+				code,
+				AppConstants.GOOGLE_OAUTH_REGISTRATION_REDIRECT_URL,
+			);
 			const googleUser = await this.getGoogleAuthUser(id_token, access_token);
 
 			const existingUser = await this.databaseInstance.userRepository?.findOneBy([
@@ -315,7 +318,10 @@ class AuthService implements IAuthService {
 				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
 			}
 
-			const { access_token, id_token } = await this.getGoogleAuthToken(code);
+			const { access_token, id_token } = await this.getGoogleAuthToken(
+				code,
+				AppConstants.GOOGLE_OAUTH_LOGIN_REDIRECT_URL,
+			);
 			const googleUser = await this.getGoogleAuthUser(id_token, access_token);
 
 			const user = await this.databaseInstance.userRepository?.findOneBy([
@@ -393,7 +399,7 @@ class AuthService implements IAuthService {
 		}
 	};
 
-	private getGoogleAuthToken = async (code: string) => {
+	private getGoogleAuthToken = async (code: string, redirectUri: string) => {
 		try {
 			const response = await axios.post<GoogleOAuthTokenResponse>(
 				AppConstants.GOOGLE_OAUTH_TOKEN_URL,
@@ -401,7 +407,7 @@ class AuthService implements IAuthService {
 					code,
 					client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
 					client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-					redirect_uri: AppConstants.GOOGLE_OAUTH_REGISTRATION_REDIRECT_URL,
+					redirect_uri: redirectUri,
 					grant_type: "authorization_code",
 				}),
 				{

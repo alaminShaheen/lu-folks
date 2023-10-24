@@ -43,29 +43,6 @@ const Register = () => {
 	const navigate = useNavigate();
 	const { publicAxiosInstance: axiosInstance } = useAxiosInstance();
 
-	useEffect(() => {
-		if (searchParams.get("accessToken")) {
-			setAuthentication((prev) => ({
-				...prev,
-				accessToken: searchParams.get("accessToken")!,
-			}));
-			setSearchParams((prev) => {
-				prev.delete("accessToken");
-				return { ...prev };
-			});
-			toast.dismiss();
-			toast.success("You have registered successfully!");
-			navigate("/news-feed");
-		} else if (searchParams.get("message")) {
-			toast.dismiss();
-			toast.error(searchParams.get("message"));
-			setSearchParams((prev) => {
-				prev.delete("message");
-				return { ...prev };
-			});
-		}
-	}, [searchParams]);
-
 	const onSubmit = useCallback(async (formValues: RegisterFormType) => {
 		try {
 			setIsLoading(true);
@@ -100,6 +77,29 @@ const Register = () => {
 	const togglePasswordVisibility = useCallback(() => {
 		setShowPassword((prev) => !prev);
 	}, []);
+
+	useEffect(() => {
+		if (searchParams.get("accessToken")) {
+			setAuthentication((prev) => ({
+				...prev,
+				accessToken: searchParams.get("accessToken")!,
+			}));
+			setSearchParams((prev) => {
+				prev.delete("accessToken");
+				return { ...prev };
+			});
+			toast.dismiss();
+			toast.success("You have logged in successfully!");
+			navigate("/news-feed");
+		} else if (searchParams.get("message")) {
+			toast.dismiss();
+			toast.error(searchParams.get("message"));
+			setSearchParams((prev) => {
+				prev.delete("message");
+				return { ...prev };
+			});
+		}
+	}, [searchParams, setAuthentication]);
 
 	return (
 		<Fragment>
