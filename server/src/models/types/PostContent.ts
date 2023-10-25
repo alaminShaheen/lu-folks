@@ -1,0 +1,3 @@
+type PostContent = {
+	body: string;
+};

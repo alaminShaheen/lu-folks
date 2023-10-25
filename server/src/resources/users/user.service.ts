@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { injectable } from "tsyringe";
-import IUserService from "@/models/IUserService";
+import IUserService from "@/models/interfaces/IUserService";
 import HttpException from "@/exceptions/httpException";
 import PostgresDatabase from "@/database/postgres.database";
 import UserEntity from "@/database/entities/user.entity";

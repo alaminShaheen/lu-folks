@@ -4,7 +4,7 @@ import { inject, injectable } from "tsyringe";
 import { NextFunction, Request, Response } from "express";
 import Controller from "@/abstracts/controller";
 import LoginUserDto from "@/dtos/loginUser.dto";
-import IAuthService from "@/models/IAuthService";
+import IAuthService from "@/models/interfaces/IAuthService";
 import AppConstants from "@/constants/AppConstants";
 import dtoValidator from "@/middlewares/dtoValidator";
 import HttpException from "@/exceptions/httpException";

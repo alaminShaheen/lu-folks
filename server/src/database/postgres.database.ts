@@ -3,6 +3,7 @@ import { Lifecycle, scoped } from "tsyringe";
 import { DataSource, Repository } from "typeorm";
 import Database from "@/abstracts/database";
 import UserEntity from "@/database/entities/user.entity";
+import PostEntity from "@/database/entities/post.entity";
 import HttpException from "@/exceptions/httpException";
 import SessionEntity from "@/database/entities/session.entity";
 import { dataSourceOptions } from "@/database/typeorm.config";
@@ -24,6 +25,13 @@ class PostgresDatabase extends Database {
 	get sessionRepository(): Repository<SessionEntity> | null {
 		if (this.dataSource) {
 			return this.dataSource.getRepository<SessionEntity>(SessionEntity);
+		}
+		return null;
+	}
+
+	get postRepository(): Repository<PostEntity> | null {
+		if (this.dataSource) {
+			return this.dataSource.getRepository<PostEntity>(PostEntity);
 		}
 		return null;
 	}

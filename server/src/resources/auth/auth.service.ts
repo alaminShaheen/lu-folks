@@ -8,16 +8,16 @@ import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebto
 import TokenDto from "@/dtos/token.dto";
 import UserService from "@/resources/users/user.service";
 import LoginUserDto from "@/dtos/loginUser.dto";
-import IAuthService from "@/models/IAuthService";
+import IAuthService from "@/models/interfaces/IAuthService";
 import AppConstants from "@/constants/AppConstants";
 import TokenPayload from "@/models/types/tokenPayload";
 import AuthProvider from "@/models/enums/AuthProvider";
 import HttpException from "@/exceptions/httpException";
 import RegisterUserDto from "@/dtos/registerUser.dto";
 import PostgresDatabase from "@/database/postgres.database";
-import GoogleOAuthTokenResponse from "@/models/GoogleOAuthTokenResponse";
+import GoogleOAuthTokenResponse from "@/models/types/GoogleOAuthTokenResponse";
 import FieldValidationException from "@/exceptions/fieldValidationException";
-import GoogleOAuthUserResponse from "@/models/GoogleOAuthUserResponse";
+import GoogleOAuthUserResponse from "@/models/types/GoogleOAuthUserResponse";
 
 @injectable()
 class AuthService implements IAuthService {

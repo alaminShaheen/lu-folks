@@ -27,4 +27,5 @@ const app = new App(
 	[userController, authController, healthcheckController],
 	Number(process.env.PORT),
 );
+
 app.listen();
