@@ -1,11 +1,11 @@
-import Database from "@/abstracts/database";
-import { DataSource, Repository } from "typeorm";
-import UserEntity from "./entities/user.entity";
-import process from "process";
-import HttpException from "@/exceptions/httpException";
 import httpStatus from "http-status";
 import { Lifecycle, scoped } from "tsyringe";
+import { DataSource, Repository } from "typeorm";
+import Database from "@/abstracts/database";
+import UserEntity from "@/database/entities/user.entity";
+import HttpException from "@/exceptions/httpException";
 import SessionEntity from "@/database/entities/session.entity";
+import { dataSourceOptions } from "@/database/typeorm.config";
 
 @scoped(Lifecycle.ContainerScoped)
 class PostgresDatabase extends Database {
@@ -30,18 +30,7 @@ class PostgresDatabase extends Database {
 
 	connect = async (): Promise<void> => {
 		try {
-			this.dataSource = new DataSource({
-				applicationName: "lu_folks_dev",
-				type: "postgres",
-				host: process.env.POSTGRES_HOST,
-				port: Number(process.env.POSTGRES_DATABASE_PORT),
-				username: process.env.POSTGRES_USER,
-				password: process.env.POSTGRES_PASSWORD,
-				synchronize: true,
-				logging: false,
-				database: process.env.POSTGRES_DATABASE_NAME,
-				entities: ["dist/database/entities/*.entity.js"],
-			});
+			this.dataSource = new DataSource(dataSourceOptions);
 			await this.dataSource.initialize();
 			console.log("Database connected successfully.");
 		} catch (error) {

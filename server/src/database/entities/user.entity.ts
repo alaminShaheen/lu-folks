@@ -8,9 +8,9 @@ import {
 	PrimaryColumn,
 	UpdateDateColumn,
 } from "typeorm";
-import SessionEntity from "@/database/entities/session.entity";
-import AuthProvider from "@/models/enums/AuthProvider";
+import AuthProvider from "../../models/enums/AuthProvider";
 import uuid4 from "uuid4";
+import SessionEntity from "./session.entity";
 
 @Entity()
 class UserEntity {

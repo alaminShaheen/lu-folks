@@ -1,5 +1,5 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import UserEntity from "@/database/entities/user.entity";
+import UserEntity from "./user.entity";
 
 @Entity()
 class SessionEntity {
