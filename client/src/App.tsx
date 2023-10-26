@@ -6,6 +6,7 @@ import Register from "@/pages/Register";
 import Toast from "@/components/Toast.tsx";
 import NewsFeed from "@/pages/NewsFeed.tsx";
 import ProtectedRoutesWrapper from "@/components/ProtectedRoutesWrapper.tsx";
+import CreateGroup from "@/pages/CreateGroup.tsx";
 
 function App() {
 	return (
@@ -18,6 +19,7 @@ function App() {
 					<Route path="/register" Component={Register} />
 					<Route Component={ProtectedRoutesWrapper}>
 						<Route path="/news-feed" Component={NewsFeed} />
+						<Route path="/create-group" Component={CreateGroup} />
 					</Route>
 				</Routes>
 			</BrowserRouter>

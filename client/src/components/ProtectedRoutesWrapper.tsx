@@ -1,15 +1,31 @@
-import { useAppContext } from "@/context/AppContext.tsx";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import useRefreshToken from "@/hooks/useRefreshToken.tsx";
-import { useEffect, useState } from "react";
 import { Comment } from "react-loader-spinner";
+import { useCallback, useEffect, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import Layout from "@/components/Layout.tsx";
+import ROUTES from "@/constants/Routes.ts";
+import useRefreshToken from "@/hooks/useRefreshToken.tsx";
+import { useAppContext } from "@/context/AppContext.tsx";
 
 const ProtectedRoutesWrapper = () => {
-	const { authentication } = useAppContext();
+	const { authentication, setAuthentication } = useAppContext();
 	const { refresh } = useRefreshToken();
 	const location = useLocation();
+	const navigate = useNavigate();
 	const [loading, setLoading] = useState(true);
+
+	const verifyRefreshToken = useCallback(async () => {
+		try {
+			const accessToken = await refresh();
+			setAuthentication((prev) => ({ ...prev, accessToken }));
+		} catch (error) {
+			console.error(error);
+			toast.error("You need to be logged in.");
+			navigate(ROUTES.LOGIN, { replace: true, state: { from: location } });
+		} finally {
+			setLoading(false);
+		}
+	}, [location, navigate, refresh, setAuthentication]);
 
 	useEffect(() => {
 		if (!authentication.accessToken) {
@@ -17,27 +33,8 @@ const ProtectedRoutesWrapper = () => {
 		} else {
 			setLoading(false);
 		}
-	}, []);
+	}, [authentication.accessToken, verifyRefreshToken]);
 
-	const verifyRefreshToken = async () => {
-		try {
-			await refresh();
-		} catch (error) {
-			console.error(error);
-			toast.error("You need to be logged in.");
-			return <Navigate to={"/login"} state={{ from: location }} replace />;
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	// if (authentication.accessToken) {
-	// 	return <Outlet />;
-	// } else {
-	// 	void verifyRefreshToken();
-	// 	// toast.error("You need to be logged in.");
-	// 	// return <Navigate to={"/login"} state={{ from: location }} replace />;
-	// }
 	return loading ? (
 		<Comment
 			visible={loading}
@@ -50,7 +47,9 @@ const ProtectedRoutesWrapper = () => {
 			backgroundColor="#F4442E"
 		/>
 	) : (
-		<Outlet />
+		<Layout>
+			<Outlet />
+		</Layout>
 	);
 };
 

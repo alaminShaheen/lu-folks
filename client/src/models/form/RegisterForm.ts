@@ -1,8 +1,8 @@
-type RegisterFormType = {
+type RegisterForm = {
 	email: string;
 	username: string;
 	password: string;
 	confirmPassword: string;
 };
 
-export default RegisterFormType;
+export default RegisterForm;

@@ -1,23 +1,26 @@
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
+import { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import ROUTES from "@/constants/Routes.ts";
+import AppLogo from "@/components/AppLogo.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
+import LoginForm from "@/models/form/LoginForm.ts";
 import { Button } from "@/components/ui/button.tsx";
-import LoginFormType from "@/models/form/LoginFormType.ts";
-import InputWithIcon from "@/components/ui/InputWithIcon.tsx";
-import LoadingSpinner from "@/components/LoadingSpinner.tsx";
+import AppConstants from "@/constants/AppConstants.ts";
+import ApiErrorType from "@/models/enums/ApiErrorType.ts";
+import InputWithIcon from "@/components/ui/inputWithIcon.tsx";
 import Authentication from "@/models/Authentication.ts";
+import LoadingSpinner from "@/components/LoadingSpinner.tsx";
 import { AUTH_ROUTES } from "@/constants/ApiRoutes.ts";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import FieldValidationError from "@/models/FieldValidationError.ts";
-import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import generateGoogleOAuthConsentUrl from "@/utils/GenerateGoogleOAuthConsentUrl.ts";
-import AppConstants from "@/constants/AppConstants.ts";
 
 const Login = () => {
 	const { setAuthentication } = useAppContext();
@@ -29,7 +32,7 @@ const Login = () => {
 		handleSubmit,
 		setError,
 		formState: { errors },
-	} = useForm<LoginFormType>({
+	} = useForm<LoginForm>({
 		defaultValues: {
 			password: "",
 			email: "",
@@ -39,34 +42,38 @@ const Login = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
-	const onSubmit = useCallback(async (formValues: LoginFormType) => {
-		try {
-			setIsLoading(true);
-			const { data } = await axiosInstance.post<Authentication>(
-				AUTH_ROUTES.LOGIN,
-				formValues,
-			);
-			setAuthentication(data);
-			toast.dismiss();
-			toast.success("You have logged in successfully!");
-			navigate(location.state?.from || "/news-feed", { replace: true });
-		} catch (error: any) {
-			console.log(error);
-			if (error.response.data.type === ApiErrorType.FIELD_VALIDATION) {
-				Object.entries(
-					(error.response.data as FieldValidationError).validationErrors,
-				).forEach(([key, value]) => {
-					setError(key as keyof LoginFormType, { message: value, type: "server" });
-				});
-			} else {
+	const onSubmit = useCallback(
+		async (formValues: LoginForm) => {
+			try {
+				setIsLoading(true);
+				const { data } = await axiosInstance.post<Authentication>(
+					AUTH_ROUTES.LOGIN,
+					formValues,
+				);
+				setAuthentication(data);
 				toast.dismiss();
-				console.log(error.response);
-				toast.error(error.response.data.message);
+				toast.success("You have logged in successfully!");
+				navigate(location.state?.from || ROUTES.NEWS_FEED, { replace: true });
+			} catch (error: any) {
+				if (
+					error instanceof AxiosError &&
+					error.response?.data.type === ApiErrorType.FIELD_VALIDATION
+				) {
+					Object.entries(
+						(error.response.data as FieldValidationError).validationErrors,
+					).forEach(([key, value]) => {
+						setError(key as keyof LoginForm, { message: value, type: "server" });
+					});
+				} else {
+					toast.dismiss();
+					toast.error(error.response.data.message);
+				}
+			} finally {
+				setIsLoading(false);
 			}
-		} finally {
-			setIsLoading(false);
-		}
-	}, []);
+		},
+		[axiosInstance, location.state?.from, navigate, setAuthentication, setError],
+	);
 
 	const togglePasswordVisibility = useCallback(() => {
 		setShowPassword((prev) => !prev);
@@ -93,7 +100,7 @@ const Login = () => {
 				return { ...prev };
 			});
 		}
-	}, [searchParams, setAuthentication]);
+	}, [navigate, searchParams, setAuthentication, setSearchParams]);
 
 	return (
 		<Fragment>
@@ -206,8 +213,8 @@ const Login = () => {
 							{/*.*/}
 							Don't have an account?{" "}
 							<Link
-								to="/register"
 								className="underline underline-offset-4 hover:text-primary"
+								to={ROUTES.REGISTER}
 							>
 								Sign up!
 							</Link>
@@ -217,18 +224,7 @@ const Login = () => {
 				<div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
 					<div className="absolute inset-0 bg-zinc-900" />
 					<div className="relative z-20 flex items-center text-lg font-medium">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							className="mr-2 h-6 w-6"
-						>
-							<path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-						</svg>
+						<AppLogo />
 						LU Folks
 					</div>
 					<div className="relative z-20 mt-auto">
