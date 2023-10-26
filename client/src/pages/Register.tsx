@@ -177,7 +177,7 @@ const Register = () => {
 									<Label htmlFor="password">Password</Label>
 									<InputWithIcon
 										{...register("password", {
-											required: "Password is required,
+											required: "Password is required",
 										})}
 										id="password"
 										type={showPassword ? "text" : "password"}
@@ -213,7 +213,7 @@ const Register = () => {
 											required: "Confirm password is required",
 											validate: (value) =>
 												value === watch("password") ||
-												"Passwords don't match"
+												"Passwords don't match",
 										})}
 										id="confirmPassword"
 										type={showConfirmPassword ? "text" : "password"}
@@ -261,7 +261,7 @@ const Register = () => {
 						<Button variant="outline" type="button" disabled={isLoading}>
 							<a
 								href={generateGoogleOAuthConsentUrl(
-									AppConstants.GOOGLE_OAUTH_REGISTRATION_REDIRECT_URL
+									AppConstants.GOOGLE_OAUTH_REGISTRATION_REDIRECT_URL,
 								)}
 								tabIndex={-1}
 								className="inline-flex items-center justify-center w-full"
