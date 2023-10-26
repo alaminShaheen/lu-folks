@@ -12,6 +12,7 @@ import PostService from "@/resources/posts/post.service";
 import AuthController from "@/resources/auth/auth.controller";
 import PostController from "@/resources/posts/post.controller";
 import HealthcheckController from "@/resources/healthcheck/healthcheck.controller";
+import GroupService from "@/resources/groups/group.service";
 
 validateEnv();
 container.resolve(PostgresDatabase);
@@ -21,6 +22,7 @@ container.resolve(AuthService);
 container.register("IUserService", { useClass: UserService });
 container.register("IPostService", { useClass: PostService });
 container.register("IAuthService", { useClass: AuthService });
+container.register("IGroupService", { useClass: GroupService });
 
 const userController = container.resolve(UserController);
 const postController = container.resolve(PostController);

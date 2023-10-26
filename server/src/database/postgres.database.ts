@@ -7,6 +7,7 @@ import PostEntity from "@/database/entities/post.entity";
 import HttpException from "@/exceptions/httpException";
 import SessionEntity from "@/database/entities/session.entity";
 import { dataSourceOptions } from "@/database/typeorm.config";
+import GroupEntity from "@/database/entities/group.entity";
 
 @scoped(Lifecycle.ContainerScoped)
 class PostgresDatabase extends Database {
@@ -32,6 +33,13 @@ class PostgresDatabase extends Database {
 	get postRepository(): Repository<PostEntity> | null {
 		if (this.dataSource) {
 			return this.dataSource.getRepository<PostEntity>(PostEntity);
+		}
+		return null;
+	}
+
+	get groupRepository(): Repository<GroupEntity> | null {
+		if (this.dataSource) {
+			return this.dataSource.getRepository<GroupEntity>(GroupEntity);
 		}
 		return null;
 	}

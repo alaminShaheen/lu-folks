@@ -8,7 +8,7 @@ import {
 	OneToMany,
 	OneToOne,
 	PrimaryColumn,
-	UpdateDateColumn
+	UpdateDateColumn,
 } from "typeorm";
 import uuid4 from "uuid4";
 import PostEntity from "./post.entity";
@@ -71,13 +71,13 @@ class UserEntity {
 
 	@ManyToMany(() => PostEntity, (post) => post.userReactions, {
 		onDelete: "NO ACTION",
-		onUpdate: "NO ACTION,
+		onUpdate: "NO ACTION",
 	})
 	postsReactedTo?: PostEntity[];
 
 	@ManyToMany(() => CommentEntity, (comment) => comment.userReactions, {
 		onDelete: "NO ACTION",
-		onUpdate: "NO ACTION"
+		onUpdate: "NO ACTION",
 	})
 	commentsReactedTo?: CommentEntity[];
 }

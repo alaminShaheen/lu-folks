@@ -5,6 +5,7 @@ import HttpException from "@/exceptions/httpException";
 import PostgresDatabase from "@/database/postgres.database";
 import UserEntity from "@/database/entities/user.entity";
 import { Repository } from "typeorm";
+import * as console from "console";
 
 @injectable()
 class UserService implements IUserService {
@@ -14,11 +15,34 @@ class UserService implements IUserService {
 		this.userRepository = this.databaseInstance.userRepository!;
 	}
 
+	public getUserById = async (userId: string): Promise<UserEntity | null> => {
+		try {
+			const user = await this.userRepository.findOneBy({ id: userId });
+			if (!user) {
+				console.log(`User with id: ${userId} not found.`);
+				return null;
+			}
+			return user;
+		} catch (error) {
+			if (error instanceof HttpException) throw error;
+			else throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred");
+		}
+	};
+
 	public getUsers = async () => {
 		try {
 			const users = await this.userRepository.find();
 			if (!users) throw new HttpException(httpStatus.NO_CONTENT, "No users found");
 			return users;
+		} catch (error) {
+			if (error instanceof HttpException) throw error;
+			else throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred");
+		}
+	};
+
+	public saveUser = async (user: UserEntity): Promise<UserEntity> => {
+		try {
+			return await this.userRepository.save(user);
 		} catch (error) {
 			if (error instanceof HttpException) throw error;
 			else throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred");
