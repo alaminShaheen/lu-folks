@@ -26,7 +26,10 @@ class GroupController extends Controller {
 			if (error instanceof Error) nextFunction(error);
 			else {
 				nextFunction(
-					new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred."),
+					new HttpException(
+						httpStatus.INTERNAL_SERVER_ERROR,
+						"An error occurred while creating group.",
+					),
 				);
 			}
 		}

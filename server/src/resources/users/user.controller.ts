@@ -20,11 +20,27 @@ class UserController extends Controller {
 			.route(this.path)
 			.get(verifyAuthentication, this.getUsers)
 			.post(DtoValidator(RegisterUserDto), this.createUser);
+		this.router
+			.route(`${this.path}/current-user`)
+			.get(verifyAuthentication, this.getCurrentUser);
 	};
 
 	private getUsers = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
 			const result = await this.userService.getUsers();
+			return response.status(httpStatus.OK).send(result);
+		} catch (error: unknown) {
+			errorHandler(error as any, request, response, nextFunction);
+		}
+	};
+
+	private getCurrentUser = async (
+		request: Request,
+		response: Response,
+		nextFunction: NextFunction,
+	) => {
+		try {
+			const result = await this.userService.getCurrentUser(request.user?.userId!);
 			return response.status(httpStatus.OK).send(result);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);

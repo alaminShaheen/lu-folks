@@ -15,6 +15,26 @@ class UserService implements IUserService {
 		this.userRepository = this.databaseInstance.userRepository!;
 	}
 
+	public getCurrentUser = async (
+		userId: string,
+	): Promise<Pick<UserEntity, "imageUrl" | "username" | "email">> => {
+		try {
+			const currentUser = await this.userRepository.findOneBy({ id: userId });
+			if (!currentUser) {
+				console.log("Could not find current user.");
+				throw new HttpException(httpStatus.UNAUTHORIZED, "User is not authenticated.");
+			}
+			return {
+				username: currentUser.username,
+				imageUrl: currentUser.imageUrl,
+				email: currentUser.email,
+			};
+		} catch (error: any) {
+			if (error instanceof HttpException) throw error;
+			else throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred");
+		}
+	};
+
 	public getUserById = async (userId: string): Promise<UserEntity | null> => {
 		try {
 			const user = await this.userRepository.findOneBy({ id: userId });

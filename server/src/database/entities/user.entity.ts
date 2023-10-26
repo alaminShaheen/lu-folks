@@ -41,7 +41,7 @@ class UserEntity {
 	@UpdateDateColumn()
 	updatedAt: Date;
 
-	@Column()
+	@Column({ nullable: true })
 	imageUrl?: string;
 
 	// on deletion of session, set session in this entity as null
