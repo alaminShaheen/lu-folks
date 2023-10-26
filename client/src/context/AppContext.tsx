@@ -6,7 +6,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
-	useState
+	useState,
 } from "react";
 import Authentication from "@/models/Authentication.ts";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
@@ -36,7 +36,7 @@ const APP_CONTEXT_DEFAULT_VALUES: AppContextType = {
 	clearAuthentication: () => {},
 	getCurrentUser: async () => {},
 };
-eport const AppContext = createContext<AppContextType>(APP_CONTEXT_DEFAULT_VALUES);
+export const AppContext = createContext<AppContextType>(APP_CONTEXT_DEFAULT_VALUES);
 
 type AppContextProviderProps = {
 	children: ReactNode;
