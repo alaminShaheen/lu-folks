@@ -35,10 +35,28 @@ class GroupController extends Controller {
 		}
 	};
 
+	public getGroup = async (request: Request, response: Response, nextFunction: NextFunction) => {
+		try {
+			const group = this.groupService.getGroup(request.params.id);
+			return response.status(httpStatus.FOUND).send(group);
+		} catch (error: any) {
+			if (error instanceof Error) nextFunction(error);
+			else {
+				nextFunction(
+					new HttpException(
+						httpStatus.INTERNAL_SERVER_ERROR,
+						"An unexpected error occurred.",
+					),
+				);
+			}
+		}
+	};
+
 	protected initialiseRoutes(): void {
 		this.router
 			.route(this.path)
 			.post(verifyAuthentication, DtoValidator(CreateGroupDto), this.createGroup);
+		this.router.route(`${this.path}/:slug`).post(verifyAuthentication, this.getGroup);
 	}
 }
 

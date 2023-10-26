@@ -14,6 +14,14 @@ class GroupService implements IGroupService {
 
 	constructor(private readonly userService: UserService) {}
 
+	public getGroup = async (slug: string): Promise<GroupEntity> => {
+		try {
+			return this.groupRepository.create();
+		} catch (error: any) {
+			throw error;
+		}
+	};
+
 	public createGroup = async (
 		creatorId: string,
 		groupInfo: CreateGroupDto,

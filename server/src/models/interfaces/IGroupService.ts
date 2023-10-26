@@ -3,4 +3,5 @@ import CreateGroupDto from "@/dtos/createGroup.dto";
 
 export default interface IGroupService {
 	createGroup: (creatorId: string, groupInfo: CreateGroupDto) => Promise<GroupEntity>;
+	getGroup: (slug: string) => Promise<GroupEntity>;
 }

@@ -7,6 +7,7 @@ import Toast from "@/components/Toast.tsx";
 import NewsFeed from "@/pages/NewsFeed.tsx";
 import ProtectedRoutesWrapper from "@/components/ProtectedRoutesWrapper.tsx";
 import CreateGroup from "@/pages/CreateGroup.tsx";
+import ROUTES from "@/constants/Routes.ts";
 
 function App() {
 	return (
@@ -15,11 +16,14 @@ function App() {
 				<Toast />
 				<Routes>
 					<Route index Component={LandingPage} />
-					<Route path="/login" Component={Login} />
-					<Route path="/register" Component={Register} />
+					<Route path={ROUTES.LOGIN} Component={Login} />
+					<Route path={ROUTES.REGISTER} Component={Register} />
 					<Route Component={ProtectedRoutesWrapper}>
-						<Route path="/news-feed" Component={NewsFeed} />
-						<Route path="/create-group" Component={CreateGroup} />
+						<Route path={ROUTES.NEWS_FEED} Component={NewsFeed} />
+						<Route path={ROUTES.CREATE_GROUP} Component={CreateGroup} />
+						<Route path={ROUTES.GROUP.BASE}>
+							<Route path={ROUTES.GROUP.DETAILS} Component={CreateGroup} />
+						</Route>
 					</Route>
 				</Routes>
 			</BrowserRouter>
