@@ -8,7 +8,7 @@ export const dataSourceOptions: DataSourceOptions = {
 	port: Number(process.env.POSTGRES_DATABASE_PORT),
 	username: process.env.POSTGRES_USER,
 	password: process.env.POSTGRES_PASSWORD,
-	synchronize: process.env.NODE_ENV === "development",
+	synchronize: true,
 	logging: false,
 	database: process.env.POSTGRES_DATABASE_NAME,
 	entities: ["dist/**/*.entity.js"],

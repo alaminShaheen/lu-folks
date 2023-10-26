@@ -4,14 +4,19 @@ import IUserService from "@/models/interfaces/IUserService";
 import HttpException from "@/exceptions/httpException";
 import PostgresDatabase from "@/database/postgres.database";
 import UserEntity from "@/database/entities/user.entity";
+import { Repository } from "typeorm";
 
 @injectable()
 class UserService implements IUserService {
-	constructor(private readonly databaseInstance: PostgresDatabase) {}
+	private readonly userRepository: Repository<UserEntity>;
+
+	constructor(private readonly databaseInstance: PostgresDatabase) {
+		this.userRepository = this.databaseInstance.userRepository!;
+	}
 
 	public getUsers = async () => {
 		try {
-			const users = await this.databaseInstance.userRepository?.find();
+			const users = await this.userRepository.find();
 			if (!users) throw new HttpException(httpStatus.NO_CONTENT, "No users found");
 			return users;
 		} catch (error) {
@@ -22,7 +27,7 @@ class UserService implements IUserService {
 
 	public createAndSaveUser = async (newUserInfo: Partial<UserEntity>): Promise<UserEntity> => {
 		try {
-			const user = this.databaseInstance.userRepository?.create(newUserInfo);
+			const user = this.userRepository.create(newUserInfo);
 
 			if (!user) {
 				console.log("User could not be created.");
@@ -31,7 +36,7 @@ class UserService implements IUserService {
 					"An internal server error occurred.",
 				);
 			}
-			const newUser = await this.databaseInstance.userRepository?.save(user);
+			const newUser = await this.userRepository.save(user);
 
 			if (!newUser) {
 				console.log("User could not be saved to database.");

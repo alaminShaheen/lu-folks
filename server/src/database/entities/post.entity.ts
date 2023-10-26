@@ -3,6 +3,8 @@ import {
 	CreateDateColumn,
 	Entity,
 	JoinColumn,
+	JoinTable,
+	ManyToMany,
 	ManyToOne,
 	OneToMany,
 	PrimaryColumn,
@@ -10,8 +12,8 @@ import {
 } from "typeorm";
 import uuid4 from "uuid4";
 import UserEntity from "./user.entity";
+import GroupEntity from "./group.entity";
 import CommentEntity from "./comment.entity";
-import PostReactionEntity from "./postReaction.entity";
 
 @Entity()
 class PostEntity {
@@ -38,10 +40,28 @@ class PostEntity {
 	createdBy: UserEntity;
 
 	@OneToMany(() => CommentEntity, (comment) => comment.post, { cascade: true })
-	comments: Comment[];
+	comments: CommentEntity[];
 
-	@OneToMany(() => PostReactionEntity, (postReaction) => postReaction.post, { cascade: true })
-	postReactions: PostReactionEntity[];
+	@ManyToOne(() => GroupEntity, (group) => group.posts, { onDelete: "CASCADE" })
+	@JoinColumn()
+	group: GroupEntity;
+
+	@ManyToMany(() => UserEntity, (user) => user.postsReactedTo, {
+		onDelete: "NO ACTION",
+		onUpdate: "NO ACTION",
+	})
+	@JoinTable({
+		name: "postReactions",
+		joinColumn: {
+			name: "postId",
+			referencedColumnName: "id",
+		},
+		inverseJoinColumn: {
+			name: "userId",
+			referencedColumnName: "id",
+		},
+	})
+	userReactions: UserEntity[];
 }
 
 export default PostEntity;

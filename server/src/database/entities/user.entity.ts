@@ -8,14 +8,14 @@ import {
 	OneToMany,
 	OneToOne,
 	PrimaryColumn,
-	UpdateDateColumn,
+	UpdateDateColumn
 } from "typeorm";
 import uuid4 from "uuid4";
 import PostEntity from "./post.entity";
+import GroupEntity from "./group.entity";
 import AuthProvider from "../../models/enums/AuthProvider";
 import SessionEntity from "./session.entity";
 import CommentEntity from "./comment.entity";
-import PostReactionEntity from "./postReaction.entity";
 
 @Entity()
 class UserEntity {
@@ -35,6 +35,15 @@ class UserEntity {
 	@Column({ type: "enum", enum: AuthProvider, default: AuthProvider.VANILLA })
 	authProvider: AuthProvider;
 
+	@CreateDateColumn()
+	createdAt: Date;
+
+	@UpdateDateColumn()
+	updatedAt: Date;
+
+	@Column()
+	imageUrl?: string;
+
 	// on deletion of session, set session in this entity as null
 	@OneToOne(() => SessionEntity, (session) => session.user, {
 		nullable: true,
@@ -44,24 +53,33 @@ class UserEntity {
 	@JoinColumn()
 	session: SessionEntity;
 
+	@OneToMany(() => GroupEntity, (group) => group.createdBy, { cascade: true })
+	createdGroups: GroupEntity[];
+
 	@OneToMany(() => PostEntity, (post) => post.createdBy, { cascade: true })
 	// just used for defining relationship. will not create column for this attribute in user side
 	posts: PostEntity[];
 
-	@OneToMany(() => PostReactionEntity, (postReaction) => postReaction.user, { cascade: true })
-	postReactions: PostReactionEntity[];
-
 	@OneToMany(() => CommentEntity, (comment) => comment.commenter, { cascade: true })
 	comments: CommentEntity[];
 
-	@ManyToMany(() => UserEntity)
-	friends: UserEntity[];
+	@ManyToMany(() => GroupEntity, (group) => group.members, {
+		onDelete: "NO ACTION",
+		onUpdate: "NO ACTION",
+	})
+	groupMemberships?: GroupEntity[];
 
-	@CreateDateColumn()
-	createdAt: Date;
+	@ManyToMany(() => PostEntity, (post) => post.userReactions, {
+		onDelete: "NO ACTION",
+		onUpdate: "NO ACTION,
+	})
+	postsReactedTo?: PostEntity[];
 
-	@UpdateDateColumn()
-	updatedAt: Date;
+	@ManyToMany(() => CommentEntity, (comment) => comment.userReactions, {
+		onDelete: "NO ACTION",
+		onUpdate: "NO ACTION"
+	})
+	commentsReactedTo?: CommentEntity[];
 }
 
 export default UserEntity;

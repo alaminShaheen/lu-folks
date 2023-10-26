@@ -1,7 +1,10 @@
 import {
 	Column,
 	CreateDateColumn,
+	Entity,
 	JoinColumn,
+	JoinTable,
+	ManyToMany,
 	ManyToOne,
 	OneToMany,
 	PrimaryColumn,
@@ -11,6 +14,7 @@ import uuid4 from "uuid4";
 import PostEntity from "./post.entity";
 import UserEntity from "./user.entity";
 
+@Entity()
 class CommentEntity {
 	@PrimaryColumn({ type: "varchar", default: uuid4() })
 	id: string;
@@ -24,20 +28,37 @@ class CommentEntity {
 	@UpdateDateColumn()
 	updatedAt: Date;
 
-	@ManyToOne(() => PostEntity, (post) => post.comments, { onDelete: "CASCADE" })
-	@JoinColumn()
-	post: PostEntity;
-
-	@ManyToOne(() => UserEntity, (user) => user.comments, { onDelete: "CASCADE" })
-	@JoinColumn()
-	commenter: UserEntity;
+	@OneToMany(() => CommentEntity, (comment) => comment.replyTo, { cascade: true })
+	replies: Comment[];
 
 	@ManyToOne(() => CommentEntity, (comment) => comment.replies, { onDelete: "CASCADE" })
 	@JoinColumn()
 	replyTo: CommentEntity;
 
-	@OneToMany(() => CommentEntity, (comment) => comment.replyTo, { cascade: true })
-	replies: Comment[];
+	@ManyToOne(() => UserEntity, (user) => user.comments, { onDelete: "CASCADE" })
+	@JoinColumn()
+	commenter: UserEntity;
+
+	@ManyToOne(() => PostEntity, (post) => post.comments, { onDelete: "CASCADE" })
+	@JoinColumn()
+	post: PostEntity;
+
+	@ManyToMany(() => UserEntity, (user) => user.commentsReactedTo, {
+		onDelete: "NO ACTION",
+		onUpdate: "NO ACTION",
+	})
+	@JoinTable({
+		name: "commentReactions",
+		joinColumn: {
+			name: "commentId",
+			referencedColumnName: "id",
+		},
+		inverseJoinColumn: {
+			name: "userId",
+			referencedColumnName: "id",
+		},
+	})
+	userReactions: UserEntity[];
 }
 
 export default CommentEntity;
