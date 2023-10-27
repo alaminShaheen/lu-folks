@@ -33,7 +33,7 @@ const NewsFeed = () => {
 							</p>
 						</div>
 						<ButtonLink className="w-full" to={ROUTES.CREATE_GROUP}>
-							Create Community
+							Create Group
 						</ButtonLink>
 					</dl>
 				</div>
