@@ -1,7 +1,7 @@
 import PostgresDatabase from "@/database/postgres.database";
 import { injectable } from "tsyringe";
-import PostEntity from "@/database/entities/post.entity";
 import IPostService from "@/models/interfaces/IPostService";
+import { Post } from "@prisma/client";
 
 @injectable()
 class PostService implements IPostService {
@@ -15,11 +15,11 @@ class PostService implements IPostService {
 		return Promise.resolve(undefined);
 	}
 
-	getUserPosts(userId: string): Promise<PostEntity[]> {
+	getUserPosts(userId: string): Promise<Post[]> {
 		return Promise.resolve([]);
 	}
 
-	updatePost(postInfo: Partial<PostEntity>): Promise<void> {
+	updatePost(postInfo: Partial<Post>): Promise<void> {
 		return Promise.resolve(undefined);
 	}
 }

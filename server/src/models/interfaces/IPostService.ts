@@ -1,9 +1,9 @@
-import PostEntity from "@/database/entities/post.entity";
+import { Post } from "@prisma/client";
 
 interface IPostService {
-	getUserPosts: (userId: string) => Promise<PostEntity[]>;
+	getUserPosts: (userId: string) => Promise<Post[]>;
 	createPost: () => Promise<void>;
-	updatePost: (postInfo: Partial<PostEntity>) => Promise<void>;
+	updatePost: (postInfo: Partial<Post>) => Promise<void>;
 	deletePost: (postId: string) => Promise<void>;
 }
 
