@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { Image, Link } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Image, Link as LinkIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input.tsx";
 import UserAvatar from "@/components/ui/UserAvatar.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -34,7 +34,7 @@ const MiniCreatePost = () => {
 					<Image className="text-zinc-600" size={24} />
 				</Button>
 				<Button onClick={navigateToCreatePost} variant="ghost" className="px-0">
-					<Link className="text-zinc-600" size={24} />
+					<LinkIcon className="text-zinc-600" size={24} />
 				</Button>
 			</div>
 		</li>
