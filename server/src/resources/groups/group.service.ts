@@ -60,7 +60,7 @@ class GroupService implements IGroupService {
 			return await this.databaseInstance.groupRepository.create({
 				data: {
 					title: groupInfo.title,
-					creator: { connect: { id: creatorId } ,
+					creator: { connect: { id: creatorId } },
 				},
 			});
 		} catch (error: any) {
