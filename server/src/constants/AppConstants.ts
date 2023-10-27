@@ -8,6 +8,7 @@ const AppConstants = {
 	JWT_COOKIE_NAME: "jwt",
 	JWT_ACCESS_TOKEN_DURATION: 60 * 3,
 	JWT_REFRESH_TOKEN_DURATION: 24 * 60 * 60 * 1000,
+	INFINITE_SCROLL_PAGINATION_RESULT_LENGTH: 5,
 };
 
 export default AppConstants;

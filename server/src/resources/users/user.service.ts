@@ -3,30 +3,28 @@ import { injectable } from "tsyringe";
 import IUserService from "@/models/interfaces/IUserService";
 import HttpException from "@/exceptions/httpException";
 import PostgresDatabase from "@/database/postgres.database";
-import UserEntity from "@/database/entities/user.entity";
-import { Repository } from "typeorm";
 import * as console from "console";
+import { User } from "@prisma/client";
+import UserCreate from "@/models/types/UserCreate";
 
 @injectable()
 class UserService implements IUserService {
-	private readonly userRepository: Repository<UserEntity>;
-
-	constructor(private readonly databaseInstance: PostgresDatabase) {
-		this.userRepository = this.databaseInstance.userRepository!;
-	}
+	constructor(private readonly databaseInstance: PostgresDatabase) {}
 
 	public getCurrentUser = async (
 		userId: string,
-	): Promise<Pick<UserEntity, "imageUrl" | "username" | "email">> => {
+	): Promise<Pick<User, "imageUrl" | "username" | "email">> => {
 		try {
-			const currentUser = await this.userRepository.findOneBy({ id: userId });
+			const currentUser = await this.databaseInstance.userRepository.findFirst({
+				where: { id: userId },
+			});
 			if (!currentUser) {
 				console.log("Could not find current user.");
 				throw new HttpException(httpStatus.UNAUTHORIZED, "User is not authenticated.");
 			}
 			return {
 				username: currentUser.username,
-				imageUrl: currentUser.imageUrl,
+				imageUrl: currentUser.imageUrl || null,
 				email: currentUser.email,
 			};
 		} catch (error: any) {
@@ -35,9 +33,11 @@ class UserService implements IUserService {
 		}
 	};
 
-	public getUserById = async (userId: string): Promise<UserEntity | null> => {
+	public getUserById = async (userId: string): Promise<User | null> => {
 		try {
-			const user = await this.userRepository.findOneBy({ id: userId });
+			const user: User | null = await this.databaseInstance.userRepository.findFirst({
+				where: { id: userId },
+			});
 			if (!user) {
 				console.log(`User with id: ${userId} not found.`);
 				return null;
@@ -49,9 +49,9 @@ class UserService implements IUserService {
 		}
 	};
 
-	public getUsers = async () => {
+	public getUsers = async (): Promise<User[]> => {
 		try {
-			const users = await this.userRepository.find();
+			const users = await this.databaseInstance.userRepository.findMany({ take: 5 });
 			if (!users) throw new HttpException(httpStatus.NO_CONTENT, "No users found");
 			return users;
 		} catch (error) {
@@ -60,18 +60,9 @@ class UserService implements IUserService {
 		}
 	};
 
-	public saveUser = async (user: UserEntity): Promise<UserEntity> => {
+	public createAndSaveUser = async (newUserInfo: UserCreate): Promise<User> => {
 		try {
-			return await this.userRepository.save(user);
-		} catch (error) {
-			if (error instanceof HttpException) throw error;
-			else throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred");
-		}
-	};
-
-	public createAndSaveUser = async (newUserInfo: Partial<UserEntity>): Promise<UserEntity> => {
-		try {
-			const user = this.userRepository.create(newUserInfo);
+			const user = this.databaseInstance.userRepository.create({ data: newUserInfo });
 
 			if (!user) {
 				console.log("User could not be created.");
@@ -80,16 +71,7 @@ class UserService implements IUserService {
 					"An internal server error occurred.",
 				);
 			}
-			const newUser = await this.userRepository.save(user);
-
-			if (!newUser) {
-				console.log("User could not be saved to database.");
-				throw new HttpException(
-					httpStatus.INTERNAL_SERVER_ERROR,
-					"An internal server error occurred.",
-				);
-			}
-			return newUser;
+			return user;
 		} catch (error) {
 			throw error;
 		}

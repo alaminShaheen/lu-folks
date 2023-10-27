@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_DATABASE_CONNECTION_STRING")
+}
+
+enum AuthProvider {
+  VANILLA
+  GOOGLE
+}
+
+model Session {
+  id           String @id @default(cuid())
+  refreshToken String
+  userId       String @unique // 1 -> 1
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id               String       @id @default(cuid())
+  email            String       @unique
+  username         String
+  password         String?
+  imageUrl         String?
+  authProvider     AuthProvider @default(VANILLA)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt()
+  session          Session? // 1 -> 1
+  createdGroups    Group[] // 1 -> n
+  memberOfGroups   Group[]      @relation(name: "groupMembership") // n -> n
+  createdPosts     Post[] // 1 -> n
+  comments         Comment[] // 1 -> n
+  postReactions    Post[]       @relation(name: "postReactions") // n -> n
+  commentReactions Comment[]    @relation(name: "commentReactions") // n -> n
+}
+
+model Group {
+  id           String   @id @default(cuid())
+  title        String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt()
+  creator      User     @relation(fields: [creatorId], references: [id]) // n -> 1
+  creatorId    String   @unique
+  groupMembers User[]   @relation(name: "groupMembership") // n -> n
+  posts        Post[] // 1 -> n
+}
+
+model Post {
+  id           String    @id @default(cuid())
+  content      Json
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt()
+  creator      User      @relation(fields: [creatorId], references: [id]) // n -> 1
+  creatorId    String
+  group        Group     @relation(fields: [groupId], references: [id]) // n -> 1
+  groupId      String
+  comments     Comment[] // 1 -> n
+  postReactors User[]    @relation(name: "postReactions") // n -> n
+}
+
+model Comment {
+  id              String   @id @default(cuid())
+  comment         String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt()
+  commenter       User     @relation(fields: [commenterId], references: [id]) // n -> 1
+  commenterId     String
+  post            Post     @relation(fields: [postId], references: [id]) // n -> 1
+  postId          String
+  commentReactors User[]   @relation(name: "commentReactions") // n -> n
+}

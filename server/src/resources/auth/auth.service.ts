@@ -4,20 +4,22 @@ import bcrypt from "bcrypt";
 import process from "process";
 import httpStatus from "http-status";
 import { injectable } from "tsyringe";
-import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
 import TokenDto from "@/dtos/token.dto";
 import UserService from "@/resources/users/user.service";
 import LoginUserDto from "@/dtos/loginUser.dto";
 import IAuthService from "@/models/interfaces/IAuthService";
 import AppConstants from "@/constants/AppConstants";
 import TokenPayload from "@/models/types/tokenPayload";
-import AuthProvider from "@/models/enums/AuthProvider";
 import HttpException from "@/exceptions/httpException";
 import RegisterUserDto from "@/dtos/registerUser.dto";
+import { AuthProvider } from "@prisma/client";
 import PostgresDatabase from "@/database/postgres.database";
-import GoogleOAuthTokenResponse from "@/models/types/GoogleOAuthTokenResponse";
-import FieldValidationException from "@/exceptions/fieldValidationException";
 import GoogleOAuthUserResponse from "@/models/types/GoogleOAuthUserResponse";
+import FieldValidationException from "@/exceptions/fieldValidationException";
+import GoogleOAuthTokenResponse from "@/models/types/GoogleOAuthTokenResponse";
+import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
+import tokenPayload from "@/models/types/tokenPayload";
+import tokenPayload from "@/models/types/tokenPayload";
 
 @injectable()
 class AuthService implements IAuthService {
@@ -65,9 +67,9 @@ class AuthService implements IAuthService {
 		}
 
 		try {
-			const session = await this.databaseInstance.sessionRepository?.findOne({
+			const session = await this.databaseInstance.sessionRepository.findFirst({
 				where: { refreshToken },
-				relations: { user: true },
+				include: { user: true },
 			});
 
 			if (!session || !session.user) {
@@ -111,20 +113,11 @@ class AuthService implements IAuthService {
 		const { email, password } = userInfo;
 
 		try {
-			const userRepository = this.databaseInstance.userRepository;
-			const sessionRepository = this.databaseInstance.sessionRepository;
-
-			if (!userRepository || !sessionRepository) {
-				console.error("Database repositories not initialized.");
-				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
-			}
-
-			const user = await userRepository.findOneBy({ email });
-
+			const user = await this.databaseInstance.userRepository.findFirst({ where: { email } });
 			if (!user || user.authProvider === AuthProvider.GOOGLE) {
 				console.error("Incorrect credentials provided.");
 				throw new HttpException(httpStatus.BAD_REQUEST, "Incorrect login credentials");
-			} else if (user.authProvider === AuthProvider.VANILLA) {
+			} else if (user.authProvider === AuthProvider.VANILLA && user.password) {
 				const isCorrectPassword = await bcrypt.compare(password, user.password);
 				if (!isCorrectPassword) {
 					console.error("Password did not match.");
@@ -142,15 +135,9 @@ class AuthService implements IAuthService {
 				userId: user.id,
 			});
 
-			const session = sessionRepository.create({
-				refreshToken,
+			const session = this.databaseInstance.sessionRepository.create({
+				data: { refreshToken, userId: user.id },
 			});
-
-			await sessionRepository.save(session);
-
-			user.session = session;
-
-			await userRepository.save(user);
 
 			return { accessToken, refreshToken };
 		} catch (error) {
@@ -160,16 +147,18 @@ class AuthService implements IAuthService {
 
 	public logout = async (userId: string) => {
 		try {
-			const user = await this.databaseInstance.userRepository?.findOne({
-				relations: { session: true },
+			const user = await this.databaseInstance.userRepository.findFirst({
 				where: { id: userId },
+				include: { session: true },
 			});
 
 			if (!user || !user.session) {
 				console.error(`User is unauthenticated as no user with ${userId} found.`);
 				throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthenticated");
 			}
-			await this.databaseInstance.sessionRepository?.remove(user.session);
+			await this.databaseInstance.sessionRepository.delete({
+				where: { id: user.session.id ,
+			});
 		} catch (error) {
 			throw error;
 		}
@@ -186,16 +175,10 @@ class AuthService implements IAuthService {
 		}
 
 		try {
-			const userRepository = this.databaseInstance.userRepository;
-			const sessionRepository = this.databaseInstance.sessionRepository;
-
-			if (!userRepository || !sessionRepository) {
-				console.error("Database repositories not initialized.");
-				throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, "An error occurred.");
-			}
-
-			const userWithSameEntries = await userRepository.find({
-				where: [{ username }, { email }],
+			const userWithSameEntries = await this.databaseInstance.userRepository.findMany({
+				where: {
+					OR: [{ username }, { email }]
+				}
 			});
 
 			if (userWithSameEntries && userWithSameEntries.length > 0) {
@@ -230,13 +213,9 @@ class AuthService implements IAuthService {
 				userId: finalUser.id,
 			});
 
-			const newUserSession = sessionRepository.create({
-				refreshToken,
+			const newUserSession = this.databaseInstance.sessionRepository.create({
+				data: { refreshToken, userId: finalUser.id }
 			});
-
-			finalUser.session = await sessionRepository.save(newUserSession);
-
-			await userRepository.save(finalUser);
 
 			return { refreshToken, accessToken };
 		} catch (error) {
@@ -260,10 +239,11 @@ class AuthService implements IAuthService {
 			);
 			const googleUser = await this.getGoogleAuthUser(id_token, access_token);
 
-			const existingUser = await this.databaseInstance.userRepository?.findOneBy([
-				{ email: googleUser.email },
-				{ id: googleUser.sub },
-			]);
+			const existingUser = await this.databaseInstance.userRepository.findFirst({
+				where: {
+					AND: [{ id: googleUser.sub }, { email: googleUser.email }]
+				}
+			});
 
 			if (!googleUser.verified_email) {
 				console.log("Google email unverified.");
@@ -293,13 +273,12 @@ class AuthService implements IAuthService {
 				userId: finalUser.id,
 			});
 
-			const newUserSession = sessionRepository.create({
-				refreshToken,
+			const newUserSession = await this.databaseInstance.sessionRepository.create({
+				data: {
+					refreshToken,
+					userId: finalUser.id
+				}
 			});
-
-			finalUser.session = await sessionRepository.save(newUserSession);
-
-			await userRepository.save(finalUser);
 
 			return { accessToken, refreshToken };
 		} catch (error) {
@@ -324,10 +303,11 @@ class AuthService implements IAuthService {
 			);
 			const googleUser = await this.getGoogleAuthUser(id_token, access_token);
 
-			const user = await this.databaseInstance.userRepository?.findOneBy([
-				{ email: googleUser.email },
-				{ id: googleUser.sub },
-			]);
+			const user = await this.databaseInstance.userRepository.findFirst({
+				where: {
+					AND: [{ email: googleUser.email }, { id: googleUser.sub }]
+				}
+			});
 
 			if (!googleUser.verified_email) {
 				console.log("Google email unverified.");
@@ -350,13 +330,9 @@ class AuthService implements IAuthService {
 				userId: user.id,
 			});
 
-			const session = sessionRepository.create({
-				refreshToken,
+			const session = this.databaseInstance.sessionRepository.create({
+				data: { refreshToken, userId: user.id }
 			});
-
-			user.session = await sessionRepository.save(session);
-
-			await userRepository.save(user);
 
 			return { accessToken, refreshToken };
 		} catch (error: any) {

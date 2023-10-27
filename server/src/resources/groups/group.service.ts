@@ -1,31 +1,50 @@
 import httpStatus from "http-status";
-import { Repository } from "typeorm";
 import { injectable } from "tsyringe";
 import UserService from "@/resources/users/user.service";
-import GroupEntity from "@/database/entities/group.entity";
 import HttpException from "@/exceptions/httpException";
 import IGroupService from "@/models/interfaces/IGroupService";
 import CreateGroupDto from "@/dtos/createGroup.dto";
 import FieldValidationException from "@/exceptions/fieldValidationException";
+import PostgresDatabase from "@/database/postgres.database";
+import { Group } from "@prisma/client";
+import AppConstants from "@/constants/AppConstants";
 
 @injectable()
 class GroupService implements IGroupService {
-	private readonly groupRepository: Repository<GroupEntity>;
+	constructor(
+		private readonly userService: UserService,
+		private readonly databaseInstance: PostgresDatabase,
+	) {}
 
-	constructor(private readonly userService: UserService) {}
-
-	public getGroup = async (slug: string): Promise<GroupEntity> => {
+	public getGroup = async (slug: string): Promise<Group> => {
 		try {
-			return this.groupRepository.create();
+			const group = await this.databaseInstance.groupRepository.findFirst({
+				where: { id: slug },
+				include: {
+					posts: {
+						include: {
+							creator: true,
+							postReactors: true,
+							comments: true,
+							group: true,
+						},
+						take: AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH,
+					},
+				},
+			});
+
+			if (!group) {
+				console.log(`No group found with slug: ${slug}`);
+				throw new HttpException(httpStatus.NOT_FOUND, "No group found.");
+			}
+
+			return group;
 		} catch (error: any) {
 			throw error;
 		}
 	};
 
-	public createGroup = async (
-		creatorId: string,
-		groupInfo: CreateGroupDto,
-	): Promise<GroupEntity> => {
+	public createGroup = async (creatorId: string, groupInfo: CreateGroupDto): Promise<Group> => {
 		try {
 			const creator = await this.userService.getUserById(creatorId);
 
@@ -33,9 +52,10 @@ class GroupService implements IGroupService {
 				throw new HttpException(httpStatus.FORBIDDEN, "User is not authenticated.");
 			}
 
-			const existingGroupWithSameTitle = await this.groupRepository.findOneBy({
-				title: groupInfo.title,
-			});
+			const existingGroupWithSameTitle =
+				await this.databaseInstance.groupRepository.findFirst({
+					where: { title: groupInfo.title },
+				});
 
 			if (existingGroupWithSameTitle) {
 				throw new FieldValidationException(httpStatus.FORBIDDEN, {
@@ -43,17 +63,12 @@ class GroupService implements IGroupService {
 				});
 			}
 
-			const unsavedNewGroup = this.groupRepository.create({
-				title: groupInfo.title,
-				members: [creator],
-				createdBy: creator,
+			return await this.databaseInstance.groupRepository.create({
+				data: {
+					title: groupInfo.title,
+					creatorI,
+				,
 			});
-
-			const newGroup = await this.groupRepository.save(unsavedNewGroup);
-
-			creator.createdGroups.push(newGroup);
-			await this.userService.saveUser(creator);
-			return newGroup;
 		} catch (error: any) {
 			throw error;
 		}

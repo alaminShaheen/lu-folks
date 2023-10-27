@@ -1,18 +1,16 @@
-import { DataSource, Repository } from "typeorm";
-import UserEntity from "../database/entities/user.entity";
-import SessionEntity from "@/database/entities/session.entity";
-import PostEntity from "@/database/entities/post.entity";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { DefaultArgs } from "@prisma/client/runtime/library";
 
 abstract class Database {
-	protected dataSource: DataSource | null = null;
+	protected dataSource: PrismaClient;
 
-	abstract get userRepository(): Repository<UserEntity> | null;
+	public abstract get userRepository(): Prisma.UserDelegate<DefaultArgs>;
 
-	abstract get sessionRepository(): Repository<SessionEntity> | null;
+	public abstract get sessionRepository(): Prisma.SessionDelegate<DefaultArgs>;
 
-	abstract get postRepository(): Repository<PostEntity> | null;
+	public abstract get postRepository(): Prisma.PostDelegate<DefaultArgs>;
 
-	abstract connect(): void;
+	public abstract get groupRepository(): Prisma.GroupDelegate<DefaultArgs>;
 
 	abstract disconnect(): void;
 }

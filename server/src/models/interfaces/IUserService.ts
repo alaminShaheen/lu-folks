@@ -1,15 +1,16 @@
-import UserEntity from "@/database/entities/user.entity";
+import { User } from "@prisma/client";
+import UserCreate from "@/models/types/UserCreate";
 
 interface IUserService {
-	getUsers(): Promise<unknown>;
+	getUsers(): Promise<User[]>;
 
-	getCurrentUser(userId: string): Promise<Pick<UserEntity, "imageUrl" | "username" | "email">>;
+	getCurrentUser(userId: string): Promise<Pick<User, "imageUrl" | "username" | "email">>;
 
-	saveUser(user: UserEntity): Promise<UserEntity>;
+	// updateUser(userId: string): Promise<Pick<User, "imageUrl" | "username" | "email">>;
 
-	getUserById(userId: string): Promise<UserEntity | null>;
+	getUserById(userId: string): Promise<User | null>;
 
-	createAndSaveUser(userInfo: Partial<UserEntity>): Promise<Partial<UserEntity>>;
+	createAndSaveUser(userInfo: UserCreate): Promise<User>;
 }
 
 export default IUserService;

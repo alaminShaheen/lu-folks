@@ -1,16 +1,11 @@
 import PostgresDatabase from "@/database/postgres.database";
 import { injectable } from "tsyringe";
-import { Repository } from "typeorm";
 import PostEntity from "@/database/entities/post.entity";
 import IPostService from "@/models/interfaces/IPostService";
 
 @injectable()
 class PostService implements IPostService {
-	private readonly postRepository: Repository<PostEntity>;
-
-	constructor(private readonly databaseInstance: PostgresDatabase) {
-		this.postRepository = this.databaseInstance.postRepository!;
-	}
+	constructor(private readonly databaseInstance: PostgresDatabase) {}
 
 	createPost(): Promise<void> {
 		return Promise.resolve(undefined);
