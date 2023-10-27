@@ -16,11 +16,11 @@ import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import InputWithIcon from "@/components/ui/inputWithIcon.tsx";
 import Authentication from "@/models/Authentication.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
-import { AUTH_ROUTES } from "@/constants/ApiRoutes.ts";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import FieldValidationError from "@/models/FieldValidationError.ts";
 import generateGoogleOAuthConsentUrl from "@/utils/GenerateGoogleOAuthConsentUrl.ts";
+import APILinks from "@/constants/APILinks.ts";
 
 const Login = () => {
 	const { setAuthentication } = useAppContext();
@@ -47,7 +47,7 @@ const Login = () => {
 			try {
 				setIsLoading(true);
 				const { data } = await axiosInstance.post<Authentication>(
-					AUTH_ROUTES.LOGIN,
+					APILinks.login(),
 					formValues,
 				);
 				setAuthentication(data);

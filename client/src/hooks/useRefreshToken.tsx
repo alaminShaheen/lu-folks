@@ -1,12 +1,12 @@
 import { useCallback } from "react";
 import Authentication from "@/models/Authentication.ts";
-import { AUTH_ROUTES } from "@/constants/ApiRoutes.ts";
 import { publicAxiosInstance } from "@/api/Axios.ts";
+import APILinks from "@/constants/APILinks.ts";
 
 const UseRefreshToken = () => {
 	const refresh = useCallback(async (): Promise<string> => {
 		const response = await publicAxiosInstance.post<Authentication>(
-			AUTH_ROUTES.REFRESH_TOKEN,
+			APILinks.refreshToken(),
 			{},
 		);
 		return response.data.accessToken;

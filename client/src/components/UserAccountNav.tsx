@@ -9,12 +9,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import User from "@/models/User";
 import ROUTES from "@/constants/Routes.ts";
-import { AUTH_ROUTES } from "@/constants/ApiRoutes.ts";
+import APILinks from "@/constants/APILinks.ts";
+import UserAvatar from "@/components/ui/UserAvatar.tsx";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.tsx";
-import User from "@/models/User";
 
 interface UserAccountNavProps extends HTMLAttributes<HTMLDivElement> {
 	user: User;
@@ -28,7 +28,7 @@ export function UserAccountNav(props: UserAccountNavProps) {
 
 	const logout = useCallback(async () => {
 		try {
-			await axiosInstance.delete(AUTH_ROUTES.LOGOUT);
+			await axiosInstance.delete(APILinks.logout());
 			clearAuthentication();
 			toast.dismiss();
 			toast.success("You have logged out successfully.");
@@ -47,10 +47,7 @@ export function UserAccountNav(props: UserAccountNavProps) {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
-				<Avatar>
-					<AvatarImage src={user.imageUrl} />
-					<AvatarFallback>{user.username}</AvatarFallback>
-				</Avatar>
+				<UserAvatar username={user.username} imageUrl={user.imageUrl} />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="bg-white" align="end">
 				<div className="flex items-center justify-start gap-2 p-2">

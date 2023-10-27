@@ -11,9 +11,9 @@ import {
 import Authentication from "@/models/Authentication.ts";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import User from "@/models/User.ts";
-import { USER_ROUTES } from "@/constants/ApiRoutes.ts";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
+import APILinks from "@/constants/APILinks.ts";
 
 type AppContextType = {
 	authentication: Authentication;
@@ -54,25 +54,22 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 		setUser(null);
 	}, []);
 
-	const getCurrentUser = useCallback(
-		async () => {
-			try {
-				setAppLoading(true);
-				const { data } = await privateAxiosInstance.get<User>(USER_ROUTES.CURRENT_USER);
-				setUser(data);
-			} catch (error: any) {
-				toast.dismiss();
-				if (error instanceof AxiosError) {
-					toast.error(error.response?.data.message);
-				} else {
-					toast.error(error.message);
-				}
-			} finally {
-				setAppLoading(false);
+	const getCurrentUser = useCallback(async () => {
+		try {
+			setAppLoading(true);
+			const { data } = await privateAxiosInstance.get<User>(APILinks.currentUser());
+			setUser(data);
+		} catch (error: any) {
+			toast.dismiss();
+			if (error instanceof AxiosError) {
+				toast.error(error.response?.data.message);
+			} else {
+				toast.error(error.message);
 			}
-		},
-		[privateAxiosInstance]
-	);
+		} finally {
+			setAppLoading(false);
+		}
+	}, [privateAxiosInstance]);
 
 	useEffect(() => {
 		if (authentication.accessToken && !user) {
@@ -90,7 +87,7 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 				setAppLoading,
 				appLoading,
 				getCurrentUser,
-				setUser
+				setUser,
 			}}
 		>
 			{children}

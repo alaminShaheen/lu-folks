@@ -2,14 +2,17 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useCallback, useState } from "react";
+import APILinks from "@/constants/APILinks.ts";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import CreateGroupForm from "@/models/form/CreateGroupForm.ts";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
-import { GROUP_BASE_ROUTE } from "@/constants/ApiRoutes.ts";
 import FieldValidationError from "@/models/FieldValidationError.ts";
+import Group from "@/models/Group.ts";
+import { AxiosError } from "axios";
+import ROUTES from "@/constants/Routes.ts";
 
 const CreateGroup = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -26,33 +29,42 @@ const CreateGroup = () => {
 	});
 	const navigate = useNavigate();
 	const groupTitle = watch("title");
-	const { publicAxiosInstance: axiosInstance } = useAxiosInstance();
+	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
 
 	const onSubmit = useCallback(
 		async (formValues: CreateGroupForm) => {
 			try {
-				setIsLoading(true);
-				const { data } = await axiosInstance.post<Group>(GROUP_BASE_ROUTE, formValues);
-
 				toast.dismiss();
-				toast.success("Group created successfully!");
-				navigate(`/${data.id}`);
+				setIsLoading(true);
+				const { data } = await axiosInstance.post<Group>(
+					APILinks.createGroup(),
+					formValues,
+				);
+				console.log(data);
+				toast.success("GroupDetails created successfully!");
+				navigate(`/${ROUTES.GROUP.BASE}/${data.id}`);
 			} catch (error: any) {
-				if (error.response.data.type === ApiErrorType.FIELD_VALIDATION) {
-					Object.entries(
-						(error.response.data as FieldValidationError).validationErrors,
-					).forEach(([key, value]) => {
-						setError(key as keyof CreateGroupForm, { message: value, type: "server" });
-					});
+				if (error instanceof AxiosError) {
+					if (error.response?.data.type === ApiErrorType.FIELD_VALIDATION) {
+						Object.entries(
+							(error.response.data as FieldValidationError).validationError,
+						).forEach(([key, value]) => {
+							setError(key as keyof CreateGroupForm, {
+								message: value,
+								type: "server,
+							});
+						});
+					} else {
+						toast.error(error.response?.data.message);
+					}
 				} else {
-					toast.dismiss();
-					toast.error(error.response.data.message);
+					toast.error(error.response?.data.message);
 				}
 			} finally {
 				setIsLoading(false);
 			}
 		},
-		[axiosInstance, navigate, setError],
+		[axiosInstance, setError]
 	);
 
 	return (

@@ -6,6 +6,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import ROUTES from "@/constants/Routes.ts";
 import AppLogo from "@/components/AppLogo.tsx";
+import APILinks from "@/constants/APILinks.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -15,7 +16,6 @@ import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import InputWithIcon from "@/components/ui/inputWithIcon.tsx";
 import Authentication from "@/models/Authentication.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
-import { AUTH_ROUTES } from "@/constants/ApiRoutes";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import FieldValidationError from "@/models/FieldValidationError.ts";
@@ -50,7 +50,7 @@ const Register = () => {
 			try {
 				setIsLoading(true);
 				const { data } = await axiosInstance.post<Authentication>(
-					AUTH_ROUTES.REGISTER,
+					APILinks.register(),
 					formValues,
 				);
 				setAuthentication(data);
