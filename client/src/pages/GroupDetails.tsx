@@ -18,7 +18,14 @@ const GroupDetails = () => {
 			setLoading(true);
 			const { data } = await axiosInstance.get<Group>(APILinks.getGroup(params.slug!));
 			setGroupInfo(
-				new Group(data.id, data.title, data.createdAt, data.updatedAt, data.posts),
+				new Group(
+					data.id,
+					data.title,
+					data.createdAt,
+					data.updatedAt,
+					data.posts,
+					data.creator,
+				),
 			);
 		} catch (error: any) {
 			toast.dismiss();

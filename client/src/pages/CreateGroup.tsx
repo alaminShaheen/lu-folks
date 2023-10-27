@@ -51,7 +51,7 @@ const CreateGroup = () => {
 						).forEach(([key, value]) => {
 							setError(key as keyof CreateGroupForm, {
 								message: value,
-								type: "server,
+								type: "server",
 							});
 						});
 					} else {
@@ -64,7 +64,7 @@ const CreateGroup = () => {
 				setIsLoading(false);
 			}
 		},
-		[axiosInstance, navigate, setError]
+		[axiosInstance, navigate, setError],
 	);
 
 	return (
