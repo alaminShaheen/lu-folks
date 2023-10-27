@@ -18,6 +18,8 @@ import GoogleOAuthUserResponse from "@/models/types/GoogleOAuthUserResponse";
 import FieldValidationException from "@/exceptions/fieldValidationException";
 import GoogleOAuthTokenResponse from "@/models/types/GoogleOAuthTokenResponse";
 import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
+import tokenPayload from "@/models/types/tokenPayload";
+import tokenPayload from "@/models/types/tokenPayload";
 
 @injectable()
 class AuthService implements IAuthService {
@@ -175,7 +177,7 @@ class AuthService implements IAuthService {
 		try {
 			const userWithSameEntries = await this.databaseInstance.userRepository.findMany({
 				where: {
-					OR: [{ username }, { email },
+					OR: [{ username }, { email }],
 				},
 			});
 
@@ -212,7 +214,7 @@ class AuthService implements IAuthService {
 			});
 
 			const newUserSession = this.databaseInstance.sessionRepository.create({
-				data: { refreshToken, userId: finalUser.id }
+				data: { refreshToken, userId: finalUser.id ,
 			});
 
 			return { refreshToken, accessToken };
