@@ -42,7 +42,7 @@ model User {
 
 model Group {
   id           String   @id @default(cuid())
-  title        String
+  title        String   @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt()
   creator      User     @relation(fields: [creatorId], references: [id]) // n -> 1

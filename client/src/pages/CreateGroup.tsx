@@ -47,7 +47,7 @@ const CreateGroup = () => {
 				if (error instanceof AxiosError) {
 					if (error.response?.data.type === ApiErrorType.FIELD_VALIDATION) {
 						Object.entries(
-							(error.response.data as FieldValidationError).validationError,
+							(error.response.data as FieldValidationError).validationErrors,
 						).forEach(([key, value]) => {
 							setError(key as keyof CreateGroupForm, {
 								message: value,
@@ -64,7 +64,7 @@ const CreateGroup = () => {
 				setIsLoading(false);
 			}
 		},
-		[axiosInstance, setError]
+		[axiosInstance, navigate, setError]
 	);
 
 	return (

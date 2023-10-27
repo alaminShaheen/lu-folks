@@ -6,14 +6,13 @@ import PostgresDatabase from "@/database/postgres.database";
 import * as console from "console";
 import { User } from "@prisma/client";
 import UserCreate from "@/models/types/UserCreate";
+import AuthenticatedUser from "@/models/types/AuthenticatedUser";
 
 @injectable()
 class UserService implements IUserService {
 	constructor(private readonly databaseInstance: PostgresDatabase) {}
 
-	public getCurrentUser = async (
-		userId: string,
-	): Promise<Pick<User, "imageUrl" | "username" | "email">> => {
+	public getCurrentUser = async (userId: string): Promise<AuthenticatedUser> => {
 		try {
 			const currentUser = await this.databaseInstance.userRepository.findFirst({
 				where: { id: userId },
@@ -26,6 +25,7 @@ class UserService implements IUserService {
 				username: currentUser.username,
 				imageUrl: currentUser.imageUrl || null,
 				email: currentUser.email,
+				id: currentUser.id,
 			};
 		} catch (error: any) {
 			if (error instanceof HttpException) throw error;

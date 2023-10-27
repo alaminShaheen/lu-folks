@@ -1,5 +1,7 @@
+import User from "@/models/User.ts";
+
 class Group {
-	static EMPTY = new Group("", "", new Date(), new Date(), []);
+	static EMPTY = new Group("", "", new Date(), new Date(), [], User.EMPTY);
 
 	constructor(
 		public id: string,
@@ -7,6 +9,7 @@ class Group {
 		public createdAt: Date,
 		public updatedAt: Date,
 		public posts: { title: string }[],
+		public creator: User,
 	) {}
 }
 

@@ -12,7 +12,6 @@ const GroupDetails = () => {
 	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
 	const [groupInfo, setGroupInfo] = useState<Group>(Group.EMPTY);
 	const [, setLoading] = useState(false);
-	console.log(params.slug);
 
 	const fetchGroupDetails = useCallback(async () => {
 		try {

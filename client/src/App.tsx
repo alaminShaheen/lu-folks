@@ -9,6 +9,7 @@ import ProtectedRoutesWrapper from "@/components/ProtectedRoutesWrapper.tsx";
 import CreateGroup from "@/pages/CreateGroup.tsx";
 import ROUTES from "@/constants/Routes.ts";
 import GroupDetails from "@/pages/GroupDetails.tsx";
+import GroupLayout from "@/components/GroupLayout.tsx";
 
 function App() {
 	return (
@@ -22,7 +23,7 @@ function App() {
 					<Route Component={ProtectedRoutesWrapper}>
 						<Route path={ROUTES.NEWS_FEED} Component={NewsFeed} />
 						<Route path={ROUTES.CREATE_GROUP} Component={CreateGroup} />
-						<Route path={ROUTES.GROUP.BASE}>
+						<Route path={ROUTES.GROUP.BASE} Component={GroupLayout}>
 							<Route path={ROUTES.GROUP.DETAILS} Component={GroupDetails} />
 						</Route>
 					</Route>
