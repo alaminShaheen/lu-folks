@@ -40,7 +40,7 @@ model User {
   commentReactions Comment[]    @relation(name: "commentReactions") // n -> n
 }
 
-model GroupDetails {
+model Group {
   id           String   @id @default(cuid())
   title        String
   createdAt    DateTime @default(now())

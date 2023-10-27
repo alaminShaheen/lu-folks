@@ -53,7 +53,7 @@ class GroupService implements IGroupService {
 
 			if (existingGroupWithSameTitle) {
 				throw new FieldValidationException(httpStatus.BAD_REQUEST, {
-					title: "GroupDetails with same name already exists.",
+					title: "Group with same name already exists.",
 				});
 			}
 
