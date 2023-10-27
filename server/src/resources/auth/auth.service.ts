@@ -344,7 +344,7 @@ class AuthService implements IAuthService {
 					refreshToken,
 					user: {
 						connect: {
-							id: userid,
+							id: user.id,
 						},
 					},
 				},
