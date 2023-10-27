@@ -1,17 +1,15 @@
-import { Simulate } from "react-dom/test-utils";
-import { Input } from "@/components/ui/input.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { useCallback, useState } from "react";
-import { useForm } from "react-hook-form";
-import CreateGroupForm from "@/models/form/CreateGroupForm.ts";
-import { Label } from "@/components/ui/label.tsx";
-import { Link, useNavigate } from "react-router-dom";
-import { GROUP_BASE_ROUTE } from "@/constants/ApiRoutes.ts";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { Input } from "@/components/ui/input.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import ApiErrorType from "@/models/enums/ApiErrorType.ts";
-import FieldValidationError from "@/models/FieldValidationError.ts";
+import CreateGroupForm from "@/models/form/CreateGroupForm.ts";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
-import input = Simulate.input;
+import { GROUP_BASE_ROUTE } from "@/constants/ApiRoutes.ts";
+import FieldValidationError from "@/models/FieldValidationError.ts";
 
 const CreateGroup = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -20,12 +18,14 @@ const CreateGroup = () => {
 		handleSubmit,
 		formState: { errors },
 		setError,
+		watch,
 	} = useForm<CreateGroupForm>({
 		defaultValues: {
 			title: "",
 		},
 	});
 	const navigate = useNavigate();
+	const groupTitle = watch("title");
 	const { publicAxiosInstance: axiosInstance } = useAxiosInstance();
 
 	const onSubmit = useCallback(
@@ -36,7 +36,7 @@ const CreateGroup = () => {
 
 				toast.dismiss();
 				toast.success("Group created successfully!");
-				navigate(`/group/${data.id}`);
+				navigate(`/${data.id}`);
 			} catch (error: any) {
 				if (error.response.data.type === ApiErrorType.FIELD_VALIDATION) {
 					Object.entries(
@@ -101,7 +101,7 @@ const CreateGroup = () => {
 						</Link>
 					</Button>
 					<Button
-						disabled={input.length === 0 || isLoading}
+						disabled={groupTitle.length === 0 || isLoading}
 						form="create-group-form"
 						onSubmit={handleSubmit(onSubmit)}
 					>

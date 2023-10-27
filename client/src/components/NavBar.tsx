@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import ROUTES from "@/constants/Routes.ts";
 import AppLogo from "@/components/AppLogo.tsx";
+import ButtonLink from "@/components/ui/ButtonLink.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import { UserAccountNav } from "@/components/UserAccountNav.tsx";
-import ButtonLink from "@/components/ui/ButtonLink.tsx";
 
 const Navbar = () => {
 	const { user } = useAppContext();
