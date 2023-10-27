@@ -10,6 +10,7 @@ class PostgresDatabase extends Database {
 	constructor() {
 		super();
 		this.dataSource = new PrismaClient();
+		console.log("Database connected");
 	}
 
 	public get userRepository(): Prisma.UserDelegate<DefaultArgs> {

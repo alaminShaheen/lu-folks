@@ -2,12 +2,12 @@ import httpStatus from "http-status";
 import { inject, injectable } from "tsyringe";
 import { NextFunction, Request, Response } from "express";
 import Controller from "@/abstracts/controller";
-import PostEntity from "@/database/entities/post.entity";
 import errorHandler from "@/middlewares/errorHandler";
 import DtoValidator from "@/middlewares/dtoValidator";
 import IPostService from "@/models/interfaces/IPostService";
 import RegisterUserDto from "@/dtos/registerUser.dto";
 import verifyAuthentication from "@/middlewares/verifyAuthentication";
+import { Post } from "@prisma/client";
 
 @injectable()
 class PostController extends Controller {
@@ -53,7 +53,7 @@ class PostController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const newUser = await this.postService.updatePost(request.body as Partial<PostEntity>);
+			const newUser = await this.postService.updatePost(request.body as Partial<Post>);
 			return response.status(httpStatus.OK).send(newUser);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);

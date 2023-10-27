@@ -1,9 +1,9 @@
 import TokenDto from "@/dtos/token.dto";
-import UserEntity from "@/database/entities/user.entity";
+import { User } from "@prisma/client";
 
 class AuthenticationResponseDto {
 	tokens: TokenDto;
-	user: Pick<UserEntity, "email" | "username" | "imageUrl">;
+	user: Pick<User, "email" | "username" | "imageUrl">;
 }
 
 export default AuthenticationResponseDto;
