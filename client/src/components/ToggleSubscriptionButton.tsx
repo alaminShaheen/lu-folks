@@ -5,7 +5,6 @@ import APILinks from "@/constants/APILinks.ts";
 import { Button } from "@/components/ui/button.tsx";
 import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
-import wait from "@/utils/Wait.ts";
 
 interface ToggleSubscriptionButtonProps {
 	isMember: boolean;
@@ -22,7 +21,6 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 	const joinGroup = useCallback(async () => {
 		try {
 			setLoading(true);
-			await wait(2000);
 			await axiosInstance.post<void>(APILinks.joinGroup(groupSlug), {});
 			toast.dismiss();
 			toast.success(`You have joined the group: ${groupTitle}`);
@@ -44,7 +42,6 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 	const leaveGroup = useCallback(async () => {
 		try {
 			setLoading(true);
-			await wait(2000);
 			await axiosInstance.delete<void>(APILinks.leaveGroup(groupSlug));
 			toast.dismiss();
 			toast.success(`You have left the group: ${groupTitle}`);
