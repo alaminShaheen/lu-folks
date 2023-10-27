@@ -18,8 +18,6 @@ import GoogleOAuthUserResponse from "@/models/types/GoogleOAuthUserResponse";
 import FieldValidationException from "@/exceptions/fieldValidationException";
 import GoogleOAuthTokenResponse from "@/models/types/GoogleOAuthTokenResponse";
 import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
-import tokenPayload from "@/models/types/tokenPayload";
-import tokenPayload from "@/models/types/tokenPayload";
 
 @injectable()
 class AuthService implements IAuthService {
@@ -214,7 +212,7 @@ class AuthService implements IAuthService {
 			});
 
 			const newUserSession = this.databaseInstance.sessionRepository.create({
-				data: { refreshToken, userId: finalUser.id ,
+				data: { refreshToken, userId: finalUser.id },
 			});
 
 			return { refreshToken, accessToken };
@@ -241,7 +239,7 @@ class AuthService implements IAuthService {
 
 			const existingUser = await this.databaseInstance.userRepository.findFirst({
 				where: {
-					AND: [{ id: googleUser.sub }, { email: googleUser.email }]
+					AND: [{ id: googleUser.sub }, { email: googleUser.email }],
 				},
 			});
 
@@ -276,7 +274,7 @@ class AuthService implements IAuthService {
 			const newUserSession = await this.databaseInstance.sessionRepository.create({
 				data: {
 					refreshToken,
-					userId: finalUser.id
+					userId: finalUser.id,
 				},
 			});
 
@@ -305,7 +303,7 @@ class AuthService implements IAuthService {
 
 			const user = await this.databaseInstance.userRepository.findFirst({
 				where: {
-					AND: [{ email: googleUser.email }, { id: googleUser.sub }]
+					AND: [{ email: googleUser.email }, { id: googleUser.sub }],
 				},
 			});
 
@@ -331,7 +329,7 @@ class AuthService implements IAuthService {
 			});
 
 			const session = this.databaseInstance.sessionRepository.create({
-				data: { refreshToken, userId: user.id }
+				data: { refreshToken, userId: user.id },
 			});
 
 			return { accessToken, refreshToken };
