@@ -8,11 +8,7 @@
     "start": "node --inspect dist/index.js",
     "build": "rimraf dist && tsc",
     "postinstall": "npm run build",
-    "prisma:migrate": "npx prisma migrate dev --name",
-    "typeorm": "npm run build && npx typeorm -d dist/database/typeorm.config.js",
-    "migration:generate": "npm run typeorm -- migration:generate",
-    "migration:run": "npm run typeorm -- migration:run",
-    "migration:revert": "npm run typeorm -- migration:revert"
+    "prisma:migrate": "npx prisma migrate dev --name"
   },
   "type": "commonjs",
   "keywords": [],

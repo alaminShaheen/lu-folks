@@ -18,8 +18,6 @@ import GoogleOAuthUserResponse from "@/models/types/GoogleOAuthUserResponse";
 import FieldValidationException from "@/exceptions/fieldValidationException";
 import GoogleOAuthTokenResponse from "@/models/types/GoogleOAuthTokenResponse";
 import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from "jsonwebtoken";
-import tokenPayload from "@/models/types/tokenPayload";
-import tokenPayload from "@/models/types/tokenPayload";
 
 @injectable()
 class AuthService implements IAuthService {
@@ -157,7 +155,7 @@ class AuthService implements IAuthService {
 				throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthenticated");
 			}
 			await this.databaseInstance.sessionRepository.delete({
-				where: { id: user.session.id ,
+				where: { id: user.session.id },
 			});
 		} catch (error) {
 			throw error;
@@ -177,8 +175,8 @@ class AuthService implements IAuthService {
 		try {
 			const userWithSameEntries = await this.databaseInstance.userRepository.findMany({
 				where: {
-					OR: [{ username }, { email }]
-				}
+					OR: [{ username }, { email },
+				},
 			});
 
 			if (userWithSameEntries && userWithSameEntries.length > 0) {
@@ -242,7 +240,7 @@ class AuthService implements IAuthService {
 			const existingUser = await this.databaseInstance.userRepository.findFirst({
 				where: {
 					AND: [{ id: googleUser.sub }, { email: googleUser.email }]
-				}
+				},
 			});
 
 			if (!googleUser.verified_email) {
@@ -277,7 +275,7 @@ class AuthService implements IAuthService {
 				data: {
 					refreshToken,
 					userId: finalUser.id
-				}
+				},
 			});
 
 			return { accessToken, refreshToken };
@@ -306,7 +304,7 @@ class AuthService implements IAuthService {
 			const user = await this.databaseInstance.userRepository.findFirst({
 				where: {
 					AND: [{ email: googleUser.email }, { id: googleUser.sub }]
-				}
+				},
 			});
 
 			if (!googleUser.verified_email) {

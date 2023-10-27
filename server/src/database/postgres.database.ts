@@ -1,11 +1,9 @@
-import httpStatus from "http-status";
-import { Lifecycle, scoped } from "tsyringe";
 import Database from "@/abstracts/database";
+import httpStatus from "http-status";
 import HttpException from "@/exceptions/httpException";
-import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
-
-class UserDeletgate {}
+import { Lifecycle, scoped } from "tsyringe";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 @scoped(Lifecycle.ContainerScoped)
 class PostgresDatabase extends Database {

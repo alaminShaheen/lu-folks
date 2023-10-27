@@ -66,8 +66,8 @@ class GroupService implements IGroupService {
 			return await this.databaseInstance.groupRepository.create({
 				data: {
 					title: groupInfo.title,
-					creatorI,
-				,
+					creatorId,
+				},
 			});
 		} catch (error: any) {
 			throw error;
