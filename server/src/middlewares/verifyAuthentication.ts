@@ -17,7 +17,8 @@ function VerifyAuthentication(request: Request, response: Response, nextFunction
 			return nextFunction(new HttpException(httpStatus.FORBIDDEN, "User is unauthorized"));
 		}
 
-		request.user = (decoded as JwtPayload)["user"];
+		const userInfo = decoded as JwtPayload;
+		request.user = { username: userInfo.username, userId: userInfo.userId };
 		nextFunction();
 	});
 }

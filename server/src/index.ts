@@ -13,6 +13,7 @@ import AuthController from "@/resources/auth/auth.controller";
 import PostController from "@/resources/posts/post.controller";
 import HealthcheckController from "@/resources/healthcheck/healthcheck.controller";
 import GroupService from "@/resources/groups/group.service";
+import GroupController from "@/resources/groups/group.controller";
 
 validateEnv();
 container.resolve(PostgresDatabase);
@@ -27,10 +28,11 @@ container.register("IGroupService", { useClass: GroupService });
 const userController = container.resolve(UserController);
 const postController = container.resolve(PostController);
 const authController = container.resolve(AuthController);
+const groupController = container.resolve(GroupController);
 const healthcheckController = container.resolve(HealthcheckController);
 
 const app = new App(
-	[userController, authController, postController, healthcheckController],
+	[userController, authController, postController, healthcheckController, groupController],
 	Number(process.env.PORT),
 );
 

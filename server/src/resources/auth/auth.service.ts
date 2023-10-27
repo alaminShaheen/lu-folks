@@ -133,8 +133,15 @@ class AuthService implements IAuthService {
 				userId: user.id,
 			});
 
-			const session = this.databaseInstance.sessionRepository.create({
-				data: { refreshToken, userId: user.id },
+			await this.databaseInstance.sessionRepository.create({
+				data: {
+					refreshToken,
+					user: {
+						connect: {
+							id: user.id,
+						},
+					},
+				},
 			});
 
 			return { accessToken, refreshToken };
@@ -211,8 +218,8 @@ class AuthService implements IAuthService {
 				userId: finalUser.id,
 			});
 
-			const newUserSession = this.databaseInstance.sessionRepository.create({
-				data: { refreshToken, userId: finalUser.id },
+			await this.databaseInstance.sessionRepository.create({
+				data: { refreshToken, user: { connect: { id: finalUser.id } } },
 			});
 
 			return { refreshToken, accessToken };
@@ -271,10 +278,14 @@ class AuthService implements IAuthService {
 				userId: finalUser.id,
 			});
 
-			const newUserSession = await this.databaseInstance.sessionRepository.create({
+			await this.databaseInstance.sessionRepository.create({
 				data: {
 					refreshToken,
-					userId: finalUser.id,
+					user: {
+						connect: {
+							id: finalUser.id,
+						},
+					},
 				},
 			});
 
@@ -328,8 +339,15 @@ class AuthService implements IAuthService {
 				userId: user.id,
 			});
 
-			const session = this.databaseInstance.sessionRepository.create({
-				data: { refreshToken, userId: user.id },
+			await this.databaseInstance.sessionRepository.create({
+				data: {
+					refreshToken,
+					user: {
+						connect: {
+							id: userid,
+						},
+					},
+				},
 			});
 
 			return { accessToken, refreshToken };

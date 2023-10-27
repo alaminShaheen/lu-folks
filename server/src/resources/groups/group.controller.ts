@@ -1,5 +1,5 @@
 import Controller from "@/abstracts/controller";
-import { inject } from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import IGroupService from "@/models/interfaces/IGroupService";
 import DtoValidator from "@/middlewares/dtoValidator";
 import verifyAuthentication from "@/middlewares/verifyAuthentication";
@@ -8,19 +8,31 @@ import { NextFunction, Request, Response } from "express";
 import HttpException from "@/exceptions/httpException";
 import httpStatus from "http-status";
 
+@injectable()
 class GroupController extends Controller {
 	constructor(@inject("IGroupService") private readonly groupService: IGroupService) {
 		super("/group");
 		this.initialiseRoutes();
 	}
 
-	public createGroup = async (
+	protected initialiseRoutes = (): void => {
+		console.log(this.path);
+		this.router
+			.route(this.path)
+			.post(verifyAuthentication, DtoValidator(CreateGroupDto), this.createGroup);
+		this.router.route(`${this.path}/:slug`).get(verifyAuthentication, this.getGroup);
+	};
+
+	private createGroup = async (
 		request: Request,
 		response: Response,
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const newGroup = this.groupService.createGroup(request.user?.userId!, request.body);
+			const newGroup = await this.groupService.createGroup(
+				request.user?.userId!,
+				request.body,
+			);
 			return response.status(httpStatus.CREATED).send(newGroup);
 		} catch (error: any) {
 			if (error instanceof Error) nextFunction(error);
@@ -35,10 +47,10 @@ class GroupController extends Controller {
 		}
 	};
 
-	public getGroup = async (request: Request, response: Response, nextFunction: NextFunction) => {
+	private getGroup = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
-			const group = this.groupService.getGroup(request.params.id);
-			return response.status(httpStatus.FOUND).send(group);
+			const group = await this.groupService.getGroup(request.params.slug);
+			return response.status(httpStatus.OK).send(group);
 		} catch (error: any) {
 			if (error instanceof Error) nextFunction(error);
 			else {
@@ -51,13 +63,6 @@ class GroupController extends Controller {
 			}
 		}
 	};
-
-	protected initialiseRoutes(): void {
-		this.router
-			.route(this.path)
-			.post(verifyAuthentication, DtoValidator(CreateGroupDto), this.createGroup);
-		this.router.route(`${this.path}/:slug`).post(verifyAuthentication, this.getGroup);
-	}
 }
 
 export default GroupController;

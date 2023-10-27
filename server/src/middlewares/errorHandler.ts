@@ -11,6 +11,7 @@ function ErrorHandler(
 	_: NextFunction,
 ) {
 	if (error instanceof FieldValidationException) {
+		console.log(error);
 		return response.status(error.status || httpStatus.INTERNAL_SERVER_ERROR).send({
 			type: ApiErrorType.FIELD_VALIDATION,
 			validationErrors: error.validationErrors,

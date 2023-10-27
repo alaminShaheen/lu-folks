@@ -12,7 +12,7 @@ import { Post } from "@prisma/client";
 @injectable()
 class PostController extends Controller {
 	constructor(@inject("IPostService") private readonly postService: IPostService) {
-		super("/posts");
+		super("/post");
 		this.initialiseRoutes();
 	}
 

@@ -46,27 +46,21 @@ class GroupService implements IGroupService {
 
 	public createGroup = async (creatorId: string, groupInfo: CreateGroupDto): Promise<Group> => {
 		try {
-			const creator = await this.userService.getUserById(creatorId);
-
-			if (!creator) {
-				throw new HttpException(httpStatus.FORBIDDEN, "User is not authenticated.");
-			}
-
 			const existingGroupWithSameTitle =
 				await this.databaseInstance.groupRepository.findFirst({
 					where: { title: groupInfo.title },
 				});
 
 			if (existingGroupWithSameTitle) {
-				throw new FieldValidationException(httpStatus.FORBIDDEN, {
-					title: "Group with same name already exists.",
+				throw new FieldValidationException(httpStatus.BAD_REQUEST, {
+					title: "GroupDetails with same name already exists.",
 				});
 			}
 
 			return await this.databaseInstance.groupRepository.create({
 				data: {
 					title: groupInfo.title,
-					creatorId,
+					creator: { connect: { id: creatorId } ,
 				},
 			});
 		} catch (error: any) {

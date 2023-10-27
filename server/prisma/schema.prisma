@@ -40,13 +40,13 @@ model User {
   commentReactions Comment[]    @relation(name: "commentReactions") // n -> n
 }
 
-model Group {
+model GroupDetails {
   id           String   @id @default(cuid())
   title        String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt()
   creator      User     @relation(fields: [creatorId], references: [id]) // n -> 1
-  creatorId    String   @unique
+  creatorId    String
   groupMembers User[]   @relation(name: "groupMembership") // n -> n
   posts        Post[] // 1 -> n
 }

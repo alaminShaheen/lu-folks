@@ -11,7 +11,7 @@ import verifyAuthentication from "@/middlewares/verifyAuthentication";
 @injectable()
 class UserController extends Controller {
 	constructor(@inject("IUserService") private readonly userService: IUserService) {
-		super("/users");
+		super("/user");
 		this.initialiseRoutes();
 	}
 
@@ -40,6 +40,7 @@ class UserController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
+			console.log("hello");
 			const result = await this.userService.getCurrentUser(request.user?.userId!);
 			return response.status(httpStatus.OK).send(result);
 		} catch (error: unknown) {
