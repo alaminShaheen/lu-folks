@@ -176,7 +176,7 @@ class GroupService implements IGroupService {
 				data: {
 					title: groupInfo.title,
 					creator: { connect: { id: creatorId } },
-					groupMembers: { connect: { id: creatorId  },
+					groupMembers: { connect: { id: creatorId } },
 				},
 			});
 		} catch (error: any) {
