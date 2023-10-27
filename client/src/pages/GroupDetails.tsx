@@ -41,6 +41,7 @@ const GroupDetails = () => {
 		<Fragment>
 			<h1 className="font-bold text-3xl md:text-4xl h-14">{groupInfo.title}</h1>
 			<MiniCreatePost />
+			{/*	Show posts*/}
 		</Fragment>
 	);
 };

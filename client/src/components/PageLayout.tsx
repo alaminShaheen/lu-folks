@@ -2,11 +2,11 @@ import { ReactNode } from "react";
 import Navbar from "@/components/NavBar.tsx";
 import { cn } from "@/lib/utils.ts";
 
-interface LayoutProps {
+interface PageLayoutProps {
 	children: ReactNode;
 }
 
-const Layout = (props: LayoutProps) => {
+const PageLayout = (props: PageLayoutProps) => {
 	const { children } = props;
 	return (
 		<div className={cn("bg-white text-slate-900 antialiased light")}>
@@ -18,4 +18,4 @@ const Layout = (props: LayoutProps) => {
 	);
 };
 
-export default Layout;
+export default PageLayout;

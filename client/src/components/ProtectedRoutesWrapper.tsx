@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { Comment } from "react-loader-spinner";
 import { useCallback, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import Layout from "@/components/Layout.tsx";
+import PageLayout from "@/components/PageLayout.tsx";
 import ROUTES from "@/constants/Routes.ts";
 import useRefreshToken from "@/hooks/useRefreshToken.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
@@ -47,9 +47,9 @@ const ProtectedRoutesWrapper = () => {
 			backgroundColor="#F4442E"
 		/>
 	) : (
-		<Layout>
+		<PageLayout>
 			<Outlet />
-		</Layout>
+		</PageLayout>
 	);
 };
 
