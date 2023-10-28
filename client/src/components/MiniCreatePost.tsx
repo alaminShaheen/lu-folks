@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { Image, Link as LinkIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input.tsx";
-import UserAvatar from "@/components/ui/UserAvatar.tsx";
+import UserAvatar from "@/components/UserAvatar.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 

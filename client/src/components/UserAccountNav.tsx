@@ -12,7 +12,7 @@ import {
 import User from "@/models/User";
 import ROUTES from "@/constants/Routes.ts";
 import APILinks from "@/constants/APILinks.ts";
-import UserAvatar from "@/components/ui/UserAvatar.tsx";
+import UserAvatar from "@/components/UserAvatar.tsx";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 
