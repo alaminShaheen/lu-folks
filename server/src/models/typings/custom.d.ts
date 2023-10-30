@@ -8,3 +8,7 @@ declare module "express" {
 		user?: TokenPayload;
 	}
 }
+
+declare module "@editorjs/link" {
+	export type LinkData = any;
+}

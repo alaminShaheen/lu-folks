@@ -205,7 +205,7 @@ class GroupService implements IGroupService {
 		}
 	};
 
-	private checkGroupExistence = async (slug: string): Promise<void> => {
+	public checkGroupExistence = async (slug: string): Promise<void> => {
 		try {
 			const group = this.databaseInstance.groupRepository.findFirst({ where: { id: slug } });
 

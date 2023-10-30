@@ -13,6 +13,7 @@ export const APILinks = {
 	leaveGroup: (slug: string) => `group/leave/${slug}`,
 	unfurlLink: () => `post/unfurl-link`,
 	imageUpload: () => `image-upload`,
+	createPost: () => `/post`,
 };
 
 export default APILinks;

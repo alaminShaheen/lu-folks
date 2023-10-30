@@ -1,5 +1,5 @@
 import Group from "@/models/Group.ts";
-import Editor from "@/components/Editor.tsx";
+import CreatePostEditor from "@/components/CreatePostEditor.tsx";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import { useGroupContext } from "@/context/GroupContext.tsx";
@@ -23,7 +23,7 @@ const CreatePost = () => {
 				</div>
 			</div>
 			{/* form */}
-			<Editor />
+			<CreatePostEditor groupSlug={group.id} />
 
 			<div className="w-full flex justify-end">
 				<Button type="submit" className="w-full" form="subreddit-post-form">

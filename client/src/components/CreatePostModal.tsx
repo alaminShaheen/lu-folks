@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button.tsx";
 import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog.tsx";
-import Editor from "@/components/Editor.tsx";
+import CreatePostEditor from "@/components/CreatePostEditor.tsx";
 
 interface CreatePostModalProps {
 	groupTitle: string;
@@ -22,7 +22,7 @@ const CreatePostModal = (props: CreatePostModalProps) => {
 			</DialogHeader>
 			<div className="flex flex-col items-start gap-6">
 				{/* form */}
-				<Editor />
+				<CreatePostEditor />
 
 				<div className="w-full flex justify-end">
 					<Button type="submit" className="w-full" form="subreddit-post-form">

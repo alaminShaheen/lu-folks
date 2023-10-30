@@ -1,19 +1,36 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+	forwardRef,
+	memo,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from "react";
 import Authentication from "@/models/Authentication.ts";
-import EditorJS, { API, OutputData } from "@editorjs/editorjs";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import APILinks from "@/constants/APILinks.ts";
 
-type WysiwygEditorProps = {
-	data?: any;
+export type EditorHandle = {
+	save: () => Promise<OutputData>;
+};
+
+type WYSIWYGEditorProps = {
+	defaultData?: any;
 	editorBlockId: string;
 	authentication: Authentication;
-	onChangeFn?: (data: OutputData) => void;
 	uploadImage: (files: File) => Promise<{ success: number; file: { url: string } } | undefined>;
 };
 
-const WysiwygEditor = (props: WysiwygEditorProps) => {
-	const { data = { blocks: [] }, editorBlockId, authentication, onChangeFn, uploadImage } = props;
+const WYSIWYGEditor = forwardRef((props: WYSIWYGEditorProps, ref) => {
+	const {
+		defaultData = { blocks: [] },
+		editorBlockId,
+		authentication,
+		onChangeFn,
+		uploadImage,
+	} = props;
 	const editorRef = useRef<EditorJS>();
 	const [isComponentMounted, setIsComponentMounted] = useState(false);
 
@@ -48,11 +65,7 @@ const WysiwygEditor = (props: WysiwygEditorProps) => {
 				},
 				placeholder: "Type here to write your post...",
 				inlineToolbar: true,
-				data: data,
-				async onChange(api: API) {
-					const data = await api.saver.save();
-					onChangeFn?.(data);
-				},
+				data: defaultData,
 				tools: {
 					header: Header,
 					linkTool: {
@@ -80,7 +93,13 @@ const WysiwygEditor = (props: WysiwygEditorProps) => {
 				},
 			});
 		}
-	}, [data, editorBlockId, onChangeFn]);
+	}, [authentication.accessToken, defaultData, editorBlockId, uploadImage]);
+
+	useImperativeHandle<EditorHandle>(ref, () => ({
+		save() {
+			return editorRef.current?.save();
+		},
+	}));
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
@@ -102,9 +121,10 @@ const WysiwygEditor = (props: WysiwygEditorProps) => {
 			};
 		}
 	}, [initializeEditor, isComponentMounted]);
+
 	return <div id={editorBlockId} className="min-h-[500px]" />;
-};
+});
 
-const RichWysiwygEditor = memo(WysiwygEditor);
+const RichWYSIWYGEditor = memo(WYSIWYGEditor);
 
-export default RichWysiwygEditor;
+export default RichWYSIWYGEditor;

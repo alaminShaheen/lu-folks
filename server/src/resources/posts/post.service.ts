@@ -1,19 +1,37 @@
-import PostgresDatabase from "@/database/postgres.database";
-import { injectable } from "tsyringe";
-import IPostService from "@/models/interfaces/IPostService";
-import { Post } from "@prisma/client";
-import HttpException from "@/exceptions/httpException";
-import httpStatus from "http-status";
 import axios from "axios";
+import httpStatus from "http-status";
+import { injectable } from "tsyringe";
+import { Post } from "@prisma/client";
 import UnfurledData from "@/models/types/UnfurledData";
+import IPostService from "@/models/interfaces/IPostService";
+import GroupService from "@/resources/groups/group.service";
+import CreatePostDto from "@/dtos/createPost.dto";
+import HttpException from "@/exceptions/httpException";
+import PostgresDatabase from "@/database/postgres.database";
 
 @injectable()
 class PostService implements IPostService {
-	constructor(private readonly databaseInstance: PostgresDatabase) {}
+	constructor(
+		private readonly databaseInstance: PostgresDatabase,
+		private readonly groupService: GroupService,
+	) {}
 
-	createPost(): Promise<void> {
-		return Promise.resolve(undefined);
-	}
+	public createPost = async (userId: string, postData: CreatePostDto): Promise<Post> => {
+		try {
+			await this.groupService.checkGroupExistence(postData.groupSlug);
+
+			return await this.databaseInstance.postRepository.create({
+				data: {
+					content: postData.content,
+					title: postData.title,
+					creator: { connect: { id: userId } },
+					group: { connect: { id: postData.groupSlug } },
+				},
+			});
+		} catch (error: any) {
+			throw error;
+		}
+	};
 
 	public unfurlLink = async (url: string): Promise<UnfurledData> => {
 		try {

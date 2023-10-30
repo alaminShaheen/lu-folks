@@ -6,7 +6,7 @@ import Controller from "@/abstracts/controller";
 import errorHandler from "@/middlewares/errorHandler";
 import DtoValidator from "@/middlewares/dtoValidator";
 import IPostService from "@/models/interfaces/IPostService";
-import RegisterUserDto from "@/dtos/registerUser.dto";
+import CreatePostDto from "@/dtos/createPost.dto";
 import verifyAuthentication from "@/middlewares/verifyAuthentication";
 
 @injectable()
@@ -18,11 +18,12 @@ class PostController extends Controller {
 
 	protected initialiseRoutes = () => {
 		this.router
+			.use(this.path, verifyAuthentication)
 			.route(this.path)
-			.get(verifyAuthentication, this.getPosts)
-			.post(verifyAuthentication, DtoValidator(RegisterUserDto), this.createPost)
-			.put(verifyAuthentication, this.updatePost)
-			.delete(verifyAuthentication, this.deletePost);
+			.get(this.getPosts)
+			.post(DtoValidator(CreatePostDto), this.createPost)
+			.put(this.updatePost)
+			.delete(this.deletePost);
 		this.router.route(`${this.path}/unfurl-link`).get(verifyAuthentication, this.unfurlLink);
 	};
 
@@ -54,7 +55,7 @@ class PostController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const newPost = await this.postService.createPost();
+			const newPost = await this.postService.createPost(request.user?.userId!, request.body);
 			return response.status(httpStatus.CREATED).send(newPost);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);

@@ -1,24 +1,36 @@
-import { toast } from "react-toastify";
 import TextareaAutosize from "react-textarea-autosize";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils.ts";
 import APILinks from "@/constants/APILinks.ts";
 import PostCreate from "@/models/form/PostCreate";
+import handleError from "@/utils/handleError.ts";
 import useUploadFile from "@/hooks/useUploadFile.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
-import RichWysiwygEditor from "@/components/ui/wysiwygEditor.tsx";
+import RichWYSIWYGEditor, { EditorHandle } from "@/components/ui/wysiwygEditor.tsx";
+import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import ROUTES from "@/constants/Routes.ts";
 
-const Editor = () => {
+type CreatePostEditorType = {
+	groupSlug: string;
+};
+
+const CreatePostEditor = (props: CreatePostEditorType) => {
+	const { groupSlug } = props;
 	const _titleRef = useRef<HTMLTextAreaElement>(null);
+	const navigate = useNavigate();
+	const richTextEditorRef = useRef<EditorHandle>(null);
 	const { user, authentication } = useAppContext();
+	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
 	const [, setLoading] = useState(false);
 	const { uploadFiles } = useUploadFile();
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
-		control,
+		setError,
 	} = useForm<PostCreate>({
 		defaultValues: {
 			title: "",
@@ -47,18 +59,30 @@ const Editor = () => {
 					},
 				};
 			} catch (error: any) {
-				toast.dismiss();
-				toast.error(error.message);
+				handleError(error, setError);
 			} finally {
 				setLoading(false);
 			}
 		},
-		[uploadFiles, user?.id],
+		[setError, uploadFiles, user?.id],
 	);
 
-	const onSubmit = useCallback((formData: PostCreate) => {
-		console.log(formData);
-	}, []);
+	const onSubmit = useCallback(
+		async (formData: PostCreate) => {
+			try {
+				const content = await richTextEditorRef.current?.save();
+				formData.content = JSON.stringify(content);
+				formData.groupSlug = groupSlug;
+				const { data } = axiosInstance.post(APILinks.createPost(), formData);
+				toast.dismiss();
+				toast.success("Your post has been published.");
+				navigate(ROUTES.NEWS_FEED);
+			} catch (error: any) {
+				handleError(error, setError);
+			}
+		},
+		[setError,
+	);
 
 	useEffect(() => {
 		setTimeout(() => {
@@ -69,7 +93,7 @@ const Editor = () => {
 	return (
 		<div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
 			<form id="subreddit-post-form" className="w-full" onSubmit={handleSubmit(onSubmit)}>
-				<div className="w-full prose prose-stone dark:prose-invert">
+				<div className="prose prose-stone dark:prose-invert w-full">
 					<TextareaAutosize
 						ref={(e) => {
 							titleRef(e);
@@ -86,18 +110,11 @@ const Editor = () => {
 					{errors.title?.message && (
 						<span className="text-xs text-red-500 my-2">{errors.title.message}</span>
 					)}
-					<Controller
-						render={({ field: { name, onChange, value } }) => (
-							<RichWysiwygEditor
-								onChangeFn={onChange}
-								data={value}
-								authentication={authentication}
-								editorBlockId={name}
-								uploadImage={imageUploader}
-							/>
-						)}
-						name="content"
-						control={control}
+					<RichWYSIWYGEditor
+						ref={richTextEditorRef}
+						authentication={authentication}
+						editorBlockId="post-editor"
+						uploadImage={imageUploader}
 					/>
 					<p className="text-sm text-gray-500">
 						Use{" "}
@@ -110,4 +127,4 @@ const Editor = () => {
 	);
 };
 
-export default Editor;
+export default CreatePostEditor;
