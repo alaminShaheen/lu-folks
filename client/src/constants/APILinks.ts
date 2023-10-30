@@ -5,11 +5,14 @@ export const APILinks = {
 	refreshToken: () => `/auth/refresh-token`,
 	currentUser: () => `/user/current-user`,
 	createGroup: () => `/group`,
-	getGroup: (slug: string) => `/group/${slug}`,
+	getGroupInfo: (slug: string) => `/group/${slug}`,
+	getGroupData: (slug: string) => `/group/details/${slug}`,
 	fetchUserSubscription: (slug: string) => `/group/is-member/${slug}`,
 	fetchGroupMemberCount: (slug: string) => `group/member-count/${slug}`,
 	joinGroup: (slug: string) => `group/join/${slug}`,
 	leaveGroup: (slug: string) => `group/leave/${slug}`,
+	unfurlLink: () => `post/unfurl-link`,
+	imageUpload: () => `image-upload`,
 };
 
 export default APILinks;

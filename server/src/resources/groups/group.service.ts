@@ -9,10 +9,31 @@ import { Group } from "@prisma/client";
 import AppConstants from "@/constants/AppConstants";
 import GroupMemberCount from "@/models/types/GroupMemberCount";
 import IsMemberResponse from "@/models/types/IsMemberResponse";
+import GroupInfo from "@/models/types/GroupInfo";
+import console from "console";
 
 @injectable()
 class GroupService implements IGroupService {
 	constructor(private readonly databaseInstance: PostgresDatabase) {}
+
+	public getGroupInfo = async (slug: string): Promise<GroupInfo> => {
+		try {
+			await this.checkGroupExistence(slug);
+
+			const group = await this.databaseInstance.groupRepository.findFirst({
+				where: { id: slug },
+			});
+
+			if (!group) {
+				console.log(`No group found with slug: ${slug}`);
+				throw new HttpException(httpStatus.NOT_FOUND, "No group found.");
+			}
+
+			return group;
+		} catch (error) {
+			throw error;
+		}
+	};
 
 	public leaveGroup = async (userId: string, slug: string): Promise<void> => {
 		try {
@@ -122,7 +143,7 @@ class GroupService implements IGroupService {
 		}
 	};
 
-	public getGroup = async (slug: string): Promise<Group> => {
+	public getGroupData = async (slug: string): Promise<Group> => {
 		try {
 			await this.checkGroupExistence(slug);
 

@@ -10,25 +10,31 @@ import CreateGroup from "@/pages/CreateGroup.tsx";
 import ROUTES from "@/constants/Routes.ts";
 import GroupDetails from "@/pages/GroupDetails.tsx";
 import GroupLayout from "@/components/GroupLayout.tsx";
+import CreatePost from "@/pages/CreatePost.tsx";
+import { GroupContextProvider } from "@/context/GroupContext.tsx";
 
 function App() {
 	return (
 		<AppContextProvider>
-			<BrowserRouter>
-				<Toast />
-				<Routes>
-					<Route index Component={LandingPage} />
-					<Route path={ROUTES.LOGIN} Component={Login} />
-					<Route path={ROUTES.REGISTER} Component={Register} />
-					<Route Component={ProtectedRoutesWrapper}>
-						<Route path={ROUTES.NEWS_FEED} Component={NewsFeed} />
-						<Route path={ROUTES.CREATE_GROUP} Component={CreateGroup} />
-						<Route path={ROUTES.GROUP.BASE} Component={GroupLayout}>
-							<Route path={ROUTES.GROUP.DETAILS} Component={GroupDetails} />
+			<GroupContextProvider>
+				<BrowserRouter>
+					<Toast />
+					<Routes>
+						<Route index Component={LandingPage} />
+						<Route path={ROUTES.LOGIN} Component={Login} />
+						<Route path={ROUTES.REGISTER} Component={Register} />
+						<Route Component={ProtectedRoutesWrapper}>
+							<Route path={ROUTES.NEWS_FEED} Component={NewsFeed} />
+							<Route path={ROUTES.CREATE_GROUP} Component={CreateGroup} />
+
+							<Route path={ROUTES.GROUP.BASE} Component={GroupLayout}>
+								<Route index path={ROUTES.GROUP.DETAILS} Component={GroupDetails} />
+								<Route path={ROUTES.GROUP.CREATE_POST} Component={CreatePost} />
+							</Route>
 						</Route>
-					</Route>
-				</Routes>
-			</BrowserRouter>
+					</Routes>
+				</BrowserRouter>
+			</GroupContextProvider>
 		</AppContextProvider>
 	);
 }

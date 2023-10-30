@@ -14,6 +14,8 @@ import PostController from "@/resources/posts/post.controller";
 import HealthcheckController from "@/resources/healthcheck/healthcheck.controller";
 import GroupService from "@/resources/groups/group.service";
 import GroupController from "@/resources/groups/group.controller";
+import process from "process";
+import FileController from "@/resources/files/file.controller";
 
 validateEnv();
 container.resolve(PostgresDatabase);
@@ -30,9 +32,17 @@ const postController = container.resolve(PostController);
 const authController = container.resolve(AuthController);
 const groupController = container.resolve(GroupController);
 const healthcheckController = container.resolve(HealthcheckController);
+const fileController = container.resolve(FileController);
 
 const app = new App(
-	[userController, authController, postController, healthcheckController, groupController],
+	[
+		userController,
+		authController,
+		postController,
+		healthcheckController,
+		groupController,
+		fileController,
+	],
 	Number(process.env.PORT),
 );
 

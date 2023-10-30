@@ -16,7 +16,7 @@ const GroupDetails = () => {
 	const fetchGroupDetails = useCallback(async () => {
 		try {
 			setLoading(true);
-			const { data } = await axiosInstance.get<Group>(APILinks.getGroup(params.slug!));
+			const { data } = await axiosInstance.get<Group>(APILinks.getGroupData(params.slug!));
 			setGroupInfo(
 				new Group(
 					data.id,

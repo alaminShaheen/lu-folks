@@ -12,7 +12,6 @@ import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import FieldValidationError from "@/models/FieldValidationError.ts";
 import Group from "@/models/Group.ts";
 import { AxiosError } from "axios";
-import ROUTES from "@/constants/Routes.ts";
 
 const CreateGroup = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -40,9 +39,8 @@ const CreateGroup = () => {
 					APILinks.createGroup(),
 					formValues,
 				);
-				console.log(data);
-				toast.success("GroupDetails created successfully!");
-				navigate(`/${ROUTES.GROUP.BASE}/${data.id}`);
+				toast.success("Group created successfully!");
+				navigate(`/group/${data.id}`);
 			} catch (error: any) {
 				if (error instanceof AxiosError) {
 					if (error.response?.data.type === ApiErrorType.FIELD_VALIDATION) {

@@ -41,7 +41,10 @@ class GroupController extends Controller {
 		this.router
 			.route(this.path)
 			.post(verifyAuthentication, DtoValidator(CreateGroupDto), this.createGroup);
-		this.router.route(`${this.path}/:slug`).get(verifyAuthentication, this.getGroup);
+		this.router.route(`${this.path}/:slug`).get(verifyAuthentication, this.getGroupInfo);
+		this.router
+			.route(`${this.path}/details/:slug`)
+			.get(verifyAuthentication, this.getGroupData);
 		this.router
 			.route(`${this.path}/is-member/:slug`)
 			.get(verifyAuthentication, this.isGroupMember);
@@ -118,9 +121,34 @@ class GroupController extends Controller {
 		}
 	};
 
-	private getGroup = async (request: Request, response: Response, nextFunction: NextFunction) => {
+	private getGroupData = async (
+		request: Request,
+		response: Response,
+		nextFunction: NextFunction,
+	) => {
 		try {
-			const group = await this.groupService.getGroup(request.params.slug);
+			const group = await this.groupService.getGroupData(request.params.slug);
+			return response.status(httpStatus.OK).send(group);
+		} catch (error: any) {
+			if (error instanceof Error) nextFunction(error);
+			else {
+				nextFunction(
+					new HttpException(
+						httpStatus.INTERNAL_SERVER_ERROR,
+						"An unexpected error occurred.",
+					),
+				);
+			}
+		}
+	};
+
+	private getGroupInfo = async (
+		request: Request,
+		response: Response,
+		nextFunction: NextFunction,
+	) => {
+		try {
+			const group = await this.groupService.getGroupInfo(request.params.slug);
 			return response.status(httpStatus.OK).send(group);
 		} catch (error: any) {
 			if (error instanceof Error) nextFunction(error);

@@ -1,41 +1,40 @@
 import { useCallback } from "react";
-import { Image, Link as LinkIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Image, Link as LinkIcon } from "lucide-react";
+import ROUTES from "@/constants/Routes.ts";
 import { Input } from "@/components/ui/input.tsx";
 import UserAvatar from "@/components/UserAvatar.tsx";
-import { Button } from "@/components/ui/button.tsx";
+import ButtonLink from "@/components/ui/ButtonLink.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 
 const MiniCreatePost = () => {
 	const { user } = useAppContext();
 	const navigate = useNavigate();
 
-	const navigateToCreatePost = useCallback(() => {
-		navigate("/");
+	const goToCreatePost = useCallback(() => {
+		navigate(ROUTES.GROUP.CREATE_POST);
 	}, [navigate]);
 
 	return (
 		<li className="overflow-hidden rounded-md bg-white shadow list-none">
-			<div className="h-full px-6 py-4 flex justify-between gap-6">
+			<div className="h-full px-6 py-4 flex justify-between gap-6 items-center">
 				<div className="relative">
 					{user && <UserAvatar imageUrl={user?.imageUrl} username={user?.username} />}
 
 					<span className="absolute bottom-0 right-0 rounded-full w-3 h-3 bg-green-500 outline outline-2 outline-white" />
 				</div>
-
 				<Input
-					className="cursor-pointer"
-					focusVisibleClass="focus-visible:outline-none focus-visible:ring-2"
-					onClick={navigateToCreatePost}
+					onClick={goToCreatePost}
 					readOnly
 					placeholder="Create post"
+					className="cursor-pointer"
 				/>
-				<Button onClick={navigateToCreatePost} variant="ghost" className="px-0">
-					<Image className="text-zinc-600" size={24} />
-				</Button>
-				<Button onClick={navigateToCreatePost} variant="ghost" className="px-0">
-					<LinkIcon className="text-zinc-600" size={24} />
-				</Button>
+				<ButtonLink to={ROUTES.GROUP.CREATE_POST} buttonClass="my-0" variant="ghost">
+					<Image className="text-zinc-600" size={20} />
+				</ButtonLink>
+				<ButtonLink to={ROUTES.GROUP.CREATE_POST} buttonClass="my-0" variant="ghost">
+					<LinkIcon className="text-zinc-600" size={20} />
+				</ButtonLink>
 			</div>
 		</li>
 	);

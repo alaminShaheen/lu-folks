@@ -1,6 +1,8 @@
 **/node_modules
 **/.env
-**/.env.prod
+server/.env.prod
 **/dist
 **/*.xml
 **/.idea
+server/.env
+/server/.env.prod

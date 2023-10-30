@@ -5,25 +5,24 @@ import APILinks from "@/constants/APILinks.ts";
 import { Button } from "@/components/ui/button.tsx";
 import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
+import { useGroupContext } from "@/context/GroupContext.tsx";
 
 interface ToggleSubscriptionButtonProps {
-	isMember: boolean;
-	groupSlug: string;
-	groupTitle: string;
 	onSubscriptionChange: () => void;
 }
 
 const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
-	const { isMember, groupTitle, groupSlug, onSubscriptionChange } = props;
+	const { onSubscriptionChange } = props;
+	const { isMember, group } = useGroupContext();
 	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
 	const [loading, setLoading] = useState(false);
 
 	const joinGroup = useCallback(async () => {
 		try {
 			setLoading(true);
-			await axiosInstance.post<void>(APILinks.joinGroup(groupSlug), {});
+			await axiosInstance.post<void>(APILinks.joinGroup(group.id), {});
 			toast.dismiss();
-			toast.success(`You have joined the group: ${groupTitle}`);
+			toast.success(`You have joined the group: ${group.title}`);
 			onSubscriptionChange();
 		} catch (error: any) {
 			if (error instanceof AxiosError) {
@@ -37,14 +36,14 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 		} finally {
 			setLoading(false);
 		}
-	}, [axiosInstance, groupSlug, groupTitle, onSubscriptionChange]);
+	}, [axiosInstance, group.id, group.title, onSubscriptionChange]);
 
 	const leaveGroup = useCallback(async () => {
 		try {
 			setLoading(true);
-			await axiosInstance.delete<void>(APILinks.leaveGroup(groupSlug));
+			await axiosInstance.delete<void>(APILinks.leaveGroup(group.id));
 			toast.dismiss();
-			toast.success(`You have left the group: ${groupTitle}`);
+			toast.success(`You have left the group: ${group.title}`);
 			onSubscriptionChange();
 		} catch (error: any) {
 			if (error instanceof AxiosError) {
@@ -57,7 +56,7 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 		} finally {
 			setLoading(false);
 		}
-	}, [axiosInstance, groupSlug, groupTitle, onSubscriptionChange]);
+	}, [axiosInstance, group.id, group.title, onSubscriptionChange]);
 
 	return isMember ? (
 		<Button
