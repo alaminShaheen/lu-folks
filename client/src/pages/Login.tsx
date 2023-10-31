@@ -124,7 +124,7 @@ const Login = () => {
 									<Label htmlFor="password">Password</Label>
 									<InputWithIcon
 										{...register("password", {
-											required: "Password is required,
+											required: "Password is required",
 										})}
 										id="password"
 										type={showPassword ? "text" : "password"}
@@ -172,7 +172,7 @@ const Login = () => {
 						<Button variant="outline" type="button" loading={isLoading}>
 							<a
 								href={generateGoogleOAuthConsentUrl(
-									AppConstants.GOOGLE_OAUTH_LOGIN_REDIRECT_URL
+									AppConstants.GOOGLE_OAUTH_LOGIN_REDIRECT_UR,
 								)}
 								className="inline-flex items-center justify-center w-full"
 							>
