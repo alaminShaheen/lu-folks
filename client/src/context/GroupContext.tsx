@@ -1,9 +1,9 @@
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
-import Group from "@/models/Group.ts";
+import ExtendedGroup from "@/models/ExtendedGroup.ts";
 
 type GroupContextType = {
-	group: Group;
-	setGroup: Dispatch<SetStateAction<Group>>;
+	group: ExtendedGroup;
+	setGroup: Dispatch<SetStateAction<ExtendedGroup>>;
 	groupMemberCount: number;
 	setGroupMemberCount: Dispatch<SetStateAction<number>>;
 	isMember: boolean;
@@ -11,7 +11,7 @@ type GroupContextType = {
 };
 
 const GROUP_CONTEXT_DEFAULT_VALUES: GroupContextType = {
-	group: Group.EMPTY,
+	group: ExtendedGroup.EMPTY,
 	setGroup: () => {},
 	setIsMember: () => {},
 	setGroupMemberCount: () => {},
@@ -27,7 +27,7 @@ export const GroupContext = createContext<GroupContextType>(GROUP_CONTEXT_DEFAUL
 
 export const GroupContextProvider = (props: GroupContextProviderProps) => {
 	const { children } = props;
-	const [group, setGroup] = useState<Group>(GROUP_CONTEXT_DEFAULT_VALUES.group);
+	const [group, setGroup] = useState<ExtendedGroup>(GROUP_CONTEXT_DEFAULT_VALUES.group);
 	const [groupMemberCount, setGroupMemberCount] = useState<number>(0);
 	const [isMember, setIsMember] = useState(false);
 

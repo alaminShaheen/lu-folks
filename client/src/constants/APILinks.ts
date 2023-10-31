@@ -14,6 +14,8 @@ export const APILinks = {
 	unfurlLink: () => `post/unfurl-link`,
 	imageUpload: () => `image-upload`,
 	createPost: () => `/post`,
+	getPosts: (limit: number, page: number, slug?: string) =>
+		`/post?limit=${limit}&page=${page}&slug=${slug}`,
 };
 
 export default APILinks;

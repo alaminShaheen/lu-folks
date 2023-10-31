@@ -1,17 +1,17 @@
 import TextareaAutosize from "react-textarea-autosize";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils.ts";
+import ROUTES from "@/constants/Routes.ts";
 import APILinks from "@/constants/APILinks.ts";
 import PostCreate from "@/models/form/PostCreate";
 import handleError from "@/utils/handleError.ts";
 import useUploadFile from "@/hooks/useUploadFile.tsx";
+import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import RichWYSIWYGEditor, { EditorHandle } from "@/components/ui/wysiwygEditor.tsx";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import ROUTES from "@/constants/Routes.ts";
 
 type CreatePostEditorType = {
 	groupSlug: string;
@@ -73,7 +73,7 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 				const content = await richTextEditorRef.current?.save();
 				formData.content = JSON.stringify(content);
 				formData.groupSlug = groupSlug;
-				const { data } = axiosInstance.post(APILinks.createPost(), formData);
+				await axiosInstance.post(APILinks.createPost(), formData);
 				toast.dismiss();
 				toast.success("Your post has been published.");
 				navigate(ROUTES.NEWS_FEED);
@@ -81,7 +81,7 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 				handleError(error, setError);
 			}
 		},
-		[setError,
+		[axiosInstance, groupSlug, navigate, setError],
 	);
 
 	useEffect(() => {

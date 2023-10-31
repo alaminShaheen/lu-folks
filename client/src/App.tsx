@@ -12,30 +12,39 @@ import GroupDetails from "@/pages/GroupDetails.tsx";
 import GroupLayout from "@/components/GroupLayout.tsx";
 import CreatePost from "@/pages/CreatePost.tsx";
 import { GroupContextProvider } from "@/context/GroupContext.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 function App() {
 	return (
-		<AppContextProvider>
-			<GroupContextProvider>
-				<BrowserRouter>
-					<Toast />
-					<Routes>
-						<Route index Component={LandingPage} />
-						<Route path={ROUTES.LOGIN} Component={Login} />
-						<Route path={ROUTES.REGISTER} Component={Register} />
-						<Route Component={ProtectedRoutesWrapper}>
-							<Route path={ROUTES.NEWS_FEED} Component={NewsFeed} />
-							<Route path={ROUTES.CREATE_GROUP} Component={CreateGroup} />
+		<QueryClientProvider client={queryClient}>
+			<AppContextProvider>
+				<GroupContextProvider>
+					<BrowserRouter>
+						<Toast />
+						<Routes>
+							<Route index Component={LandingPage} />
+							<Route path={ROUTES.LOGIN} Component={Login} />
+							<Route path={ROUTES.REGISTER} Component={Register} />
+							<Route Component={ProtectedRoutesWrapper}>
+								<Route path={ROUTES.NEWS_FEED} Component={NewsFeed} />
+								<Route path={ROUTES.CREATE_GROUP} Component={CreateGroup} />
 
-							<Route path={ROUTES.GROUP.BASE} Component={GroupLayout}>
-								<Route index path={ROUTES.GROUP.DETAILS} Component={GroupDetails} />
-								<Route path={ROUTES.GROUP.CREATE_POST} Component={CreatePost} />
+								<Route path={ROUTES.GROUP.BASE} Component={GroupLayout}>
+									<Route
+										index
+										path={ROUTES.GROUP.DETAILS}
+										Component={GroupDetails}
+									/>
+									<Route path={ROUTES.GROUP.CREATE_POST} Component={CreatePost} />
+								</Route>
 							</Route>
-						</Route>
-					</Routes>
-				</BrowserRouter>
-			</GroupContextProvider>
-		</AppContextProvider>
+						</Routes>
+					</BrowserRouter>
+				</GroupContextProvider>
+			</AppContextProvider>
+		</QueryClientProvider>
 	);
 }
 

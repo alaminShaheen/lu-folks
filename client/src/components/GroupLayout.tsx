@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { AxiosError } from "axios";
 import { Outlet, useParams } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
-import Group from "@/models/Group.ts";
+import ExtendedGroup from "@/models/ExtendedGroup.ts";
 import ROUTES from "@/constants/Routes.ts";
 import APILinks from "@/constants/APILinks.ts";
 import ButtonLink from "@/components/ui/ButtonLink.tsx";
@@ -26,9 +26,11 @@ const GroupLayout = () => {
 	const fetchGroupDetails = useCallback(async () => {
 		try {
 			setLoading(true);
-			const { data } = await axiosInstance.get<Group>(APILinks.getGroupData(params.slug!));
+			const { data } = await axiosInstance.get<ExtendedGroup>(
+				APILinks.getGroupData(params.slug!),
+			);
 			setGroup(
-				new Group(
+				new ExtendedGroup(
 					data.id,
 					data.title,
 					new Date(data.createdAt),
@@ -110,7 +112,7 @@ const GroupLayout = () => {
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6">
 					<ul className="flex flex-col col-span-2 space-y-6">{<Outlet />}</ul>
-					{group !== Group.EMPTY ? (
+					{group !== ExtendedGroup.EMPTY ? (
 						<div className="overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last">
 							<div className="px-6 py-4">
 								<p className="font-semibold py-3">About {group.title}</p>

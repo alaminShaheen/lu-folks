@@ -10,7 +10,7 @@ import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import CreateGroupForm from "@/models/form/CreateGroupForm.ts";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import FieldValidationError from "@/models/FieldValidationError.ts";
-import Group from "@/models/Group.ts";
+import ExtendedGroup from "@/models/ExtendedGroup.ts";
 import { AxiosError } from "axios";
 
 const CreateGroup = () => {
@@ -35,7 +35,7 @@ const CreateGroup = () => {
 			try {
 				toast.dismiss();
 				setIsLoading(true);
-				const { data } = await axiosInstance.post<Group>(
+				const { data } = await axiosInstance.post<ExtendedGroup>(
 					APILinks.createGroup(),
 					formValues,
 				);

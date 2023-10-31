@@ -1,4 +1,4 @@
-import Group from "@/models/Group.ts";
+import ExtendedGroup from "@/models/ExtendedGroup.ts";
 import CreatePostEditor from "@/components/CreatePostEditor.tsx";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
@@ -15,7 +15,7 @@ const CreatePost = () => {
 					<h3 className="ml-2 mt-2 text-base font-semibold leading-6 text-gray-900">
 						Create Post
 					</h3>
-					{group === Group.EMPTY ? (
+					{group === ExtendedGroup.EMPTY ? (
 						<Skeleton></Skeleton>
 					) : (
 						<p className="ml-2 truncate text-sm text-gray-500">in {group.title}</p>

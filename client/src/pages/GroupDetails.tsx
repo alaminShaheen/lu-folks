@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { Fragment, useCallback, useEffect, useState } from "react";
-import Group from "@/models/Group";
+import ExtendedGroup from "@/models/ExtendedGroup.ts";
 import APILinks from "@/constants/APILinks.ts";
 import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import MiniCreatePost from "@/components/MiniCreatePost.tsx";
@@ -10,15 +10,17 @@ import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 const GroupDetails = () => {
 	const params = useParams<"slug">();
 	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
-	const [groupInfo, setGroupInfo] = useState<Group>(Group.EMPTY);
+	const [groupInfo, setGroupInfo] = useState<ExtendedGroup>(ExtendedGroup.EMPTY);
 	const [, setLoading] = useState(false);
 
 	const fetchGroupDetails = useCallback(async () => {
 		try {
 			setLoading(true);
-			const { data } = await axiosInstance.get<Group>(APILinks.getGroupData(params.slug!));
+			const { data } = await axiosInstance.get<ExtendedGroup>(
+				APILinks.getGroupData(params.slug!),
+			);
 			setGroupInfo(
-				new Group(
+				new ExtendedGroup(
 					data.id,
 					data.title,
 					data.createdAt,
