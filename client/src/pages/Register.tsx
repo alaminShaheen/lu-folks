@@ -25,7 +25,6 @@ const Register = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams();
-
 	const {
 		register,
 		handleSubmit,
@@ -64,7 +63,7 @@ const Register = () => {
 		(formValues: RegisterForm) => {
 			onRegisterFormSubmit(formValues);
 		},
-		[onRegisterFormSubmi],
+		[onRegisterFormSubmit],
 	);
 
 	const toggleConfirmPasswordVisibility = useCallback(() => {
@@ -213,7 +212,7 @@ const Register = () => {
 										autoCorrect="off"
 										disabled={isLoading}
 										icon={
-											showPassword ? (
+											showConfirmPassword ? (
 												<EyeOff
 													className="h-4 w-4"
 													onClick={toggleConfirmPasswordVisibility}
