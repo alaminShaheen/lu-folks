@@ -10,19 +10,18 @@ import APILinks from "@/constants/APILinks.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import handleError from "@/utils/handleError.ts";
 import AppConstants from "@/constants/AppConstants.ts";
 import RegisterForm from "@/models/form/RegisterForm.ts";
-import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import InputWithIcon from "@/components/ui/inputWithIcon.tsx";
 import Authentication from "@/models/Authentication.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
+import { useMutation } from "@tanstack/react-query";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
-import FieldValidationError from "@/models/FieldValidationError.ts";
 import generateGoogleOAuthConsentUrl from "@/utils/GenerateGoogleOAuthConsentUrl.ts";
 
 const Register = () => {
-	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -44,35 +43,28 @@ const Register = () => {
 	const { setAuthentication } = useAppContext();
 	const navigate = useNavigate();
 	const { publicAxiosInstance: axiosInstance } = useAxiosInstance();
+	const { mutate: onRegisterFormSubmit, isPending: isLoading } = useMutation({
+		mutationFn: async (formData: RegisterForm) => {
+			const { data } = await axiosInstance.post<Authentication>(
+				APILinks.register(),
+				formData,
+			);
+			return data;
+		},
+		onSuccess: (data) => {
+			setAuthentication(data);
+			toast.dismiss();
+			toast.success("You have registered successfully!");
+			navigate(ROUTES.NEWS_FEED);
+		},
+		onError: (error) => handleError<RegisterForm>(error, setError),
+	});
 
 	const onSubmit = useCallback(
-		async (formValues: RegisterForm) => {
-			try {
-				setIsLoading(true);
-				const { data } = await axiosInstance.post<Authentication>(
-					APILinks.register(),
-					formValues,
-				);
-				setAuthentication(data);
-				toast.dismiss();
-				toast.success("You have registered successfully!");
-				navigate(ROUTES.NEWS_FEED);
-			} catch (error: any) {
-				if (error.response.data.type === ApiErrorType.FIELD_VALIDATION) {
-					Object.entries(
-						(error.response.data as FieldValidationError).validationErrors,
-					).forEach(([key, value]) => {
-						setError(key as keyof RegisterForm, { message: value, type: "server" });
-					});
-				} else {
-					toast.dismiss();
-					toast.error(error.response.data.message);
-				}
-			} finally {
-				setIsLoading(false);
-			}
+		(formValues: RegisterForm) => {
+			onRegisterFormSubmit(formValues);
 		},
-		[axiosInstance, navigate, setAuthentication, setError],
+		[onRegisterFormSubmi],
 	);
 
 	const toggleConfirmPasswordVisibility = useCallback(() => {
