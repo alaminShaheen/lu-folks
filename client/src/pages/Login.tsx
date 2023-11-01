@@ -20,6 +20,7 @@ import { useMutation } from "@tanstack/react-query";
 import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import generateGoogleOAuthConsentUrl from "@/utils/GenerateGoogleOAuthConsentUrl.ts";
+import QueryKeys from "@/constants/QueryKeys.ts";
 
 const Login = () => {
 	const { setAuthentication } = useAppContext();
@@ -40,6 +41,7 @@ const Login = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [showPassword, setShowPassword] = useState(false);
 	const { mutate: onLoginFormSubmit, isPending: isLoading } = useMutation({
+		mutationKey: [QueryKeys.LOGIN],
 		mutationFn: async (formData: LoginForm) => {
 			const { data } = await axiosInstance.post<Authentication>(APILinks.login(), formData);
 			return data;

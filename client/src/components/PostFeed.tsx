@@ -1,9 +1,9 @@
-import React, { useCallback, useRef, useState } from "react";
-import ExtendedPost from "@/models/ExtendedPost.ts";
 import { useIntersection } from "@mantine/hooks";
-import handleError from "@/utils/handleError.ts";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
+import React, { useCallback, useRef, useState } from "react";
 import APILinks from "@/constants/APILinks.ts";
+import handleError from "@/utils/handleError.ts";
+import ExtendedPost from "@/models/ExtendedPost.ts";
+import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 
 type PostFeed = {
 	initialPosts: ExtendedPost[];

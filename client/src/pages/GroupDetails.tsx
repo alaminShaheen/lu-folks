@@ -1,53 +1,31 @@
-import { toast } from "react-toastify";
-import { useParams } from "react-router-dom";
-import { Fragment, useCallback, useEffect, useState } from "react";
-import ExtendedGroup from "@/models/ExtendedGroup.ts";
-import APILinks from "@/constants/APILinks.ts";
-import ApiErrorType from "@/models/enums/ApiErrorType.ts";
+import { Fragment } from "react";
 import MiniCreatePost from "@/components/MiniCreatePost.tsx";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
+import { useParams } from "react-router-dom";
+import useFetchGroupDetails from "@/hooks/group/useFetchGroupDetails.tsx";
+import { Skeleton } from "@/components/ui/skeleton.tsx";
+import handleError from "@/utils/handleError.ts";
 
 const GroupDetails = () => {
 	const params = useParams<"slug">();
-	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
-	const [groupInfo, setGroupInfo] = useState<ExtendedGroup>(ExtendedGroup.EMPTY);
-	const [, setLoading] = useState(false);
+	const {
+		data: group,
+		isFetching: fetchingGroup,
+		isError: fetchGroupIsError,
+		error: fetchGroupError,
+	} = useFetchGroupDetails(params.slug!);
 
-	const fetchGroupDetails = useCallback(async () => {
-		try {
-			setLoading(true);
-			const { data } = await axiosInstance.get<ExtendedGroup>(
-				APILinks.getGroupData(params.slug!),
-			);
-			setGroupInfo(
-				new ExtendedGroup(
-					data.id,
-					data.title,
-					data.createdAt,
-					data.updatedAt,
-					data.posts,
-					data.creator,
-				),
-			);
-		} catch (error: any) {
-			toast.dismiss();
-			if (error.response.data.type === ApiErrorType.GENERAL) {
-				toast.error(error.response.data.message);
-			} else {
-				toast.error(error.message);
-			}
-		} finally {
-			setLoading(false);
-		}
-	}, [axiosInstance, params.slug]);
-
-	useEffect(() => {
-		void fetchGroupDetails();
-	}, [fetchGroupDetails]);
+	if (fetchGroupIsError) {
+		handleError(fetchGroupError);
+	}
 
 	return (
 		<Fragment>
-			<h1 className="font-bold text-3xl md:text-4xl h-14">{groupInfo.title}</h1>
+			{fetchingGroup ? (
+				<Skeleton className="rounded h-11 w-1/2" />
+			) : (
+				<h1 className="font-bold text-3xl md:text-4xl h-14">{group.title}</h1>
+			)}
+
 			<MiniCreatePost />
 			{/*	Show posts*/}
 		</Fragment>

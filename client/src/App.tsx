@@ -30,7 +30,7 @@ function App() {
 							<Route Component={ProtectedRoutesWrapper}>
 								<Route path={ROUTES.NEWS_FEED} Component={NewsFeed} />
 								<Route path={ROUTES.CREATE_GROUP} Component={CreateGroup} />
-
+								{/*<GroupContextProvider>*/}
 								<Route path={ROUTES.GROUP.BASE} Component={GroupLayout}>
 									<Route
 										index
@@ -39,6 +39,7 @@ function App() {
 									/>
 									<Route path={ROUTES.GROUP.CREATE_POST} Component={CreatePost} />
 								</Route>
+								{/*</GroupContextProvider>*/}
 							</Route>
 						</Routes>
 					</BrowserRouter>
