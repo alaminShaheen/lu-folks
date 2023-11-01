@@ -15,7 +15,7 @@ export const APILinks = {
 	imageUpload: () => `image-upload`,
 	createPost: () => `/post`,
 	getPosts: (limit: number, page: number, slug?: string) =>
-		`/post?limit=${limit}&page=${page}&slug=${slug}`,
+		`/post?limit=${limit}&page=${page}${slug ? `&slug=${slug}` : ""}`,
 };
 
 export default APILinks;

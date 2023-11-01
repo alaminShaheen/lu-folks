@@ -153,7 +153,7 @@ class GroupService implements IGroupService {
 					posts: {
 						include: {
 							creator: true,
-							postReactors: true,
+							postReactions: true,
 							comments: true,
 							group: true,
 						},

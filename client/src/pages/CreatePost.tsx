@@ -1,13 +1,25 @@
-import ExtendedGroup from "@/models/ExtendedGroup.ts";
-import CreatePostEditor from "@/components/CreatePostEditor.tsx";
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton.tsx";
-import { useGroupContext } from "@/context/GroupContext.tsx";
+import handleError from "@/utils/handleError.ts";
+import CreatePostEditor from "@/components/CreatePostEditor.tsx";
+import useFetchGroupDetails from "@/hooks/group/useFetchGroupDetails.tsx";
 
 const CreatePost = () => {
-	const { group } = useGroupContext();
+	const params = useParams<"slug">();
+	const {
+		data: group,
+		isFetching: fetchingGroup,
+		isError: fetchGroupIsError,
+		error: fetchGroupError,
+	} = useFetchGroupDetails(params.slug!);
 
-	return (
+	if (fetchGroupIsError) {
+		handleError(fetchGroupError);
+	}
+
+	return fetchingGroup ? (
+		<div>Loading...</div>
+	) : (
 		<div className="flex flex-col items-start gap-6">
 			{/* heading */}
 			<div className="border-b border-gray-200 pb-5">
@@ -15,11 +27,7 @@ const CreatePost = () => {
 					<h3 className="ml-2 mt-2 text-base font-semibold leading-6 text-gray-900">
 						Create Post
 					</h3>
-					{group === ExtendedGroup.EMPTY ? (
-						<Skeleton></Skeleton>
-					) : (
-						<p className="ml-2 truncate text-sm text-gray-500">in {group.title}</p>
-					)}
+					<p className="ml-2 truncate text-sm text-gray-500">in {group.title}</p>
 				</div>
 			</div>
 			{/* form */}

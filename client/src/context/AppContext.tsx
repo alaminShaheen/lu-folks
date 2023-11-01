@@ -5,15 +5,12 @@ import {
 	SetStateAction,
 	useCallback,
 	useContext,
-	useEffect,
 	useState,
 } from "react";
 import Authentication from "@/models/Authentication.ts";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import User from "@/models/User.ts";
-import { toast } from "react-toastify";
-import { AxiosError } from "axios";
-import APILinks from "@/constants/APILinks.ts";
+import useFetchCurrentUser from "@/hooks/auth/useFetchCurrentUser.tsx";
+import handleError from "@/utils/handleError.ts";
 
 type AppContextType = {
 	authentication: Authentication;
@@ -21,9 +18,7 @@ type AppContextType = {
 	appLoading: boolean;
 	setAppLoading: Dispatch<SetStateAction<boolean>>;
 	user: User | null;
-	setUser: Dispatch<SetStateAction<User | null>>;
 	clearAuthentication: () => void;
-	getCurrentUser: (authData: Authentication) => Promise<void>;
 };
 
 const APP_CONTEXT_DEFAULT_VALUES: AppContextType = {
@@ -32,9 +27,8 @@ const APP_CONTEXT_DEFAULT_VALUES: AppContextType = {
 	appLoading: false,
 	setAppLoading: () => {},
 	user: null,
-	setUser: () => {},
 	clearAuthentication: () => {},
-	getCurrentUser: async () => {},
+	// getCurrentUser: async () => {},
 };
 export const AppContext = createContext<AppContextType>(APP_CONTEXT_DEFAULT_VALUES);
 
@@ -46,48 +40,36 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 	const { children } = props;
 	const [authentication, setAuthentication] = useState(APP_CONTEXT_DEFAULT_VALUES.authentication);
 	const [appLoading, setAppLoading] = useState(false);
-	const [user, setUser] = useState<User | null>(null);
-	const { privateAxiosInstance } = useAxiosInstance();
+	// const [, setUser] = useState<User | null>(null);
 
 	const clearAuthentication = useCallback(() => {
 		setAuthentication(Authentication.EMPTY);
-		setUser(null);
+		// setUser(null);
 	}, []);
 
-	const getCurrentUser = useCallback(async () => {
-		try {
-			setAppLoading(true);
-			const { data } = await privateAxiosInstance.get<User>(APILinks.currentUser());
-			setUser(data);
-		} catch (error: any) {
-			toast.dismiss();
-			if (error instanceof AxiosError) {
-				toast.error(error.response?.data.message);
-			} else {
-				toast.error(error.message);
-			}
-		} finally {
-			setAppLoading(false);
-		}
-	}, [privateAxiosInstance]);
+	const {
+		data: user,
+		isFetching,
+		isError,
+		error,
+	} = useFetchCurrentUser({ accessToken: authentication.accessToken });
 
-	useEffect(() => {
-		if (authentication.accessToken && !user) {
-			void getCurrentUser();
-		}
-	}, [authentication.accessToken, getCurrentUser, user]);
+	if (isError) {
+		handleError(error);
+	}
 
-	return (
+	return isFetching ? (
+		<div>Loading....</div>
+	) : (
 		<AppContext.Provider
 			value={{
 				authentication,
 				setAuthentication,
 				clearAuthentication,
-				user,
+				user: user || null,
 				setAppLoading,
 				appLoading,
-				getCurrentUser,
-				setUser,
+				// getCurrentUser,
 			}}
 		>
 			{children}

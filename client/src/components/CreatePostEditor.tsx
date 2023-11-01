@@ -1,17 +1,18 @@
-import TextareaAutosize from "react-textarea-autosize";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import TextareaAutosize from "react-textarea-autosize";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils.ts";
-import ROUTES from "@/constants/Routes.ts";
 import APILinks from "@/constants/APILinks.ts";
 import PostCreate from "@/models/form/PostCreate";
 import handleError from "@/utils/handleError.ts";
 import useUploadFile from "@/hooks/useUploadFile.tsx";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
+import useCreatePost from "@/hooks/post/useCreatePost.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import RichWYSIWYGEditor, { EditorHandle } from "@/components/ui/wysiwygEditor.tsx";
+import { useQueryClient } from "@tanstack/react-query";
+import QueryKeys from "@/constants/QueryKeys.ts";
+import { useNavigate } from "react-router-dom";
 
 type CreatePostEditorType = {
 	groupSlug: string;
@@ -20,11 +21,11 @@ type CreatePostEditorType = {
 const CreatePostEditor = (props: CreatePostEditorType) => {
 	const { groupSlug } = props;
 	const _titleRef = useRef<HTMLTextAreaElement>(null);
-	const navigate = useNavigate();
 	const richTextEditorRef = useRef<EditorHandle>(null);
 	const { user, authentication } = useAppContext();
-	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
+	const navigate = useNavigate();
 	const [, setLoading] = useState(false);
+	const queryClient = useQueryClient();
 	const { uploadFiles } = useUploadFile();
 	const {
 		register,
@@ -67,21 +68,23 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 		[setError, uploadFiles, user?.id],
 	);
 
+	const onPostCreated = useCallback(async () => {
+		toast.dismiss();
+		toast.success("Your post has been published.");
+		await queryClient.invalidateQueries([QueryKeys.GROUP_DETAILS, groupSlug]);
+		navigate(`/group/${groupSlug}`);
+	}, [groupSlug, navigate, queryClient]);
+
+	const { mutate } = useCreatePost({ setError, onSuccess: onPostCreated });
+
 	const onSubmit = useCallback(
 		async (formData: PostCreate) => {
-			try {
-				const content = await richTextEditorRef.current?.save();
-				formData.content = JSON.stringify(content);
-				formData.groupSlug = groupSlug;
-				await axiosInstance.post(APILinks.createPost(), formData);
-				toast.dismiss();
-				toast.success("Your post has been published.");
-				navigate(ROUTES.NEWS_FEED);
-			} catch (error: any) {
-				handleError(error, setError);
-			}
+			const content = await richTextEditorRef.current?.save();
+			formData.content = JSON.stringify(content);
+			formData.groupSlug = groupSlug;
+			mutate(formData);
 		},
-		[axiosInstance, groupSlug, navigate, setError],
+		[groupSlug, mutate],
 	);
 
 	useEffect(() => {

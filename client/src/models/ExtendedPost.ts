@@ -1,5 +1,6 @@
 import User from "@/models/User.ts";
 import Group from "@/models/Group.ts";
+import PostReaction from "@/models/PostReaction.ts";
 
 class ExtendedPost {
 	static EMPTY = new ExtendedPost(
@@ -22,8 +23,8 @@ class ExtendedPost {
 		public updatedAt: Date,
 		public creator: User,
 		public group: Group,
-		public comments: string[],
-		public postReactors: string[],
+		public comments: Comment[],
+		public postReactions: PostReaction[],
 	) {}
 }
 

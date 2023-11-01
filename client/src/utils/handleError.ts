@@ -1,10 +1,10 @@
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
-import { UseFormSetError } from "react-hook-form";
+import { FieldErrors, UseFormSetError } from "react-hook-form";
 import ApiErrorType from "@/models/enums/ApiErrorType.ts";
 import FieldValidationError from "@/models/FieldValidationError.ts";
 
-function HandleError<T>(error: any, setError?: UseFormSetError<T>) {
+function HandleError<T extends FieldErrors>(error: any, setError?: UseFormSetError<T>) {
 	if (error instanceof AxiosError) {
 		if (error.response?.data.type === ApiErrorType.FIELD_VALIDATION) {
 			Object.entries((error.response.data as FieldValidationError).validationErrors).forEach(

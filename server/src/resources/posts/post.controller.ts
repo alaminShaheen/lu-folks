@@ -20,7 +20,7 @@ class PostController extends Controller {
 		this.router
 			.use(this.path, verifyAuthentication)
 			.route(this.path)
-			.get(this.getPosts)
+			// .get(this.getPosts)
 			.post(DtoValidator(CreatePostDto), this.createPost)
 			.put(this.updatePost)
 			.delete(this.deletePost);

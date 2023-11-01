@@ -33,7 +33,6 @@ function App() {
 								{/*<GroupContextProvider>*/}
 								<Route path={ROUTES.GROUP.BASE} Component={GroupLayout}>
 									<Route
-										index
 										path={ROUTES.GROUP.DETAILS}
 										Component={GroupDetails}
 									/>
