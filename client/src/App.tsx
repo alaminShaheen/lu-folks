@@ -32,10 +32,7 @@ function App() {
 								<Route path={ROUTES.CREATE_GROUP} Component={CreateGroup} />
 								{/*<GroupContextProvider>*/}
 								<Route path={ROUTES.GROUP.BASE} Component={GroupLayout}>
-									<Route
-										path={ROUTES.GROUP.DETAILS}
-										Component={GroupDetails}
-									/>
+									<Route index Component={GroupDetails} />
 									<Route path={ROUTES.GROUP.CREATE_POST} Component={CreatePost} />
 								</Route>
 								{/*</GroupContextProvider>*/}

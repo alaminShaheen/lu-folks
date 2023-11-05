@@ -1,20 +1,15 @@
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCallback, useState } from "react";
-import APILinks from "@/constants/APILinks.ts";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import ApiErrorType from "@/models/enums/ApiErrorType.ts";
-import CreateGroupForm from "@/models/form/CreateGroupForm.ts";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
-import FieldValidationError from "@/models/FieldValidationError.ts";
 import ExtendedGroup from "@/models/ExtendedGroup.ts";
-import { AxiosError } from "axios";
+import useCreateGroup from "@/hooks/group/useCreateGroup.tsx";
+import CreateGroupForm from "@/models/form/CreateGroupForm.ts";
 
 const CreateGroup = () => {
-	const [isLoading, setIsLoading] = useState(false);
 	const {
 		register,
 		handleSubmit,
@@ -28,41 +23,25 @@ const CreateGroup = () => {
 	});
 	const navigate = useNavigate();
 	const groupTitle = watch("title");
-	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
+
+	const onGroupCreated = useCallback(
+		(data: ExtendedGroup) => {
+			toast.success("Group created successfully!");
+			navigate(`/group/${data.id}`);
+		},
+		[navigate],
+	);
+
+	const { mutate: createGroup, isPending } = useCreateGroup({
+		setError: setError,
+		onSuccess: onGroupCreated,
+	});
 
 	const onSubmit = useCallback(
-		async (formValues: CreateGroupForm) => {
-			try {
-				toast.dismiss();
-				setIsLoading(true);
-				const { data } = await axiosInstance.post<ExtendedGroup>(
-					APILinks.createGroup(),
-					formValues,
-				);
-				toast.success("Group created successfully!");
-				navigate(`/group/${data.id}`);
-			} catch (error: any) {
-				if (error instanceof AxiosError) {
-					if (error.response?.data.type === ApiErrorType.FIELD_VALIDATION) {
-						Object.entries(
-							(error.response.data as FieldValidationError).validationErrors,
-						).forEach(([key, value]) => {
-							setError(key as keyof CreateGroupForm, {
-								message: value,
-								type: "server",
-							});
-						});
-					} else {
-						toast.error(error.response?.data.message);
-					}
-				} else {
-					toast.error(error.response?.data.message);
-				}
-			} finally {
-				setIsLoading(false);
-			}
+		(formValues: CreateGroupForm) => {
+			createGroup(formValues);
 		},
-		[axiosInstance, navigate, setError],
+		[createGrou],
 	);
 
 	return (
@@ -93,7 +72,7 @@ const CreateGroup = () => {
 								autoCapitalize="none"
 								autoComplete="text"
 								autoCorrect="off"
-								disabled={isLoading}
+								disabled={isPending}
 							/>
 							{errors.title?.message && (
 								<span className="text-xs text-red-500 my-2">
@@ -105,13 +84,13 @@ const CreateGroup = () => {
 				</div>
 
 				<div className="flex justify-end items-center gap-4">
-					<Button disabled={isLoading} variant="secondary">
+					<Button disabled={isPending} variant="secondary">
 						<Link to="/news-feed" tabIndex={-1}>
 							Cancel
 						</Link>
 					</Button>
 					<Button
-						disabled={groupTitle.length === 0 || isLoading}
+						disabled={groupTitle.length === 0 || isPending}
 						form="create-group-form"
 						onSubmit={handleSubmit(onSubmit)}
 					>

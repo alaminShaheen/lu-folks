@@ -2,8 +2,8 @@ import APILinks from "@/constants/APILinks.ts";
 import QueryKeys from "@/constants/QueryKeys.ts";
 import ExtendedPost from "@/models/ExtendedPost.ts";
 import AppConstants from "@/constants/AppConstants.ts";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { privateAxiosInstance } from "@/api/Axios.ts";
 
 type UseFetchPaginatedPostsProps = {
 	initialPageParam?: number;
@@ -19,11 +19,11 @@ const UseFetchPaginatedPosts = (props: UseFetchPaginatedPostsProps) => {
 		groupSlug,
 		initialPosts = [],
 	} = props;
-	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
+
 	return useInfiniteQuery({
 		queryKey: [QueryKeys.FETCH_INFINITE_POST, groupSlug],
 		queryFn: async ({ pageParam = 1 }) => {
-			const { data } = await axiosInstance.get<ExtendedPost[]>(
+			const { data } = await privateAxiosInstance.get<ExtendedPost[]>(
 				APILinks.getPosts(limit, pageParam, groupSlug),
 			);
 			return data;

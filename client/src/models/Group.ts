@@ -4,8 +4,8 @@ class Group {
 	constructor(
 		public id: string,
 		public title: string,
-		public updatedAt: Date,
-		public createdAt: Date,
+		public updatedAt: string,
+		public createdAt: string,
 	) {}
 }
 

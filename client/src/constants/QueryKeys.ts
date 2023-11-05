@@ -9,6 +9,7 @@ const QueryKeys = {
 	LEAVE_GROUP: "leave-group",
 	FETCH_INFINITE_POST: "fetch-infinite-post",
 	CREATE_POST: "create-post",
+	CREATE_GROUP: "create-group",
 } as const;
 
 export default QueryKeys;

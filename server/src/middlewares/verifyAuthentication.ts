@@ -7,13 +7,17 @@ import process from "process";
 function VerifyAuthentication(request: Request, response: Response, nextFunction: NextFunction) {
 	const authHeader = request.headers.authorization;
 
-	if (!authHeader)
+	if (!authHeader) {
+		console.error("No access token found.");
 		return nextFunction(new HttpException(httpStatus.FORBIDDEN, "User is unauthorized"));
+	}
 
 	// authHeader = "Bearer <<token>>
 	const token = authHeader.split(" ")[1];
+	console.log(token, "sakib");
 	jwt.verify(token, String(process.env.ACCESS_TOKEN_SECRET), (error, decoded) => {
 		if (error) {
+			console.error("JWT is invalid.", error);
 			return nextFunction(new HttpException(httpStatus.FORBIDDEN, "User is unauthorized"));
 		}
 

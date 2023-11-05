@@ -3,27 +3,25 @@ import APILinks from "@/constants/APILinks.ts";
 import QueryKeys from "@/constants/QueryKeys.ts";
 import PostCreate from "@/models/form/PostCreate.ts";
 import handleError from "@/utils/handleError.ts";
-import RegisterForm from "@/models/form/RegisterForm.ts";
 import { useMutation } from "@tanstack/react-query";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
+import ServiceHookCommonProps from "@/models/ServiceHookCommonProps.ts";
+import { privateAxiosInstance } from "@/api/Axios.ts";
 
-type UseCreatePostProps = {
-	setError: UseFormSetError<any>;
-	onSuccess: () => Promise<void>;
-};
+interface UseCreatePostProps extends ServiceHookCommonProps<void> {
+	setError: UseFormSetError<PostCreate>;
+}
 
 const UseCreatePost = (props: UseCreatePostProps) => {
 	const { setError, onSuccess } = props;
-	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
 
 	return useMutation({
 		mutationKey: [QueryKeys.CREATE_POST],
 		mutationFn: async (formData: PostCreate) => {
-			const { data } = await axiosInstance.post<void>(APILinks.createPost(), formData);
+			const { data } = await privateAxiosInstance.post<void>(APILinks.createPost(), formData);
 			return data;
 		},
 		onSuccess,
-		onError: (error) => handleError<RegisterForm>(error, setError),
+		onError: (error) => handleError(error, setError),
 	});
 };
 

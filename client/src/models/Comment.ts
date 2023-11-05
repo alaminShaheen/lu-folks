@@ -1,14 +1,16 @@
+import CommentReaction from "@/models/CommentReaction.ts";
+
 class Comment {
 	static EMPTY = new Comment("", "", new Date(), new Date(), "", "", []);
 
 	constructor(
 		public id: string,
 		public comment: string,
-		public createdAt: Date,
-		public updatedAt: Date,
+		public createdAt: string,
+		public updatedAt: string,
 		public commenterId: string,
 		public postId: string,
-		public commentReactions: string[],
+		public commentReactions: CommentReaction[],
 	) {}
 }
 

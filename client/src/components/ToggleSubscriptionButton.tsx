@@ -1,12 +1,12 @@
 import { toast } from "react-toastify";
 import { useCallback } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import APILinks from "@/constants/APILinks.ts";
 import QueryKeys from "@/constants/QueryKeys.ts";
 import { Button } from "@/components/ui/button.tsx";
 import handleError from "@/utils/handleError.ts";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import useIsGroupMember from "@/hooks/group/useIsGroupMember.tsx";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { privateAxiosInstance } from "@/api/Axios.ts";
 
 interface ToggleSubscriptionButtonProps {
 	groupTitle: string;
@@ -15,14 +15,13 @@ interface ToggleSubscriptionButtonProps {
 
 const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 	const { groupId, groupTitle } = props;
-	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
 	const queryClient = useQueryClient();
 	const { data: isGroupMember, isLoading: fetchingIsGroupMember } = useIsGroupMember(groupId);
 
 	const { mutate: joinGroup, isPending: joiningGroup } = useMutation({
 		mutationKey: [QueryKeys.JOIN_GROUP],
 		mutationFn: async () => {
-			const { data } = await axiosInstance.post<void>(APILinks.joinGroup(groupId), {});
+			const { data } = await privateAxiosInstance.post<void>(APILinks.joinGroup(groupId), {});
 			return data;
 		},
 		onSuccess: async () => {
@@ -62,46 +61,6 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 		},
 		onError: (error: any) => handleError(error),
 	});
-
-	// const joinGroup = useCallback(async () => {
-	// 	try {
-	// 		await axiosInstance.post<void>(APILinks.joinGroup(group.id), {});
-	// 		toast.dismiss();
-	// 		toast.success(`You have joined the group: ${group.title}`);
-	// 		onSubscriptionChange();
-	// 	} catch (error: any) {
-	// 		if (error instanceof AxiosError) {
-	// 			if (error.response?.data.type === ApiErrorType.GENERAL) {
-	// 				toast.error(error.response?.data.message);
-	// 			}
-	// 		} else {
-	// 			onSubscriptionChange();
-	// 			toast.error(error.message);
-	// 		}
-	// 	} finally {
-	// 		setLoading(false);
-	// 	}
-	// }, [axiosInstance, group.id, group.title, onSubscriptionChange]);
-
-	// const leaveGroup = useCallback(async () => {
-	// 	try {
-	// 		setLoading(true);
-	// 		await axiosInstance.delete<void>(APILinks.leaveGroup(group.id));
-	// 		toast.dismiss();
-	// 		toast.success(`You have left the group: ${group.title}`);
-	// 		onSubscriptionChange();
-	// 	} catch (error: any) {
-	// 		if (error instanceof AxiosError) {
-	// 			if (error.response?.data.type === ApiErrorType.GENERAL) {
-	// 				toast.error(error.response?.data.message);
-	// 			}
-	// 		} else {
-	// 			toast.error(error.message);
-	// 		}
-	// 	} finally {
-	// 		setLoading(false);
-	// 	}
-	// }, [axiosInstance, group.id, group.title, onSubscriptionChange]);
 
 	const onJoinGroup = useCallback(() => {
 		void joinGroup();

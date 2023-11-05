@@ -49,8 +49,8 @@ const GroupLayout = () => {
 								<div className="flex justify-between gap-x-4 py-3 items-center">
 									<dt className="text-gray-500">Created</dt>
 									<dd className="text-gray-700">
-										<time dateTime={group.createdAt.toDateString()}>
-											{format(group.createdAt, "MMMM d, yyyy")}
+										<time dateTime={group.createdAt}>
+											{format(new Date(group.createdAt), "MMMM d, yyyy")}
 										</time>
 									</dd>
 								</div>

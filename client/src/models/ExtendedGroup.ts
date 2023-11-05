@@ -7,8 +7,8 @@ class ExtendedGroup {
 	constructor(
 		public id: string,
 		public title: string,
-		public createdAt: Date,
-		public updatedAt: Date,
+		public createdAt: string,
+		public updatedAt: string,
 		public posts: ExtendedPost[],
 		public creator: User,
 	) {}

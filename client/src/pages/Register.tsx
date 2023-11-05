@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import ROUTES from "@/constants/Routes.ts";
 import AppLogo from "@/components/AppLogo.tsx";
 import APILinks from "@/constants/APILinks.ts";
+import QueryKeys from "@/constants/QueryKeys.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -17,10 +18,8 @@ import InputWithIcon from "@/components/ui/inputWithIcon.tsx";
 import Authentication from "@/models/Authentication.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
 import { useMutation } from "@tanstack/react-query";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import generateGoogleOAuthConsentUrl from "@/utils/GenerateGoogleOAuthConsentUrl.ts";
-import QueryKeys from "@/constants/QueryKeys.ts";
 
 const Register = () => {
 	const [showPassword, setShowPassword] = useState(false);
@@ -40,9 +39,8 @@ const Register = () => {
 			username: "",
 		},
 	});
-	const { setAuthentication } = useAppContext();
+	const { setAuthentication, publicAxiosInstance: axiosInstance } = useAppContext();
 	const navigate = useNavigate();
-	const { publicAxiosInstance: axiosInstance } = useAxiosInstance();
 	const { mutate: onRegisterFormSubmit, isPending: isLoading } = useMutation({
 		mutationKey: [QueryKeys.REGISTER],
 		mutationFn: async (formData: RegisterForm) => {
@@ -55,10 +53,11 @@ const Register = () => {
 		onSuccess: (data) => {
 			setAuthentication(data);
 			toast.dismiss();
+			console.log("hello");
 			toast.success("You have registered successfully!");
 			navigate(ROUTES.NEWS_FEED);
 		},
-		onError: (error) => handleError<RegisterForm>(error, setError),
+		onError: (error) => handleError(error, setError),
 	});
 
 	const onSubmit = useCallback(

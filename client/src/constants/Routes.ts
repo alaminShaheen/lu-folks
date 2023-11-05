@@ -5,7 +5,7 @@ const ROUTES = {
 	CREATE_GROUP: "/create-group",
 	GROUP: {
 		BASE: "group/:slug",
-		DETAILS: "",
+		DETAILS: "/",
 		CREATE_POST: "create-post",
 	},
 };

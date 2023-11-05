@@ -7,6 +7,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import ROUTES from "@/constants/Routes.ts";
 import AppLogo from "@/components/AppLogo.tsx";
 import APILinks from "@/constants/APILinks.ts";
+import QueryKeys from "@/constants/QueryKeys.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import LoginForm from "@/models/form/LoginForm.ts";
@@ -17,16 +18,13 @@ import InputWithIcon from "@/components/ui/inputWithIcon.tsx";
 import Authentication from "@/models/Authentication.ts";
 import LoadingSpinner from "@/components/LoadingSpinner.tsx";
 import { useMutation } from "@tanstack/react-query";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import generateGoogleOAuthConsentUrl from "@/utils/GenerateGoogleOAuthConsentUrl.ts";
-import QueryKeys from "@/constants/QueryKeys.ts";
 
 const Login = () => {
-	const { setAuthentication } = useAppContext();
+	const { setAuthentication, publicAxiosInstance: axiosInstance } = useAppContext();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { publicAxiosInstance: axiosInstance } = useAxiosInstance();
 	const {
 		register,
 		handleSubmit,
@@ -52,7 +50,7 @@ const Login = () => {
 			toast.success("You have logged in successfully!");
 			navigate(location.state?.from || ROUTES.NEWS_FEED, { replace: true });
 		},
-		onError: (error) => handleError<LoginForm>(error, setError),
+		onError: (error) => handleError(error, setError),
 	});
 
 	const onSubmit = useCallback(

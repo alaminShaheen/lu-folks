@@ -5,12 +5,16 @@ import {
 	SetStateAction,
 	useCallback,
 	useContext,
-	useState,
+	useEffect,
+	useState
 } from "react";
 import Authentication from "@/models/Authentication.ts";
 import User from "@/models/User.ts";
 import useFetchCurrentUser from "@/hooks/auth/useFetchCurrentUser.tsx";
 import handleError from "@/utils/handleError.ts";
+import { privateAxiosInstance, publicAxiosInstance } from "@/api/Axios.ts";
+import httpStatus from "http-status";
+import { AxiosInstance } from "axios";
 
 type AppContextType = {
 	authentication: Authentication;
@@ -19,6 +23,8 @@ type AppContextType = {
 	setAppLoading: Dispatch<SetStateAction<boolean>>;
 	user: User | null;
 	clearAuthentication: () => void;
+	publicAxiosInstance: AxiosInstance;
+	privateAxiosInstance: AxiosInstance;
 };
 
 const APP_CONTEXT_DEFAULT_VALUES: AppContextType = {
@@ -29,6 +35,8 @@ const APP_CONTEXT_DEFAULT_VALUES: AppContextType = {
 	user: null,
 	clearAuthentication: () => {},
 	// getCurrentUser: async () => {},
+	privateAxiosInstance: null,
+	publicAxiosInstance: null,
 };
 export const AppContext = createContext<AppContextType>(APP_CONTEXT_DEFAULT_VALUES);
 
@@ -47,6 +55,42 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 		// setUser(null);
 	}, []);
 
+	useEffect(() => {
+		const requestIntercept = privateAxiosInstance.interceptors.request.use(
+			(config) => {
+				if (!config.headers["authorization"]) {
+					config.headers["authorization"] = `Bearer ${authentication.accessToken}`;
+				}
+				return config;
+			},
+			(error) => Promise.reject(error,
+		);
+
+		const responseIntercept = privateAxiosInstance.interceptors.response.use(
+			(response) => response,
+			async (error) => {
+				const previousRequestConfig = error?.config;
+				if (
+					[httpStatus.FORBIDDEN, httpStatus.UNAUTHORIZED].includes(
+						error?.response?.statu,
+					) &&
+					!previousRequestConfig?.sent
+				) {
+					previousRequestConfig.sent = true;
+					const newAccessToken = await refresh();
+					previousRequestConfig.headers["authorization"] = `Bearer ${newAccessToken}`;
+					return privateAxiosInstance(previousRequestConfig);
+				}
+				return Promise.reject(error);
+			,
+		);
+
+		return () => {
+			privateAxiosInstance.interceptors.request.eject(requestIntercept);
+			privateAxiosInstance.interceptors.response.eject(responseIntercept);
+		};
+	}, [authentication.accessToken]);
+
 	const {
 		data: user,
 		isFetching,
@@ -58,9 +102,7 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 		handleError(error);
 	}
 
-	return isFetching ? (
-		<div>Loading....</div>
-	) : (
+	return (
 		<AppContext.Provider
 			value={{
 				authentication,
@@ -70,9 +112,11 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 				setAppLoading,
 				appLoading,
 				// getCurrentUser,
+				publicAxiosInstance,
+				privateAxiosInstance
 			}}
 		>
-			{children}
+			{isFetching ? <div>Loading....</div> : children}
 		</AppContext.Provider>
 	);
 };

@@ -13,8 +13,8 @@ import User from "@/models/User";
 import ROUTES from "@/constants/Routes.ts";
 import APILinks from "@/constants/APILinks.ts";
 import UserAvatar from "@/components/UserAvatar.tsx";
-import useAxiosInstance from "@/hooks/useAxiosInstance.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
+import { privateAxiosInstance } from "@/api/Axios.ts";
 
 interface UserAccountNavProps extends HTMLAttributes<HTMLDivElement> {
 	user: User;
@@ -22,13 +22,12 @@ interface UserAccountNavProps extends HTMLAttributes<HTMLDivElement> {
 
 export function UserAccountNav(props: UserAccountNavProps) {
 	const { user } = props;
-	const { privateAxiosInstance: axiosInstance } = useAxiosInstance();
 	const { clearAuthentication } = useAppContext();
 	const navigate = useNavigate();
 
 	const logout = useCallback(async () => {
 		try {
-			await axiosInstance.delete(APILinks.logout());
+			await privateAxiosInstance.delete(APILinks.logout());
 			clearAuthentication();
 			toast.dismiss();
 			toast.success("You have logged out successfully.");
@@ -42,7 +41,7 @@ export function UserAccountNav(props: UserAccountNavProps) {
 				toast.error(error.message);
 			}
 		}
-	}, [axiosInstance, clearAuthentication, navigate]);
+	}, [clearAuthentication, navigate]);
 
 	return (
 		<DropdownMenu>
