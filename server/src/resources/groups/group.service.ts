@@ -205,14 +205,18 @@ class GroupService implements IGroupService {
 		}
 	};
 
-	public checkGroupExistence = async (slug: string): Promise<void> => {
+	public checkGroupExistence = async (slug: string): Promise<Group> => {
 		try {
-			const group = this.databaseInstance.groupRepository.findFirst({ where: { id: slug } });
+			const group = await this.databaseInstance.groupRepository.findFirst({
+				where: { id: slug },
+			});
 
 			if (!group) {
 				console.log("Group does not exist.");
 				throw new HttpException(httpStatus.BAD_REQUEST, "The group does not exist");
 			}
+
+			return group;
 		} catch (error) {
 			throw error;
 		}

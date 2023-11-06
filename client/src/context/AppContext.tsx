@@ -6,7 +6,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
-	useState
+	useState,
 } from "react";
 import Authentication from "@/models/Authentication.ts";
 import User from "@/models/User.ts";
@@ -63,7 +63,7 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 				}
 				return config;
 			},
-			(error) => Promise.reject(error,
+			(error) => Promise.reject(error),
 		);
 
 		const responseIntercept = privateAxiosInstance.interceptors.response.use(
@@ -82,7 +82,7 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 					return privateAxiosInstance(previousRequestConfig);
 				}
 				return Promise.reject(error);
-			,
+			}
 		);
 
 		return () => {

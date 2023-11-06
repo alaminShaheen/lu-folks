@@ -23,21 +23,21 @@ model Session {
 }
 
 model User {
-  id               String             @id @default(cuid())
-  email            String             @unique
+  id               String            @id @default(cuid())
+  email            String            @unique
   username         String
   password         String?
   imageUrl         String?
-  authProvider     AuthProvider       @default(VANILLA)
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt()
+  authProvider     AuthProvider      @default(VANILLA)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt()
   session          Session? // 1 -> 1
   createdGroups    Group[] // 1 -> n
-  memberOfGroups   Group[]            @relation(name: "groupMembership") // n -> n
+  memberOfGroups   Group[]           @relation(name: "groupMembership") // n -> n
   createdPosts     Post[] // 1 -> n
   comments         Comment[] // 1 -> n
-  commentReactions CommentReactions[] // n -> n
-  postReactions    PostReactions[] // n -> n
+  commentReactions CommentReaction[] // n -> n
+  postReactions    PostReaction[] // n -> n
 }
 
 model Group {
@@ -52,49 +52,49 @@ model Group {
 }
 
 model Post {
-  id            String          @id @default(cuid())
+  id            String         @id @default(cuid())
   title         String
   content       Json
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt()
-  creator       User            @relation(fields: [creatorId], references: [id]) // n -> 1
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt()
+  creator       User           @relation(fields: [creatorId], references: [id]) // n -> 1
   creatorId     String
-  group         Group           @relation(fields: [groupId], references: [id]) // n -> 1
+  group         Group          @relation(fields: [groupId], references: [id]) // n -> 1
   groupId       String
   comments      Comment[] // 1 -> n
-  postReactions PostReactions[] // n -> n
+  postReactions PostReaction[] // n -> n
 }
 
 model Comment {
-  id               String             @id @default(cuid())
+  id               String            @id @default(cuid())
   comment          String
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt()
-  commenter        User               @relation(fields: [commenterId], references: [id]) // n -> 1
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt()
+  commenter        User              @relation(fields: [commenterId], references: [id]) // n -> 1
   commenterId      String
-  post             Post               @relation(fields: [postId], references: [id]) // n -> 1
+  post             Post              @relation(fields: [postId], references: [id]) // n -> 1
   postId           String
-  commentReactions CommentReactions[] // n -> n
+  commentReactions CommentReaction[] // n -> n
 }
 
-model PostReactions {
+model PostReaction {
   user   User         @relation(fields: [userId], references: [id])
   userId String
   post   Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String
   type   ReactionType
 
-  @@id([userId, postId])
+  @@id([userId, postId, type])
 }
 
-model CommentReactions {
+model CommentReaction {
   user      User         @relation(fields: [userId], references: [id])
   userId    String
   comment   Comment      @relation(fields: [commentId], references: [id])
   commentId String
   type      ReactionType
 
-  @@id([userId, commentId])
+  @@id([userId, commentId, type])
 }
 
 enum ReactionType {

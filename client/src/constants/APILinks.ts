@@ -16,6 +16,7 @@ export const APILinks = {
 	createPost: () => `/post`,
 	getPosts: (limit: number, page: number, slug?: string) =>
 		`/post?limit=${limit}&page=${page}${slug ? `&slug=${slug}` : ""}`,
+	reactToPost: () => `/post/react`,
 };
 
 export default APILinks;

@@ -17,20 +17,28 @@ class PostController extends Controller {
 	}
 
 	protected initialiseRoutes = () => {
-		this.router
-			.use(this.path, verifyAuthentication)
-			.route(this.path)
-			// .get(this.getPosts)
-			.post(DtoValidator(CreatePostDto), this.createPost)
-			.put(this.updatePost)
-			.delete(this.deletePost);
 		this.router.route(`${this.path}/unfurl-link`).get(verifyAuthentication, this.unfurlLink);
+		this.router.route(`${this.path}/react`).patch(verifyAuthentication, this.react);
+		this.router
+			.route(this.path)
+			.post(verifyAuthentication, DtoValidator(CreatePostDto), this.createPost);
+		this.router.route(this.path).put(this.updatePost);
+		this.router.route(this.path).delete(this.deletePost);
 	};
 
 	private getPosts = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
 			const posts = await this.postService.getUserPosts(request.user?.userId!);
 			return response.status(httpStatus.OK).send(posts);
+		} catch (error: unknown) {
+			errorHandler(error as any, request, response, nextFunction);
+		}
+	};
+
+	private react = async (request: Request, response: Response, nextFunction: NextFunction) => {
+		try {
+			await this.postService.react(request.user?.userId!, request.body);
+			return response.sendStatus(httpStatus.OK);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);
 		}

@@ -12,6 +12,8 @@ abstract class Database {
 
 	public abstract get groupRepository(): Prisma.GroupDelegate<DefaultArgs>;
 
+	public abstract get postReactionRepository(): Prisma.PostReactionDelegate<DefaultArgs>;
+
 	abstract disconnect(): void;
 }
 

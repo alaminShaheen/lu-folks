@@ -19,6 +19,12 @@ function validateEnv() {
 
 		GOOGLE_OAUTH_CLIENT_ID: str(),
 		GOOGLE_OAUTH_CLIENT_SECRET: str(),
+
+		UPLOADTHING_SECRET: str(),
+		UPLOADTHING_APP_ID: str(),
+
+		REDIS_URL: str(),
+		REDIS_TOKEN: str(),
 	});
 }
 

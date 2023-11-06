@@ -29,6 +29,10 @@ class PostgresDatabase extends Database {
 		return this.dataSource.group;
 	}
 
+	public get postReactionRepository(): Prisma.PostReactionDelegate<DefaultArgs> {
+		return this.dataSource.postReaction;
+	}
+
 	disconnect = async () => {
 		if (this.dataSource) {
 			try {

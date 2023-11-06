@@ -14,7 +14,6 @@ function VerifyAuthentication(request: Request, response: Response, nextFunction
 
 	// authHeader = "Bearer <<token>>
 	const token = authHeader.split(" ")[1];
-	console.log(token, "sakib");
 	jwt.verify(token, String(process.env.ACCESS_TOKEN_SECRET), (error, decoded) => {
 		if (error) {
 			console.error("JWT is invalid.", error);

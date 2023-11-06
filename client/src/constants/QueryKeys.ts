@@ -10,6 +10,7 @@ const QueryKeys = {
 	FETCH_INFINITE_POST: "fetch-infinite-post",
 	CREATE_POST: "create-post",
 	CREATE_GROUP: "create-group",
+	POST_REACTION: "post-reaction",
 } as const;
 
 export default QueryKeys;

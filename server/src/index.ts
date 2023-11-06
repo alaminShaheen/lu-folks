@@ -16,9 +16,11 @@ import GroupService from "@/resources/groups/group.service";
 import GroupController from "@/resources/groups/group.controller";
 import process from "process";
 import FileController from "@/resources/files/file.controller";
+import RedisDatabase from "@/database/redis.database";
 
 validateEnv();
 container.resolve(PostgresDatabase);
+container.resolve(RedisDatabase);
 container.resolve(UserService);
 container.resolve(AuthService);
 

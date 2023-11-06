@@ -1,10 +1,14 @@
 import { Link } from "react-router-dom";
 import { Fragment, useRef } from "react";
+import { MessageSquare } from "lucide-react";
 import ROUTES from "@/constants/Routes.ts";
 import GroupInfo from "@/models/GroupInfo.ts";
 import ExtendedPost from "@/models/ExtendedPost.ts";
+import EditorOutput from "@/components/EditorOutput.tsx";
 import ReactionType from "@/models/enums/ReactionType.ts";
 import { formatTimeToNow } from "@/utils/DateFormatters.ts";
+import PostReactions from "@/components/PostReactions.tsx";
+import { clsx } from "clsx";
 
 type PostProps = {
 	post: ExtendedPost;
@@ -17,7 +21,6 @@ type PostProps = {
 
 const Post = (props: PostProps) => {
 	const { commentCount, likeCount, unlikeCount, post, ownReaction, groupInfo } = props;
-
 	const paragraphBlurRef = useRef<HTMLParagraphElement>(null);
 
 	return (
@@ -58,22 +61,33 @@ const Post = (props: PostProps) => {
 						className="relative text-sm max-h-40 w-full overflow-clip"
 						ref={paragraphBlurRef}
 					>
-						{/*<EditorOutput content={post.content} />*/}
-						{paragraphBlurRef.current?.clientHeight >= 160 ? (
+						<EditorOutput postContent={JSON.parse(post.content)} />
+						{paragraphBlurRef.current?.clientHeight === 160 ? (
 							// blur bottom if content is too long
-							<div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white to-transparent" />
+							<div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white to-transparent"></div>
 						) : null}
 					</div>
 				</div>
 			</div>
 
-			<div className="bg-gray-50 z-20 text-sm px-4 py-4 sm:px-6">
+			<div className="bg-gray-50 z-20 text-sm px-4 py-4 sm:px-6 flex items-center gap-3">
+				<PostReactions
+					postId={post.id}
+					likeCount={likeCount}
+					unlikeCount={unlikeCount}
+					ownReaction={ownReaction}
+				/>
 				<Link
 					to={"/"}
 					// href={`/r/${subredditName}/post/${post.id}`}
 					className="w-fit flex items-center gap-2"
 				>
-					{/*<MessageSquare className="h-4 w-4" /> {commentAmt} comments*/}
+					<MessageSquare
+						className={clsx(
+							"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",
+						)}
+					/>{" "}
+					{commentCount} {/*{commentCount === 1 ? "comment" : "comments"}*/}
 				</Link>
 			</div>
 		</div>

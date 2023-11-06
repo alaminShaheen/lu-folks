@@ -19,7 +19,7 @@ const PostFeed = (props: PostFeedProps) => {
 		root: lastPostContainerRef.current,
 		threshold: 1,
 	});
-	console.log(groupInfo.id);
+
 	const {
 		data: postData,
 		fetchNextPage,
@@ -38,13 +38,13 @@ const PostFeed = (props: PostFeedProps) => {
 		<ul className="flex flex-col col-span-2 space-y-6 list-none">
 			{posts.map((post, index) => {
 				const likes = post.postReactions.filter(
-					(reaction) => reaction.type === ReactionType.LIK,
+					(reaction) => reaction.type === ReactionType.LIKE,
 				).length;
 				const unlikes = post.postReactions.filter(
 					(reaction) => reaction.type === ReactionType.UNLIK,
 				).length;
 				const ownReaction = post.postReactions.find(
-					(reaction) => reaction.userId === user?.i,
+					(reaction) => reaction.userId === user?.id,
 				)?.type;
 				return (
 					<li key={post.id} ref={index === posts.length - 1 ? lastPostRef : undefined}>
