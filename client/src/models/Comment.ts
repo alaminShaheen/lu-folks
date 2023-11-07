@@ -1,7 +1,7 @@
 import CommentReaction from "@/models/CommentReaction.ts";
 
 class Comment {
-	static EMPTY = new Comment("", "", new Date(), new Date(), "", "", []);
+	static EMPTY = new Comment("", "", "", "", "", "", []);
 
 	constructor(
 		public id: string,

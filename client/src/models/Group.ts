@@ -1,5 +1,5 @@
 class Group {
-	static EMPTY = new Group("", "", new Date(), new Date());
+	static EMPTY = new Group("", "", "", "");
 
 	constructor(
 		public id: string,

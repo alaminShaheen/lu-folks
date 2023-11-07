@@ -15,7 +15,7 @@ type PostProps = {
 	likeCount: number;
 	unlikeCount: number;
 	commentCount: number;
-	groupInfo?: GroupInfo;
+	groupInfo?: Omit<GroupInfo, "groupMemberCount" | "isMember">;
 	ownReaction?: ReactionType;
 };
 

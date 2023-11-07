@@ -2,7 +2,7 @@ import User from "@/models/User.ts";
 import ExtendedPost from "@/models/ExtendedPost.ts";
 
 class ExtendedGroup {
-	static EMPTY = new ExtendedGroup("", "", new Date(), new Date(), [], User.EMPTY);
+	static EMPTY = new ExtendedGroup("", "", "", "", [], User.EMPTY);
 
 	constructor(
 		public id: string,

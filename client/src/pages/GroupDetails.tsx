@@ -25,7 +25,7 @@ const GroupDetails = () => {
 
 	return (
 		<Fragment>
-			{fetchingGroup ? (
+			{fetchingGroup || !group ? (
 				<Skeleton className="rounded h-11 w-1/2" />
 			) : (
 				<h1 className="font-bold text-3xl md:text-4xl h-14">{group.title}</h1>

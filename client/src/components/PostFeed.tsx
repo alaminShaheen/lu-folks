@@ -9,7 +9,7 @@ import useFetchPaginatedPosts from "@/hooks/post/useFetchPaginatedPosts.tsx";
 
 type PostFeedProps = {
 	initialPosts: ExtendedPost[];
-	groupInfo: GroupInfo;
+	groupInfo: Omit<GroupInfo, "groupMemberCount" | "isMember">;
 };
 const PostFeed = (props: PostFeedProps) => {
 	const { initialPosts, groupInfo } = props;

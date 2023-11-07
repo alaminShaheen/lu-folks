@@ -157,7 +157,7 @@ class PostService implements IPostService {
 		userId: string,
 		limit: number,
 		page: number,
-		groupSlug?: strig,
+		groupSlug?: string,
 	): Promise<Post[]> => {
 		try {
 			let where = {};
@@ -186,13 +186,13 @@ class PostService implements IPostService {
 				take: limit,
 				skip: (page - 1) * limit,
 				orderBy: {
-					createdAt: "des",
+					createdAt: "desc",
 				},
 				include: {
 					creator: true,
 					group: true,
 					postReactions: true,
-					comments: tre,
+					comments: true,
 				},
 			});
 		} catch (error) {

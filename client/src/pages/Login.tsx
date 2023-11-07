@@ -44,13 +44,13 @@ const Login = () => {
 			const { data } = await axiosInstance.post<Authentication>(APILinks.login(), formData);
 			return data;
 		},
-		onSuccess: (data) => {
+		onSuccess: (data: Authentication) => {
 			setAuthentication(data);
 			toast.dismiss();
 			toast.success("You have logged in successfully!");
 			navigate(location.state?.from || ROUTES.NEWS_FEED, { replace: true });
 		},
-		onError: (error) => handleError(error, setError),
+		onError: (error: any) => handleError(error, setError),
 	});
 
 	const onSubmit = useCallback(

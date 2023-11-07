@@ -94,7 +94,7 @@ const WYSIWYGEditor = forwardRef((props: WYSIWYGEditorProps, ref) => {
 		}
 	}, [authentication.accessToken, defaultData, editorBlockId, uploadImage]);
 
-	useImperativeHandle<EditorHandle>(ref, () => ({
+	useImperativeHandle(ref, () => ({
 		save() {
 			return editorRef.current?.save();
 		},

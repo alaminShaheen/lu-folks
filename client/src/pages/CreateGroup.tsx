@@ -5,9 +5,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import ExtendedGroup from "@/models/ExtendedGroup.ts";
 import useCreateGroup from "@/hooks/group/useCreateGroup.tsx";
 import CreateGroupForm from "@/models/form/CreateGroupForm.ts";
+import GroupInfo from "@/models/GroupInfo.ts";
 
 const CreateGroup = () => {
 	const {
@@ -25,7 +25,7 @@ const CreateGroup = () => {
 	const groupTitle = watch("title");
 
 	const onGroupCreated = useCallback(
-		(data: ExtendedGroup) => {
+		(data: GroupInfo) => {
 			toast.success("Group created successfully!");
 			navigate(`/group/${data.id}`);
 		},

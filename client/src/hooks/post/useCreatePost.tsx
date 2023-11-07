@@ -7,22 +7,21 @@ import handleError from "@/utils/handleError.ts";
 import ExtendedPost from "@/models/ExtendedPost.ts";
 import ServiceHookCommonProps from "@/models/ServiceHookCommonProps.ts";
 import { privateAxiosInstance } from "@/api/Axios.ts";
-import { AxiosResponse } from "axios";
 
-interface UseCreatePostProps extends ServiceHookCommonProps<void> {
+interface UseCreatePostProps extends ServiceHookCommonProps<ExtendedPost> {
 	setError: UseFormSetError<PostCreate>;
 }
 
 const UseCreatePost = (props: UseCreatePostProps) => {
 	const { setError, onSuccess } = props;
 
-	return useMutation<ExtendedPost, Error, ExtendedPost>({
+	return useMutation({
 		mutationKey: [QueryKeys.CREATE_POST],
 		mutationFn: async (formData: PostCreate) => {
-			const { data } = await privateAxiosInstance.post<
-				ExtendedPost,
-				AxiosResponse<ExtendedPost>
-			>(APILinks.createPost(), formData);
+			const { data } = await privateAxiosInstance.post<ExtendedPost>(
+				APILinks.createPost(),
+				formData,
+			);
 			return data;
 		},
 		onSuccess,
