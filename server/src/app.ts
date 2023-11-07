@@ -1,13 +1,13 @@
 import cors from "cors";
-import express, { Application } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
-import compression from "compression";
-import errorHandler from "./middlewares/errorHandler";
-import Controller from "./abstracts/controller";
-import cookieParser from "cookie-parser";
 import process from "process";
 import httpStatus from "http-status";
+import compression from "compression";
+import cookieParser from "cookie-parser";
+import express, { Application } from "express";
+import Controller from "./abstracts/controller";
+import errorHandler from "./middlewares/errorHandler";
 
 class App {
 	public expressInstance: Application;
