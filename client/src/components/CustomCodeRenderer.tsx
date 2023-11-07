@@ -1,5 +1,3 @@
-import React from "react";
-
 const CustomCodeRenderer = ({ data }: any) => {
 	return (
 		<pre className="bg-gray-800 rounded-md p-4">

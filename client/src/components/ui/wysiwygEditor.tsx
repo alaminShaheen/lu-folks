@@ -28,7 +28,6 @@ const WYSIWYGEditor = forwardRef((props: WYSIWYGEditorProps, ref) => {
 		defaultData = { blocks: [] },
 		editorBlockId,
 		authentication,
-		onChangeFn,
 		uploadImage,
 	} = props;
 	const editorRef = useRef<EditorJS>();

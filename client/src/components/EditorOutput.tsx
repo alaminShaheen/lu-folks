@@ -1,6 +1,6 @@
 import CustomImageRenderer from "@/components/CustomImageRenderer.tsx";
 import CustomCodeRenderer from "@/components/CustomCodeRenderer.tsx";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import Output from "editorjs-react-renderer";
 
 type EditorOutputProps = {

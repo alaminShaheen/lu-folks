@@ -15,6 +15,7 @@ import handleError from "@/utils/handleError.ts";
 import { privateAxiosInstance, publicAxiosInstance } from "@/api/Axios.ts";
 import httpStatus from "http-status";
 import { AxiosInstance } from "axios";
+import useRefreshToken from "@/hooks/useRefreshToken.tsx";
 
 type AppContextType = {
 	authentication: Authentication;
@@ -35,8 +36,8 @@ const APP_CONTEXT_DEFAULT_VALUES: AppContextType = {
 	user: null,
 	clearAuthentication: () => {},
 	// getCurrentUser: async () => {},
-	privateAxiosInstance: null,
-	publicAxiosInstance: null,
+	privateAxiosInstance,
+	publicAxiosInstance,
 };
 export const AppContext = createContext<AppContextType>(APP_CONTEXT_DEFAULT_VALUES);
 
@@ -48,7 +49,7 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 	const { children } = props;
 	const [authentication, setAuthentication] = useState(APP_CONTEXT_DEFAULT_VALUES.authentication);
 	const [appLoading, setAppLoading] = useState(false);
-	const [fetchData, setFetchData] = useState(false);
+	const { refresh } = useRefreshToken();
 
 	const clearAuthentication = useCallback(() => {
 		setAuthentication(Authentication.EMPTY);
