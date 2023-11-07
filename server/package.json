@@ -7,7 +7,6 @@
     "dev": "tsc-watch --onSuccess \"npm run start\"",
     "start": "node --inspect dist/index.js",
     "build": "rimraf dist && tsc",
-    "postinstall": "npm run build",
     "prisma:migrate": "npx prisma migrate dev --name",
     "sync-db": "npx prisma db push"
   },
