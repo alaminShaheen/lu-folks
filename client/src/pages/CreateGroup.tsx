@@ -41,7 +41,7 @@ const CreateGroup = () => {
 		(formValues: CreateGroupForm) => {
 			createGroup(formValues);
 		},
-		[createGrou],
+		[createGroup],
 	);
 
 	return (

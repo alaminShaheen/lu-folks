@@ -1,35 +1,50 @@
+import { Group } from "@prisma/client";
 import httpStatus from "http-status";
 import { injectable } from "tsyringe";
+import GroupInfo from "@/models/types/GroupInfo";
+import AppConstants from "@/constants/AppConstants";
 import HttpException from "@/exceptions/httpException";
 import IGroupService from "@/models/interfaces/IGroupService";
 import CreateGroupDto from "@/dtos/createGroup.dto";
-import FieldValidationException from "@/exceptions/fieldValidationException";
 import PostgresDatabase from "@/database/postgres.database";
-import { Group } from "@prisma/client";
-import AppConstants from "@/constants/AppConstants";
 import GroupMemberCount from "@/models/types/GroupMemberCount";
 import IsMemberResponse from "@/models/types/IsMemberResponse";
-import GroupInfo from "@/models/types/GroupInfo";
-import console from "console";
+import FieldValidationException from "@/exceptions/fieldValidationException";
 
 @injectable()
 class GroupService implements IGroupService {
 	constructor(private readonly databaseInstance: PostgresDatabase) {}
 
-	public getGroupInfo = async (slug: string): Promise<GroupInfo> => {
+	public getGroupInfo = async (slug: string, userId: string): Promise<GroupInfo> => {
 		try {
 			await this.checkGroupExistence(slug);
 
 			const group = await this.databaseInstance.groupRepository.findFirst({
 				where: { id: slug },
+				include: {
+					_count: {
+						select: {
+							groupMembers: true,
+						},
+					},
+				},
 			});
+			const { isMember } = await this.isGroupMember(slug, userId);
 
 			if (!group) {
 				console.log(`No group found with slug: ${slug}`);
 				throw new HttpException(httpStatus.NOT_FOUND, "No group found.");
 			}
 
-			return group;
+			return {
+				isMember,
+				id: group.id,
+				title: group.title,
+				createdAt: group.createdAt,
+				creatorId: group.creatorId,
+				groupMemberCount: group._count.groupMembers,
+				updatedAt: group.updatedAt,
+			};
 		} catch (error) {
 			throw error;
 		}
@@ -133,8 +148,7 @@ class GroupService implements IGroupService {
 
 	public isGroupMember = async (slug: string, userId: string): Promise<IsMemberResponse> => {
 		try {
-			await this.checkGroupExistence(slug);
-			const group = await this.databaseInstance.groupRepository.findUnique({
+			const group = await this.databaseInstance.groupRepository.findUniqueOrThrow({
 				where: { id: slug, groupMembers: { some: { id: userId } } },
 			});
 			return { isMember: !!group };
@@ -156,6 +170,9 @@ class GroupService implements IGroupService {
 							postReactions: true,
 							comments: true,
 							group: true,
+						},
+						orderBy: {
+							createdAt: "desc",
 						},
 						take: AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH,
 					},

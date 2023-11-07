@@ -4,8 +4,7 @@ const ROUTES = {
 	REGISTER: "/register",
 	CREATE_GROUP: "/create-group",
 	GROUP: {
-		BASE: "group/:slug",
-		DETAILS: "/",
+		BASE: "/group/:slug",
 		CREATE_POST: "create-post",
 	},
 };

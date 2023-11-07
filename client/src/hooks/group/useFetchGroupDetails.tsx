@@ -20,7 +20,6 @@ const UseFetchGroupDetails = (groupId: string) => {
 				data.creator,
 			);
 		},
-		initialData: () => ExtendedGroup.EMPTY,
 	});
 };
 

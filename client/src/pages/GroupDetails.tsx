@@ -1,10 +1,10 @@
 import { Fragment } from "react";
-import MiniCreatePost from "@/components/MiniCreatePost.tsx";
 import { useParams } from "react-router-dom";
-import useFetchGroupDetails from "@/hooks/group/useFetchGroupDetails.tsx";
-import { Skeleton } from "@/components/ui/skeleton.tsx";
-import handleError from "@/utils/handleError.ts";
 import PostFeed from "@/components/PostFeed.tsx";
+import handleError from "@/utils/handleError.ts";
+import { Skeleton } from "@/components/ui/skeleton.tsx";
+import MiniCreatePost from "@/components/MiniCreatePost.tsx";
+import useFetchGroupDetails from "@/hooks/group/useFetchGroupDetails.tsx";
 
 const GroupDetails = () => {
 	const params = useParams<"slug">();
@@ -15,9 +15,13 @@ const GroupDetails = () => {
 		error: fetchGroupError,
 	} = useFetchGroupDetails(params.slug!);
 
+	// console.log(group?.posts);
+
 	if (fetchGroupIsError) {
 		handleError(fetchGroupError);
 	}
+
+	// console.log(group?.posts.map(post => post.title));
 
 	return (
 		<Fragment>
@@ -29,16 +33,21 @@ const GroupDetails = () => {
 
 			<MiniCreatePost />
 			{/*	Show posts*/}
-			<PostFeed
-				initialPosts={group.posts}
-				groupInfo={{
-					id: group.id,
-					title: group.title,
-					createAt: group.createdAt,
-					creatorId: group.creator.id,
-					updatedAt: group.updatedAt,
-				}}
-			/>
+
+			{fetchingGroup || !group ? (
+				<div>Loading...</div>
+			) : (
+				<PostFeed
+					initialPosts={group.posts}
+					groupInfo={{
+						id: group.id,
+						title: group.title,
+						createdAt: group.createdAt,
+						creatorId: group.creator.id,
+						updatedAt: group.updatedAt,
+					}}
+				/>
+			)}
 		</Fragment>
 	);
 };

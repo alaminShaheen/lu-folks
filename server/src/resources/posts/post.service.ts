@@ -2,16 +2,16 @@ import axios from "axios";
 import httpStatus from "http-status";
 import { injectable } from "tsyringe";
 import { Post } from "@prisma/client";
+import CachedPost from "@/models/types/CachedPost";
+import AppConstants from "@/constants/AppConstants";
 import UnfurledData from "@/models/types/UnfurledData";
 import IPostService from "@/models/interfaces/IPostService";
 import GroupService from "@/resources/groups/group.service";
 import CreatePostDto from "@/dtos/createPost.dto";
 import RedisDatabase from "@/database/redis.database";
 import HttpException from "@/exceptions/httpException";
-import PostgresDatabase from "@/database/postgres.database";
 import PostReactionDto from "@/dtos/postReaction.dto";
-import CachedPost from "@/models/types/CachedPost";
-import AppConstants from "@/constants/AppConstants";
+import PostgresDatabase from "@/database/postgres.database";
 
 @injectable()
 class PostService implements IPostService {
@@ -31,6 +31,12 @@ class PostService implements IPostService {
 					title: postData.title,
 					creator: { connect: { id: userId } },
 					group: { connect: { id: postData.groupSlug } },
+				},
+				include: {
+					creator: true,
+					postReactions: true,
+					comments: true,
+					group: true,
 				},
 			});
 		} catch (error: any) {
@@ -147,9 +153,52 @@ class PostService implements IPostService {
 		}
 	};
 
-	getUserPosts(userId: string): Promise<Post[]> {
-		return Promise.resolve([]);
-	}
+	public getUserPosts = async (
+		userId: string,
+		limit: number,
+		page: number,
+		groupSlug?: strig,
+	): Promise<Post[]> => {
+		try {
+			let where = {};
+			if (groupSlug) {
+				const group = await this.groupService.checkGroupExistence(groupSlug);
+
+				if (!group) {
+					console.log("The group does not exist");
+					throw new HttpException(httpStatus.BAD_REQUEST, "Posts could not be fetched");
+				}
+
+				where = { groupId: groupSlug };
+			} else {
+				const followedGroups = await this.databaseInstance.groupRepository.findMany({
+					where: { groupMembers: { some: { id: userId } } },
+					select: { id: true },
+				});
+
+				const followedGroupIds = followedGroups.map((followedGroup) => followedGroup.id);
+
+				where = { id: { in: followedGroupIds } };
+			}
+
+			return await this.databaseInstance.postRepository.findMany({
+				where,
+				take: limit,
+				skip: (page - 1) * limit,
+				orderBy: {
+					createdAt: "des",
+				},
+				include: {
+					creator: true,
+					group: true,
+					postReactions: true,
+					comments: tre,
+				},
+			});
+		} catch (error) {
+			throw error;
+		}
+	};
 
 	updatePost(postInfo: Partial<Post>): Promise<void> {
 		return Promise.resolve(undefined);
@@ -162,7 +211,7 @@ class PostService implements IPostService {
 				include: {
 					creator: !!userId,
 					_count: {
-						select: { postReactins: tru },
+						select: { postReactions: true },
 					},
 				},
 			});

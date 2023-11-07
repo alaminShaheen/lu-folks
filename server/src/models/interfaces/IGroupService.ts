@@ -7,7 +7,7 @@ import GroupInfo from "@/models/types/GroupInfo";
 export default interface IGroupService {
 	createGroup: (creatorId: string, groupInfo: CreateGroupDto) => Promise<Group>;
 	getGroupData: (slug: string) => Promise<Group>;
-	getGroupInfo: (slug: string) => Promise<GroupInfo>;
+	getGroupInfo: (slug: string, userId: string) => Promise<GroupInfo>;
 	isGroupMember: (slug: string, userId: string) => Promise<IsMemberResponse>;
 	getGroupMemberCount: (slug: string) => Promise<GroupMemberCount>;
 	joinGroup: (userId: string, slug: string) => Promise<void>;

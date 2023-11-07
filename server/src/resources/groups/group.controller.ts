@@ -148,7 +148,10 @@ class GroupController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const group = await this.groupService.getGroupInfo(request.params.slug);
+			const group = await this.groupService.getGroupInfo(
+				request.params.slug,
+				request.user?.userId!,
+			);
 			return response.status(httpStatus.OK).send(group);
 		} catch (error: any) {
 			if (error instanceof Error) nextFunction(error);

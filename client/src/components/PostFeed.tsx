@@ -41,7 +41,7 @@ const PostFeed = (props: PostFeedProps) => {
 					(reaction) => reaction.type === ReactionType.LIKE,
 				).length;
 				const unlikes = post.postReactions.filter(
-					(reaction) => reaction.type === ReactionType.UNLIK,
+					(reaction) => reaction.type === ReactionType.UNLIKE,
 				).length;
 				const ownReaction = post.postReactions.find(
 					(reaction) => reaction.userId === user?.id,

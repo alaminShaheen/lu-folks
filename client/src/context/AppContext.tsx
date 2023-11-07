@@ -48,7 +48,7 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 	const { children } = props;
 	const [authentication, setAuthentication] = useState(APP_CONTEXT_DEFAULT_VALUES.authentication);
 	const [appLoading, setAppLoading] = useState(false);
-	// const [, setUser] = useState<User | null>(null);
+	const [fetchData, setFetchData] = useState(false);
 
 	const clearAuthentication = useCallback(() => {
 		setAuthentication(Authentication.EMPTY);

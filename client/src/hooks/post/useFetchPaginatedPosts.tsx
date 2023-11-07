@@ -1,8 +1,8 @@
+import { useInfiniteQuery } from "@tanstack/react-query";
 import APILinks from "@/constants/APILinks.ts";
 import QueryKeys from "@/constants/QueryKeys.ts";
 import ExtendedPost from "@/models/ExtendedPost.ts";
 import AppConstants from "@/constants/AppConstants.ts";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { privateAxiosInstance } from "@/api/Axios.ts";
 
 type UseFetchPaginatedPostsProps = {
@@ -29,7 +29,10 @@ const UseFetchPaginatedPosts = (props: UseFetchPaginatedPostsProps) => {
 			return data;
 		},
 		initialPageParam: initialPageParam,
-		initialData: { pages: [initialPosts], pageParams: [1] },
+		initialData: {
+			pages: [initialPosts],
+			pageParams: [1],
+		},
 		getNextPageParam: (_, pages) => pages.length + 1,
 		enabled: !!groupSlug,
 	});

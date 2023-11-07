@@ -11,37 +11,34 @@ import ROUTES from "@/constants/Routes.ts";
 import GroupDetails from "@/pages/GroupDetails.tsx";
 import GroupLayout from "@/components/GroupLayout.tsx";
 import CreatePost from "@/pages/CreatePost.tsx";
-import { GroupContextProvider } from "@/context/GroupContext.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const queryClient = new QueryClient();
 
 function App() {
 	return (
-		<QueryClientProvider client={queryClient}>
-			<AppContextProvider>
-				<GroupContextProvider>
-					<BrowserRouter>
-						<Toast />
-						<Routes>
-							<Route index Component={LandingPage} />
-							<Route path={ROUTES.LOGIN} Component={Login} />
-							<Route path={ROUTES.REGISTER} Component={Register} />
-							<Route Component={ProtectedRoutesWrapper}>
-								<Route path={ROUTES.NEWS_FEED} Component={NewsFeed} />
-								<Route path={ROUTES.CREATE_GROUP} Component={CreateGroup} />
-								{/*<GroupContextProvider>*/}
-								<Route path={ROUTES.GROUP.BASE} Component={GroupLayout}>
-									<Route index Component={GroupDetails} />
-									<Route path={ROUTES.GROUP.CREATE_POST} Component={CreatePost} />
-								</Route>
-								{/*</GroupContextProvider>*/}
+		<BrowserRouter>
+			<Toast />
+			<QueryClientProvider client={queryClient}>
+				<ReactQueryDevtools />
+				<AppContextProvider>
+					<Routes>
+						<Route index element={<LandingPage />} />
+						<Route path={ROUTES.LOGIN} element={<Login />} />
+						<Route path={ROUTES.REGISTER} element={<Register />} />
+						<Route element={<ProtectedRoutesWrapper />}>
+							<Route index path={ROUTES.NEWS_FEED} element={<NewsFeed />} />
+							<Route path={ROUTES.CREATE_GROUP} element={<CreateGroup />} />
+							<Route path={ROUTES.GROUP.BASE} element={<GroupLayout />}>
+								<Route index element={<GroupDetails />} />
+								<Route path={ROUTES.GROUP.CREATE_POST} element={<CreatePost />} />
 							</Route>
-						</Routes>
-					</BrowserRouter>
-				</GroupContextProvider>
-			</AppContextProvider>
-		</QueryClientProvider>
+						</Route>
+					</Routes>
+				</AppContextProvider>
+			</QueryClientProvider>
+		</BrowserRouter>
 	);
 }
 

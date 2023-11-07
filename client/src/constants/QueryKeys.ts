@@ -3,6 +3,7 @@ const QueryKeys = {
 	LOGIN: "login",
 	CURRENT_USER: "current-user",
 	GROUP_DETAILS: "group-details",
+	GROUP_INFO: "group-info",
 	GROUP_MEMBER_COUNT: "group-member-count",
 	IS_GROUP_MEMBER: "is-group-member",
 	JOIN_GROUP: "join-group",

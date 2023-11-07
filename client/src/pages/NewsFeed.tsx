@@ -4,14 +4,6 @@ import ButtonLink from "@/components/ui/ButtonLink.tsx";
 import { Fragment } from "react";
 
 const NewsFeed = () => {
-	// return (
-	// 	<div className="flex justify-center items-center container h-screen">
-	// 		Welcome to your newsfeed!!
-	// 		<Button onClick={logout} disabled={loading}>
-	// 			Logout
-	// 		</Button>
-	// 	</div>
-	// );
 	return (
 		<Fragment>
 			<h1 className="font-bold text-3xl md:text-4xl">Your feed</h1>

@@ -24,11 +24,20 @@ class PostController extends Controller {
 			.post(verifyAuthentication, DtoValidator(CreatePostDto), this.createPost);
 		this.router.route(this.path).put(this.updatePost);
 		this.router.route(this.path).delete(this.deletePost);
+		this.router.route(this.path).get(verifyAuthentication, this.getPosts);
 	};
 
 	private getPosts = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
-			const posts = await this.postService.getUserPosts(request.user?.userId!);
+			const limit = Number(request.query.limit);
+			const page = Number(request.query.page);
+			const groupSlug: string | undefined = request.query.slug as string | undefined;
+			const posts = await this.postService.getUserPosts(
+				request.user?.userId!,
+				limit,
+				page,
+				groupSlug,
+			);
 			return response.status(httpStatus.OK).send(posts);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);

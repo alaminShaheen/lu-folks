@@ -1,5 +1,7 @@
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils.ts";
@@ -10,9 +12,6 @@ import useUploadFile from "@/hooks/useUploadFile.tsx";
 import useCreatePost from "@/hooks/post/useCreatePost.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import RichWYSIWYGEditor, { EditorHandle } from "@/components/ui/wysiwygEditor.tsx";
-import { useQueryClient } from "@tanstack/react-query";
-import QueryKeys from "@/constants/QueryKeys.ts";
-import { useNavigate } from "react-router-dom";
 
 type CreatePostEditorType = {
 	groupSlug: string;
@@ -23,8 +22,8 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 	const _titleRef = useRef<HTMLTextAreaElement>(null);
 	const richTextEditorRef = useRef<EditorHandle>(null);
 	const { user, authentication } = useAppContext();
-	const navigate = useNavigate();
 	const [, setLoading] = useState(false);
+	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const { uploadFiles } = useUploadFile();
 	const {
@@ -69,9 +68,9 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 	);
 
 	const onPostCreated = useCallback(async () => {
+		await queryClient.invalidateQueries({ queryKey: [groupSlug] });
 		toast.dismiss();
 		toast.success("Your post has been published.");
-		await queryClient.invalidateQueries([QueryKeys.GROUP_DETAILS, groupSlug]);
 		navigate(`/group/${groupSlug}`);
 	}, [groupSlug, navigate, queryClient]);
 
@@ -97,6 +96,7 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 		<div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
 			<form id="subreddit-post-form" className="w-full" onSubmit={handleSubmit(onSubmit)}>
 				<div className="prose prose-stone dark:prose-invert w-full">
+					<Link to={`/group/${groupSlug}`}>Back</Link>
 					<TextareaAutosize
 						ref={(e) => {
 							titleRef(e);

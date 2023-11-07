@@ -1,8 +1,7 @@
 import CustomImageRenderer from "@/components/CustomImageRenderer.tsx";
 import CustomCodeRenderer from "@/components/CustomCodeRenderer.tsx";
 import React, { Suspense } from "react";
-
-const Output = React.lazy(() => import("editorjs-react-renderer"));
+import Output from "editorjs-react-renderer";
 
 type EditorOutputProps = {
 	postContent: any;

@@ -16,6 +16,7 @@ const UseFetchCurrentUser = (props: UseFetchCurrentUserProps) => {
 			const { data } = await privateAxiosInstance.get<User>(APILinks.currentUser());
 			return data;
 		},
+		refetchOnMount: false,
 		enabled: !!accessToken,
 	});
 };

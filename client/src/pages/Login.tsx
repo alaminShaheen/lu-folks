@@ -75,7 +75,7 @@ const Login = () => {
 				return { ...prev };
 			});
 			toast.dismiss();
-			toast.success("You have registered successfully!");
+			toast.success("You have logged in successfully!");
 			navigate("/news-feed");
 		} else if (searchParams.get("message")) {
 			toast.dismiss();
@@ -85,7 +85,7 @@ const Login = () => {
 				return { ...prev };
 			});
 		}
-	}, [navigate, searchParams, setAuthentication, setSearchParams]);
+	}, [location, navigate, searchParams, setAuthentication, setSearchParams]);
 
 	return (
 		<div className="container relative flex h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
