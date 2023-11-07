@@ -14,7 +14,7 @@ function HandleError<T extends FieldErrors>(error: any, setError?: UseFormSetErr
 			);
 		} else {
 			toast.dismiss();
-			toast.error(error.response.data.message);
+			toast.error(error.response?.data.message);
 		}
 	} else {
 		toast.dismiss();
