@@ -4,22 +4,12 @@ import Comment from "@/models/Comment.ts";
 import PostReaction from "@/models/PostReaction.ts";
 
 class ExtendedPost {
-	static EMPTY = new ExtendedPost(
-		"",
-		"",
-		"",
-		"",
-		"",
-		User.EMPTY,
-		Group.EMPTY,
-		[],
-		[],
-	);
+	static EMPTY = new ExtendedPost("", "", "", "", "", User.EMPTY, Group.EMPTY, [], []);
 
 	constructor(
 		public id: string,
 		public title: string,
-		public content: any,
+		public content: string,
 		public createdAt: string,
 		public updatedAt: string,
 		public creator: User,

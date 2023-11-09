@@ -339,6 +339,18 @@ class AuthService implements IAuthService {
 				userId: user.id,
 			});
 
+			const existingSession = await this.databaseInstance.sessionRepository.findFirst({
+				where: {
+					userId: user.id,
+				},
+			});
+
+			if (existingSession) {
+				await this.databaseInstance.sessionRepository.delete({
+					where: { id: existingSession.id },
+				});
+			}
+
 			await this.databaseInstance.sessionRepository.create({
 				data: {
 					refreshToken,

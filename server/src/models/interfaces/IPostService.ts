@@ -10,6 +10,8 @@ interface IPostService {
 		page: number,
 		groupSlug?: string,
 	) => Promise<Post[]>;
+	getPost: (userId: string, postSlug: string) => Promise<Post>;
+	getInitialFeedPosts: (userId: string) => Promise<Post[]>;
 	createPost: (userId: string, postInfo: CreatePostDto) => Promise<Post>;
 	updatePost: (postInfo: Partial<Post>) => Promise<void>;
 	deletePost: (postId: string) => Promise<void>;

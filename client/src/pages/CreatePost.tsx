@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import handleError from "@/utils/handleError.ts";
 import CreatePostEditor from "@/components/CreatePostEditor.tsx";
@@ -27,7 +27,9 @@ const CreatePost = () => {
 					<h3 className="ml-2 mt-2 text-base font-semibold leading-6 text-gray-900">
 						Create Post
 					</h3>
-					<p className="ml-2 truncate text-sm text-gray-500">in {groupInfo.title}</p>
+					<p className="ml-2 truncate text-sm text-gray-500">
+						in <Link to={`/group/${params.slug}`}>{groupInfo.title}</Link>
+					</p>
 				</div>
 			</div>
 			{/* form */}

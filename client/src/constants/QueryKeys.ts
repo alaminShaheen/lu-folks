@@ -12,6 +12,8 @@ const QueryKeys = {
 	CREATE_POST: "create-post",
 	CREATE_GROUP: "create-group",
 	POST_REACTION: "post-reaction",
+	INITIAL_FEED_POSTS: "initial-feed-posts",
+	GET_POST: "get-post",
 } as const;
 
 export default QueryKeys;

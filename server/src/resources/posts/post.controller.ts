@@ -25,6 +25,8 @@ class PostController extends Controller {
 		this.router.route(this.path).put(this.updatePost);
 		this.router.route(this.path).delete(this.deletePost);
 		this.router.route(this.path).get(verifyAuthentication, this.getPosts);
+		this.router.route(`${this.path}/:slug`).get(verifyAuthentication, this.getPost);
+		this.router.route(`${this.path}/feed`).get(verifyAuthentication, this.getInitialFeedPosts);
 	};
 
 	private getPosts = async (request: Request, response: Response, nextFunction: NextFunction) => {
@@ -38,6 +40,29 @@ class PostController extends Controller {
 				page,
 				groupSlug,
 			);
+			return response.status(httpStatus.OK).send(posts);
+		} catch (error: unknown) {
+			errorHandler(error as any, request, response, nextFunction);
+		}
+	};
+
+	private getPost = async (request: Request, response: Response, nextFunction: NextFunction) => {
+		try {
+			const postSlug = request.params.slug;
+			const posts = await this.postService.getPost(request.user?.userId!, postSlug);
+			return response.status(httpStatus.OK).send(posts);
+		} catch (error: unknown) {
+			errorHandler(error as any, request, response, nextFunction);
+		}
+	};
+
+	private getInitialFeedPosts = async (
+		request: Request,
+		response: Response,
+		nextFunction: NextFunction,
+	) => {
+		try {
+			const posts = await this.postService.getInitialFeedPosts(request.user?.userId!);
 			return response.status(httpStatus.OK).send(posts);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);

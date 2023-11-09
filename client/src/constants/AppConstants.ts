@@ -4,7 +4,7 @@ const AppConstants = {
 		import.meta.env.VITE_API_BASE_URL
 	}/auth/oauth/google/register`,
 	GOOGLE_OAUTH_LOGIN_REDIRECT_URL: `${import.meta.env.VITE_API_BASE_URL}/auth/oauth/google/login`,
-	INFINITE_SCROLL_PAGINATION_RESULT_LENGTH: 2,
+	INFINITE_SCROLL_PAGINATION_RESULT_LENGTH: 5,
 };
 
 export default AppConstants;

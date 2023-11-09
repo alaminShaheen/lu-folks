@@ -1,8 +1,8 @@
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils.ts";
 import APILinks from "@/constants/APILinks.ts";
@@ -12,6 +12,7 @@ import useUploadFile from "@/hooks/useUploadFile.tsx";
 import useCreatePost from "@/hooks/post/useCreatePost.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import RichWYSIWYGEditor, { EditorHandle } from "@/components/ui/wysiwygEditor.tsx";
+import QueryKeys from "@/constants/QueryKeys.ts";
 
 type CreatePostEditorType = {
 	groupSlug: string;
@@ -68,7 +69,12 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 	);
 
 	const onPostCreated = useCallback(async () => {
-		await queryClient.invalidateQueries({ queryKey: [groupSlug] });
+		// await queryClient.invalidateQueries({ queryKey: [groupSlug] });
+		// await queryClient.invalidateQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
+		// await queryClient.invalidateQueries({ queryKey: [QueryKeys.FETCH_INFINITE_POST] });
+		// await queryClient.invalidateQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
+		await queryClient.refetchQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
+		await queryClient.refetchQueries({ queryKey: [QueryKeys.FETCH_INFINITE_POST] });
 		toast.dismiss();
 		toast.success("Your post has been published.");
 		navigate(`/group/${groupSlug}`);

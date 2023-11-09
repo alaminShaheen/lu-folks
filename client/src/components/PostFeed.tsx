@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useIntersection } from "@mantine/hooks";
 import Post from "@/components/Post.tsx";
-import GroupInfo from "@/models/GroupInfo.ts";
 import ExtendedPost from "@/models/ExtendedPost.ts";
 import ReactionType from "@/models/enums/ReactionType.ts";
 import { useAppContext } from "@/context/AppContext.tsx";
@@ -9,10 +8,10 @@ import useFetchPaginatedPosts from "@/hooks/post/useFetchPaginatedPosts.tsx";
 
 type PostFeedProps = {
 	initialPosts: ExtendedPost[];
-	groupInfo: Omit<GroupInfo, "groupMemberCount" | "isMember">;
+	groupSlug?: string;
 };
 const PostFeed = (props: PostFeedProps) => {
-	const { initialPosts, groupInfo } = props;
+	const { initialPosts, groupSlug } = props;
 	const { user } = useAppContext();
 	const lastPostContainerRef = useRef<HTMLLIElement>(null);
 	const { ref: lastPostRef, entry } = useIntersection({
@@ -24,7 +23,7 @@ const PostFeed = (props: PostFeedProps) => {
 		data: postData,
 		fetchNextPage,
 		isFetchingNextPage,
-	} = useFetchPaginatedPosts({ initialPosts, groupSlug: groupInfo.id });
+	} = useFetchPaginatedPosts({ initialPosts, groupSlug });
 
 	useEffect(() => {
 		if (entry?.isIntersecting) {
@@ -32,7 +31,10 @@ const PostFeed = (props: PostFeedProps) => {
 		}
 	}, [entry, fetchNextPage]);
 
-	const posts = postData?.pages.flatMap((page) => page) || initialPosts;
+	const posts =
+		postData && postData.pages.flatMap.length > 0
+			? postData.pages.flatMap((page) => page)
+			: initialPosts;
 
 	return (
 		<ul className="flex flex-col col-span-2 space-y-6 list-none">
@@ -53,7 +55,7 @@ const PostFeed = (props: PostFeedProps) => {
 							likeCount={likes}
 							unlikeCount={unlikes}
 							commentCount={post.comments.length}
-							groupInfo={groupInfo}
+							groupInfo={post.group}
 							ownReaction={ownReaction}
 						/>
 					</li>

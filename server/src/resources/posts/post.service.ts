@@ -153,6 +153,47 @@ class PostService implements IPostService {
 		}
 	};
 
+	public getPost = async (userId: string, postSlug: string): Promise<Post> => {
+		try {
+			const post = await this.databaseInstance.postRepository.findUnique({
+				where: { id: postSlug },
+				include: { postReactions: true, group: true, comments: true, creator: true },
+			});
+
+			if (!post) {
+				throw new HttpException(httpStatus.BAD_REQUEST, "The post does not exist.");
+			}
+
+			return post;
+		} catch (error) {
+			throw error;
+		}
+	};
+
+	public getInitialFeedPosts = async (userId: string): Promise<Post[]> => {
+		try {
+			const followedGroups = await this.databaseInstance.groupRepository.findMany({
+				where: { groupMembers: { some: { id: userId } } },
+				select: { id: true },
+			});
+			const followedGroupIds = followedGroups.map((followedGroup) => followedGroup.id);
+
+			return await this.databaseInstance.postRepository.findMany({
+				where: { groupId: { in: followedGroupIds } },
+				include: {
+					creator: true,
+					postReactions: true,
+					comments: true,
+					group: true,
+				},
+				orderBy: { createdAt: "desc" },
+				take: AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH,
+			});
+		} catch (error) {
+			throw error;
+		}
+	};
+
 	public getUserPosts = async (
 		userId: string,
 		limit: number,
@@ -178,7 +219,7 @@ class PostService implements IPostService {
 
 				const followedGroupIds = followedGroups.map((followedGroup) => followedGroup.id);
 
-				where = { id: { in: followedGroupIds } };
+				where = { group: { id: { in: followedGroupIds } } };
 			}
 
 			return await this.databaseInstance.postRepository.findMany({

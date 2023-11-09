@@ -59,7 +59,7 @@ export function UserAccountNav(props: UserAccountNavProps) {
 				</div>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem asChild>
-					<Link to={ROUTES.NEWS_FEED}>Feed</Link>
+					<Link to={ROUTES.HOME}>Feed</Link>
 				</DropdownMenuItem>
 
 				<DropdownMenuItem asChild>

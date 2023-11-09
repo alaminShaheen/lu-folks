@@ -17,6 +17,8 @@ export const APILinks = {
 	getPosts: (limit: number, page: number, slug?: string) =>
 		`/post?limit=${limit}&page=${page}${slug ? `&slug=${slug}` : ""}`,
 	reactToPost: () => `/post/react`,
+	getInitialFeedPosts: () => `/post/feed`,
+	getPost: (slug: string) => `/post/${slug}`,
 };
 
 export default APILinks;

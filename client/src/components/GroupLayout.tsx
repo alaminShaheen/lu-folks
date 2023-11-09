@@ -7,6 +7,7 @@ import { useAppContext } from "@/context/AppContext.tsx";
 import useFetchGroupInfo from "@/hooks/group/useFetchGroupInfo.tsx";
 import GroupLayoutSkeleton from "@/components/skeletons/GroupLayoutSkeleton.tsx";
 import ToggleSubscriptionButton from "@/components/ToggleSubscriptionButton.tsx";
+import useRelativeRouteMatch from "@/hooks/useRelativeRouteMatch.tsx";
 
 const GroupLayout = () => {
 	const { user } = useAppContext();
@@ -17,6 +18,7 @@ const GroupLayout = () => {
 		isError: fetchGroupIsError,
 		error: fetchGroupError,
 	} = useFetchGroupInfo(params.slug!);
+	const createPostRouteMatch = useRelativeRouteMatch(ROUTES.GROUP.CREATE_POST);
 
 	if (fetchGroupIsError) {
 		handleError(fetchGroupError);
@@ -68,7 +70,11 @@ const GroupLayout = () => {
 										groupTitle={groupInfo.title}
 									/>
 								)}
-								<ButtonLink to={ROUTES.GROUP.CREATE_POST}>Create Post</ButtonLink>
+								{!createPostRouteMatch && (
+									<ButtonLink to={ROUTES.GROUP.CREATE_POST}>
+										Create Post
+									</ButtonLink>
+								)}
 							</dl>
 						</div>
 					)}

@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
-import { Fragment, useRef } from "react";
+import { useRef } from "react";
 import { MessageSquare } from "lucide-react";
-import ROUTES from "@/constants/Routes.ts";
 import GroupInfo from "@/models/GroupInfo.ts";
 import ExtendedPost from "@/models/ExtendedPost.ts";
 import EditorOutput from "@/components/EditorOutput.tsx";
@@ -9,19 +8,22 @@ import ReactionType from "@/models/enums/ReactionType.ts";
 import { formatTimeToNow } from "@/utils/DateFormatters.ts";
 import PostReactions from "@/components/PostReactions.tsx";
 import { clsx } from "clsx";
+import useRelativeRouteMatch from "@/hooks/useRelativeRouteMatch.tsx";
+import ROUTES from "@/constants/Routes.ts";
 
 type PostProps = {
 	post: ExtendedPost;
 	likeCount: number;
 	unlikeCount: number;
 	commentCount: number;
-	groupInfo?: Omit<GroupInfo, "groupMemberCount" | "isMember">;
+	groupInfo: Omit<GroupInfo, "groupMemberCount" | "isMember" | "creatorId">;
 	ownReaction?: ReactionType;
 };
 
 const Post = (props: PostProps) => {
 	const { commentCount, likeCount, unlikeCount, post, ownReaction, groupInfo } = props;
 	const paragraphBlurRef = useRef<HTMLParagraphElement>(null);
+	const isHomeFeed = useRelativeRouteMatch(ROUTES.HOME);
 
 	return (
 		<div className="rounded-md bg-white shadow">
@@ -34,23 +36,23 @@ const Post = (props: PostProps) => {
 
 				<div className="w-0 flex-1">
 					<div className="max-h-40 mt-1 text-xs text-gray-500">
-						{groupInfo && (
-							<Fragment>
-								<Link
-									to={ROUTES.GROUP.BASE}
-									className="underline text-zinc-900 text-sm underline-offset-2"
-								>
-									{groupInfo.title}
-								</Link>
-								<span className="px-1">•</span>
-							</Fragment>
-						)}
+						<Link
+							to={`/group/${groupInfo.id}`}
+							className="underline text-zinc-900 text-sm underline-offset-2"
+						>
+							{groupInfo.title}
+						</Link>
+						<span className="px-1">•</span>
 						<span>Posted by {post.creator.username}</span>{" "}
 						{formatTimeToNow(new Date(post.createdAt))}
 					</div>
 					<Link
 						// href={`/r/${subredditName}/post/${post.id}`}
-						to={"/"}
+						to={
+							!!isHomeFeed
+								? `/group/${groupInfo.id}/post/${post.id}`
+								: `post/${post.id}`
+						}
 					>
 						<h1 className="text-lg font-semibold py-2 leading-6 text-gray-900">
 							{post.title}

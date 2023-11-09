@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import Output from "editorjs-react-renderer";
 
 type EditorOutputProps = {
-	postContent: any;
+	postContent: Record<string, any>;
 };
 
 const style = {

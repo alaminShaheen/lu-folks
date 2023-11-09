@@ -55,7 +55,7 @@ const Register = () => {
 			toast.dismiss();
 			console.log("hello");
 			toast.success("You have registered successfully!");
-			navigate(ROUTES.NEWS_FEED);
+			navigate(ROUTES.HOME);
 		},
 		onError: (error) => handleError(error, setError),
 	});
@@ -87,7 +87,7 @@ const Register = () => {
 			});
 			toast.dismiss();
 			toast.success("You have logged in successfully!");
-			navigate("/news-feed");
+			navigate(ROUTES.HOME);
 		} else if (searchParams.get("message")) {
 			toast.dismiss();
 			toast.error(searchParams.get("message"));

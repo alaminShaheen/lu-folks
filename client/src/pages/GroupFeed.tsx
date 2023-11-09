@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton.tsx";
 import MiniCreatePost from "@/components/MiniCreatePost.tsx";
 import useFetchGroupDetails from "@/hooks/group/useFetchGroupDetails.tsx";
 
-const GroupDetails = () => {
+const GroupFeed = () => {
 	const params = useParams<"slug">();
 	const {
 		data: group,
@@ -15,13 +15,9 @@ const GroupDetails = () => {
 		error: fetchGroupError,
 	} = useFetchGroupDetails(params.slug!);
 
-	// console.log(group?.posts);
-
 	if (fetchGroupIsError) {
 		handleError(fetchGroupError);
 	}
-
-	// console.log(group?.posts.map(post => post.title));
 
 	return (
 		<Fragment>
@@ -37,19 +33,10 @@ const GroupDetails = () => {
 			{fetchingGroup || !group ? (
 				<div>Loading...</div>
 			) : (
-				<PostFeed
-					initialPosts={group.posts}
-					groupInfo={{
-						id: group.id,
-						title: group.title,
-						createdAt: group.createdAt,
-						creatorId: group.creator.id,
-						updatedAt: group.updatedAt,
-					}}
-				/>
+				<PostFeed initialPosts={group.posts} groupSlug={group.id} />
 			)}
 		</Fragment>
 	);
 };
 
-export default GroupDetails;
+export default GroupFeed;

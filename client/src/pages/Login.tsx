@@ -48,7 +48,7 @@ const Login = () => {
 			setAuthentication(data);
 			toast.dismiss();
 			toast.success("You have logged in successfully!");
-			navigate(location.state?.from || ROUTES.NEWS_FEED, { replace: true });
+			navigate(location.state?.from || ROUTES.HOME, { replace: true });
 		},
 		onError: (error: any) => handleError(error, setError),
 	});
@@ -76,7 +76,7 @@ const Login = () => {
 			});
 			toast.dismiss();
 			toast.success("You have logged in successfully!");
-			navigate("/news-feed");
+			navigate(ROUTES.HOME);
 		} else if (searchParams.get("message")) {
 			toast.dismiss();
 			toast.error(searchParams.get("message"));
