@@ -178,6 +178,10 @@ class PostService implements IPostService {
 			});
 			const followedGroupIds = followedGroups.map((followedGroup) => followedGroup.id);
 
+			if (followedGroupIds.length === 0) {
+				return [];
+			}
+
 			return await this.databaseInstance.postRepository.findMany({
 				where: { groupId: { in: followedGroupIds } },
 				include: {

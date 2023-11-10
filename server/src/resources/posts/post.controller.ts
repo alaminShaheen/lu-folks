@@ -25,8 +25,8 @@ class PostController extends Controller {
 		this.router.route(this.path).put(this.updatePost);
 		this.router.route(this.path).delete(this.deletePost);
 		this.router.route(this.path).get(verifyAuthentication, this.getPosts);
-		this.router.route(`${this.path}/:slug`).get(verifyAuthentication, this.getPost);
 		this.router.route(`${this.path}/feed`).get(verifyAuthentication, this.getInitialFeedPosts);
+		this.router.route(`${this.path}/:slug`).get(verifyAuthentication, this.getPost);
 	};
 
 	private getPosts = async (request: Request, response: Response, nextFunction: NextFunction) => {
