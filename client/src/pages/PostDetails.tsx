@@ -50,10 +50,6 @@ const PostDetails = () => {
 						</h1>
 
 						<EditorOutput postContent={JSON.parse(post.content)} />
-						{/*<Suspense fallback={<Loader2 className="h-5 w-5 animate-spin text-zinc-500" />}>*/}
-						{/*	/!* @ts-expect-error Server Component *!/*/}
-						{/*	<CommentsSection postId={post?.id ?? cachedPost.id} />*/}
-						{/*</Suspense>*/}
 					</div>
 					<div className="text-sm px-4 sm:px-6 flex items-center gap-3 border-t border-gray-100 bg-white w-full">
 						<PostReactions
@@ -62,19 +58,12 @@ const PostDetails = () => {
 							unlikeCount={unlikes}
 							ownReaction={ownReaction}
 						/>
-						<Link
-							to={"/"}
-							// href={`/r/${subredditName}/post/${post.id}`}
-							className="w-fit flex items-center gap-2"
-						>
-							<MessageSquare
-								className={clsx(
-									"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",
-								)}
-							/>{" "}
-							{post.comments.length}{" "}
-							{/*{commentCount === 1 ? "comment" : "comments"}*/}
-						</Link>
+						<MessageSquare
+							className={clsx(
+								"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",
+							)}
+						/>{" "}
+						{post.comments.length} {/*{commentCount === 1 ? "comment" : "comments"}*/}
 					</div>
 				</div>
 			</div>
