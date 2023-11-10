@@ -32,7 +32,7 @@ const Post = (props: PostProps) => {
 					<div className="max-h-40 mt-1 text-xs text-gray-500">
 						<Link
 							to={`/group/${groupInfo.id}`}
-							className="underline text-zinc-900 text-sm underline-offset-2"
+							className="underline text-blue-500 text-sm underline-offset-2"
 						>
 							{groupInfo.title}
 						</Link>
@@ -41,14 +41,13 @@ const Post = (props: PostProps) => {
 						{formatTimeToNow(new Date(post.createdAt))}
 					</div>
 					<Link
-						// href={`/r/${subredditName}/post/${post.id}`}
 						to={
 							!!isHomeFeed
 								? `/group/${groupInfo.id}/post/${post.id}`
 								: `post/${post.id}`
 						}
 					>
-						<h1 className="text-lg font-semibold py-2 leading-6 text-gray-900">
+						<h1 className="text-lg font-semibold py-2 leading-6 text-blue-500">
 							{post.title}
 						</h1>
 					</Link>
