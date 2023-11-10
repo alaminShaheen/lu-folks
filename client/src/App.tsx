@@ -34,8 +34,8 @@ function App() {
 							<Route path={ROUTES.GROUP.BASE} element={<GroupLayout />}>
 								<Route index element={<GroupFeed />} />
 								<Route path={ROUTES.GROUP.CREATE_POST} element={<CreatePost />} />
-								<Route path={ROUTES.GROUP.POST_DETAILS} element={<PostDetails />} />
 							</Route>
+							<Route path={ROUTES.POST_DETAILS} element={<PostDetails />} />
 						</Route>
 					</Routes>
 				</AppContextProvider>

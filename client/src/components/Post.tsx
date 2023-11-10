@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
 import { MessageSquare } from "lucide-react";
@@ -5,11 +6,8 @@ import GroupInfo from "@/models/GroupInfo.ts";
 import ExtendedPost from "@/models/ExtendedPost.ts";
 import EditorOutput from "@/components/EditorOutput.tsx";
 import ReactionType from "@/models/enums/ReactionType.ts";
-import { formatTimeToNow } from "@/utils/DateFormatters.ts";
 import PostReactions from "@/components/PostReactions.tsx";
-import { clsx } from "clsx";
-import useRelativeRouteMatch from "@/hooks/useRelativeRouteMatch.tsx";
-import ROUTES from "@/constants/Routes.ts";
+import { formatTimeToNow } from "@/utils/DateFormatters.ts";
 
 type PostProps = {
 	post: ExtendedPost;
@@ -23,7 +21,6 @@ type PostProps = {
 const Post = (props: PostProps) => {
 	const { commentCount, likeCount, unlikeCount, post, ownReaction, groupInfo } = props;
 	const paragraphBlurRef = useRef<HTMLParagraphElement>(null);
-	const isHomeFeed = useRelativeRouteMatch(ROUTES.HOME);
 
 	return (
 		<div className="rounded-md bg-white shadow">
@@ -40,13 +37,7 @@ const Post = (props: PostProps) => {
 						<span>Posted by {post.creator.username}</span>{" "}
 						{formatTimeToNow(new Date(post.createdAt))}
 					</div>
-					<Link
-						to={
-							!!isHomeFeed
-								? `/group/${groupInfo.id}/post/${post.id}`
-								: `post/${post.id}`
-						}
-					>
+					<Link to={`/post/${post.id}`}>
 						<h1 className="text-lg font-semibold py-2 leading-6 text-blue-500">
 							{post.title}
 						</h1>
