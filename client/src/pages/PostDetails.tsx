@@ -76,7 +76,7 @@ const PostDetails = () => {
 					<MessageSquare
 						className={clsx(
 							"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",
-						)
+						)}
 					/>{" "}
 					{post.comments.length} {/*{commentCount === 1 ? "comment" : "comments"}*/}
 				</div>
