@@ -2,15 +2,12 @@ import axios from "axios";
 import httpStatus from "http-status";
 import { injectable } from "tsyringe";
 import { Post } from "@prisma/client";
-import CachedPost from "@/models/types/CachedPost";
 import AppConstants from "@/constants/AppConstants";
-import UnfurledData from "@/models/types/UnfurledData";
 import IPostService from "@/models/interfaces/IPostService";
 import GroupService from "@/resources/groups/group.service";
 import CreatePostDto from "@/dtos/createPost.dto";
 import RedisDatabase from "@/database/redis.database";
 import HttpException from "@/exceptions/httpException";
-import PostReactionDto from "@/dtos/postReaction.dto";
 import PostgresDatabase from "@/database/postgres.database";
 
 @injectable()
@@ -44,17 +41,16 @@ class PostService implements IPostService {
 		}
 	};
 
-	public unfurlLink = async (url: string): Promise<UnfurledData> => {
+	public unfurlLink = async (url: string): Promise<string> => {
 		try {
 			const properUrl = new URL(url);
-			const href = properUrl.searchParams.get("url");
 
-			if (!href) {
+			if (!properUrl) {
 				console.log("Invalid href provided");
 				throw new HttpException(httpStatus.BAD_REQUEST, "Invalid href provided");
 			}
 
-			const { data } = await axios.get(href);
+			const { data } = await axios.get(properUrl.href);
 
 			const titleMatch = (data as string).match(/<title>(.*?)<\/title>/);
 			const title = titleMatch?.[1] || "";
@@ -67,18 +63,16 @@ class PostService implements IPostService {
 			const imageMatch = data.match(/<meta property="og:image" content="(.*?)"/);
 			const imageUrl = imageMatch?.[1] || "";
 
-			return {
-				unfurledData: JSON.stringify({
-					success: 1,
-					meta: {
-						title,
-						description,
-						image: {
-							url: imageUrl,
-						},
+			return JSON.stringify({
+				success: 1,
+				meta: {
+					title,
+					description,
+					image: {
+						url: imageUrl,
 					},
-				}),
-			};
+				},
+			});
 		} catch (error) {
 			throw error;
 		}
@@ -87,71 +81,6 @@ class PostService implements IPostService {
 	deletePost(postId: string): Promise<void> {
 		return Promise.resolve(undefined);
 	}
-
-	public react = async (userId: string, postReactionInfo: PostReactionDto): Promise<void> => {
-		try {
-			const post = await this.checkPostExistence(postReactionInfo.postSlug, userId);
-
-			const alreadyReacted = await this.databaseInstance.postReactionRepository.findFirst({
-				where: {
-					userId,
-					postId: postReactionInfo.postSlug,
-				},
-			});
-
-			let userVote = 0;
-			if (alreadyReacted) {
-				if (alreadyReacted.type === postReactionInfo.reaction) {
-					await this.databaseInstance.postReactionRepository.delete({
-						where: {
-							userId_postId_type: {
-								type: postReactionInfo.reaction,
-								postId: postReactionInfo.postSlug,
-								userId,
-							},
-						},
-					});
-					userVote -= 1;
-				} else {
-					await this.databaseInstance.postReactionRepository.update({
-						where: {
-							userId_postId_type: {
-								type: alreadyReacted.type,
-								postId: postReactionInfo.postSlug,
-								userId,
-							},
-						},
-						data: { type: postReactionInfo.reaction },
-					});
-					userVote += 0;
-				}
-			} else {
-				await this.databaseInstance.postReactionRepository.create({
-					data: {
-						post: { connect: { id: postReactionInfo.postSlug } },
-						user: { connect: { id: userId } },
-						type: postReactionInfo.reaction,
-					},
-				});
-				userVote += 1;
-			}
-
-			if (post._count.postReactions + userVote >= AppConstants.CACHED_POSTS_COUNT) {
-				const cachedPost: CachedPost = {
-					id: post.id,
-					content: post.content,
-					title: post.title,
-					createdAt: post.createdAt,
-					creatorUsername: post.creator.username,
-					currentUserReaction: postReactionInfo.reaction,
-				};
-				await this.redisDatabaseInstance.redisInstance.hset(`post:${post.id}`, cachedPost);
-			}
-			return;
-		} catch (error) {
-			throw error;
-		}
-	};
 
 	public getPost = async (userId: string, postSlug: string): Promise<Post> => {
 		try {

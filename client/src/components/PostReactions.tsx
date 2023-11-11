@@ -38,7 +38,6 @@ const PostReactions = (props: PostReactionsProps) => {
 
 	const onMutate = useCallback(
 		(reactionInfo: CreatePostReaction) => {
-			console.log(reactionInfo);
 			if (reactionInfo.reaction === ownPostReaction) {
 				setOwnPostReaction(undefined);
 				if (reactionInfo.reaction === ReactionType.LIKE) {

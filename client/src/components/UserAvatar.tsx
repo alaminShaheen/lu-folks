@@ -10,9 +10,11 @@ interface UserAvatarProps {
 const UserAvatar = (props: UserAvatarProps) => {
 	const { imageUrl, username, className } = props;
 	return (
-		<Avatar className={cn(className, "")}>
+		<Avatar className={cn(className, "border border-amber-200")}>
 			<AvatarImage src={imageUrl} />
-			<AvatarFallback>{username}</AvatarFallback>
+			<AvatarFallback className="bg-amber-200 text-gray-600">
+				{username[0].toUpperCase()}
+			</AvatarFallback>
 		</Avatar>
 	);
 };

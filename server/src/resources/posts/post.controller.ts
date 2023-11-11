@@ -18,7 +18,6 @@ class PostController extends Controller {
 
 	protected initialiseRoutes = () => {
 		this.router.route(`${this.path}/unfurl-link`).get(verifyAuthentication, this.unfurlLink);
-		this.router.route(`${this.path}/react`).patch(verifyAuthentication, this.react);
 		this.router
 			.route(this.path)
 			.post(verifyAuthentication, DtoValidator(CreatePostDto), this.createPost);
@@ -69,22 +68,13 @@ class PostController extends Controller {
 		}
 	};
 
-	private react = async (request: Request, response: Response, nextFunction: NextFunction) => {
-		try {
-			await this.postService.react(request.user?.userId!, request.body);
-			return response.sendStatus(httpStatus.OK);
-		} catch (error: unknown) {
-			errorHandler(error as any, request, response, nextFunction);
-		}
-	};
-
 	private unfurlLink = async (
 		request: Request,
 		response: Response,
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const unfurlData = await this.postService.unfurlLink(request.url);
+			const unfurlData = await this.postService.unfurlLink(request.query.url as string);
 			return response.status(httpStatus.OK).send(unfurlData);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);
