@@ -75,6 +75,9 @@ model Comment {
   post             Post              @relation(fields: [postId], references: [id]) // n -> 1
   postId           String
   commentReactions CommentReaction[] // n -> n
+  replyToCommentId String?           @unique
+  replyTo          Comment?          @relation(fields: [id], references: [replyToCommentId], name: "replyTo")
+  replies          Comment[]         @relation("replyTo")
 }
 
 model PostReaction {

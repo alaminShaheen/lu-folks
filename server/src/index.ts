@@ -19,12 +19,15 @@ import PostgresDatabase from "@/database/postgres.database";
 import PostReactionService from "@/resources/postReactions/postReaction.service";
 import HealthcheckController from "@/resources/healthcheck/healthcheck.controller";
 import PostReactionController from "@/resources/postReactions/postReaction.controller";
+import CommentController from "@/resources/comments/comment.controller";
+import CommentService from "@/resources/comments/comment.service";
 
 validateEnv();
 container.resolve(PostService);
 container.resolve(UserService);
 container.resolve(AuthService);
 container.resolve(RedisDatabase);
+container.resolve(CommentService);
 container.resolve(PostgresDatabase);
 container.resolve(PostReactionService);
 
@@ -32,6 +35,7 @@ container.register("IUserService", { useClass: UserService });
 container.register("IPostService", { useClass: PostService });
 container.register("IAuthService", { useClass: AuthService });
 container.register("IGroupService", { useClass: GroupService });
+container.register("ICommentService", { useClass: CommentService });
 container.register("IPostReactionService", { useClass: PostReactionService });
 
 const fileController = container.resolve(FileController);
@@ -39,6 +43,7 @@ const userController = container.resolve(UserController);
 const postController = container.resolve(PostController);
 const authController = container.resolve(AuthController);
 const groupController = container.resolve(GroupController);
+const commentController = container.resolve(CommentController);
 const healthcheckController = container.resolve(HealthcheckController);
 const postReactionController = container.resolve(PostReactionController);
 
@@ -50,6 +55,7 @@ const app = new App(
 		postController,
 		fileController,
 		groupController,
+		commentController,
 		healthcheckController,
 		postReactionController,
 	],

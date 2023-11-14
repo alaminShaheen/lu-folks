@@ -21,6 +21,14 @@ class PostgresDatabase extends Database {
 		return this.dataSource.session;
 	}
 
+	public get commentRepository(): Prisma.CommentDelegate<DefaultArgs> {
+		return this.dataSource.comment;
+	}
+
+	public get commentReactionRepository(): Prisma.CommentReactionDelegate<DefaultArgs> {
+		return this.dataSource.commentReaction;
+	}
+
 	public get postRepository(): Prisma.PostDelegate<DefaultArgs> {
 		return this.dataSource.post;
 	}
