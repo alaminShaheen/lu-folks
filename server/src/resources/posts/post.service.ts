@@ -179,7 +179,10 @@ class PostService implements IPostService {
 			await this.checkPostExistence(postId);
 			return await this.databaseInstance.commentRepository.findMany({
 				where: { postId },
-				include: { commentReactions: true, commenter: true ,
+				include: {
+					commentReactions: true,
+					commenter: true,
+				},
 			});
 		} catch (error) {
 			throw error;

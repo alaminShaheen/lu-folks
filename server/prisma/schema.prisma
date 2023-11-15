@@ -72,11 +72,11 @@ model Comment {
   updatedAt        DateTime          @updatedAt()
   commenter        User              @relation(fields: [commenterId], references: [id]) // n -> 1
   commenterId      String
-  post             Post              @relation(fields: [postId], references: [id]) // n -> 1
+  post             Post              @relation(fields: [postId], references: [id], onDelete: Cascade) // n -> 1
   postId           String
   commentReactions CommentReaction[] // n -> n
-  replyToCommentId String?           @unique
-  replyTo          Comment?          @relation(fields: [replyToCommentId], references: [id], name: "replyTo")
+  replyToCommentId String?
+  replyTo          Comment?          @relation(fields: [replyToCommentId], references: [id], name: "replyTo", onDelete: Cascade, onUpdate: NoAction)
   replies          Comment[]         @relation("replyTo")
 }
 
@@ -93,7 +93,7 @@ model PostReaction {
 model CommentReaction {
   user      User         @relation(fields: [userId], references: [id])
   userId    String
-  comment   Comment      @relation(fields: [commentId], references: [id])
+  comment   Comment      @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId String
   type      ReactionType
 

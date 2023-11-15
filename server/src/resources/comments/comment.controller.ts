@@ -3,8 +3,8 @@ import { inject, injectable } from "tsyringe";
 import { NextFunction, Request, Response } from "express";
 import Controller from "@/abstracts/controller";
 import errorHandler from "@/middlewares/errorHandler";
-import verifyAuthentication from "@/middlewares/verifyAuthentication";
 import ICommentService from "@/models/interfaces/ICommentService";
+import verifyAuthentication from "@/middlewares/verifyAuthentication";
 
 @injectable()
 class CommentController extends Controller {
@@ -17,20 +17,25 @@ class CommentController extends Controller {
 		this.router
 			.route(`${this.path}/:commentSlug`)
 			.all(verifyAuthentication)
-			.get(this.getComment)
 			.patch(this.updateComment)
 			.delete(this.deleteComment);
 		this.router.route(this.path).all(verifyAuthentication).post(this.createComment);
+		this.router
+			.route(`${this.path}/:commentSlug/replies`)
+			.all(verifyAuthentication)
+			.get(this.getCommentReplies);
 	};
 
-	private getComment = async (
+	private getCommentReplies = async (
 		request: Request,
 		response: Response,
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const comment = await this.commentService.getComment(request.params.commentSlug);
-			return response.status(httpStatus.OK).send(comment);
+			const comments = await this.commentService.getCommentReplies(
+				request.params.commentSlug,
+			);
+			return response.status(httpStatus.OK).send(comments);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);
 		}

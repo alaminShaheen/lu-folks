@@ -24,6 +24,7 @@ export const APILinks = {
 	getPost: (slug: string) => `/post/${slug}`,
 	createComment: () => `comment`,
 	getPostComments: (postId: string) => `post/${postId}/comments`,
+	getCommentReplies: (parentCommentId: string) => `/comment/${parentCommentId}/replies`,
 };
 
 export default APILinks;

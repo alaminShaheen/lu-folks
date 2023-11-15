@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export default class CreateCommentDto {
 	@IsString({ message: "Comment must be a string." })
@@ -7,4 +7,7 @@ export default class CreateCommentDto {
 
 	@IsNotEmpty({ message: "PostId cannot be empty." })
 	postId: string;
+
+	@IsOptional()
+	replyToCommentId?: string;
 }

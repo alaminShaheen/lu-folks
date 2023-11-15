@@ -17,6 +17,7 @@ const QueryKeys = {
 	GET_POST: "get-post",
 	CREATE_COMMENT: "create-comment",
 	GET_POST_COMMENTS: "get-post-comments",
+	GET_COMMENT_REPLIES: "get-comment-replies",
 } as const;
 
 export default QueryKeys;

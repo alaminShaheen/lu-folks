@@ -34,7 +34,7 @@ class PostController extends Controller {
 	private getPostComments = async (
 		request: Request,
 		response: Response,
-		nextFunction: Nextunction,
+		nextFunction: NextFunction,
 	) => {
 		try {
 			const comments = await this.postService.getPostComments(request.params.slug);

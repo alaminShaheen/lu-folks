@@ -21,14 +21,31 @@ class CommentService implements ICommentService {
 	): Promise<Comment> => {
 		try {
 			await this.postService.checkPostExistence(commentInfo.postId);
-			return await this.databaseInstance.commentRepository.create({
-				data: {
-					comment: commentInfo.comment,
-					commenter: { connect: { id: userId } },
-					post: { connect: { id: commentInfo.postId } },
-				},
-				include: { commenter: true, commentReactions: true },
-			});
+
+			let replyTo = commentInfo.replyToCommentId
+				? { connect: { id: commentInfo.replyToCommentId } }
+				: undefined;
+
+			if (commentInfo.replyToCommentId) {
+				return await this.databaseInstance.commentRepository.create({
+					data: {
+						comment: commentInfo.comment,
+						commenter: { connect: { id: userId } },
+						post: { connect: { id: commentInfo.postId } },
+						replyTo: { connect: { id: commentInfo.replyToCommentId } },
+					},
+					include: { commenter: true, commentReactions: true },
+				});
+			} else {
+				return await this.databaseInstance.commentRepository.create({
+					data: {
+						comment: commentInfo.comment,
+						commenter: { connect: { id: userId } },
+						post: { connect: { id: commentInfo.postId } },
+					},
+					include: { commenter: true, commentReactions: true },
+				});
+			}
 		} catch (error) {
 			throw error;
 		}
@@ -42,18 +59,13 @@ class CommentService implements ICommentService {
 		}
 	};
 
-	public getComment = async (commentId: string): Promise<Comment> => {
+	public getCommentReplies = async (parentCommentId: string): Promise<Comment[]> => {
 		try {
-			const comment = await this.databaseInstance.commentRepository.findUnique({
-				where: { id: commentId, replyToCommentId: undefined },
-				include: { commentReactions: true, commenter: true },
+			await this.checkCommentExistence(parentCommentId);
+			return await this.databaseInstance.commentRepository.findMany({
+				where: { replyToCommentId: parentCommentId },
+				include: { commenter: true, commentReactions: true },
 			});
-
-			if (!comment) {
-				throw new HttpException(httpStatus.BAD_REQUEST, "This comment does not exist");
-			}
-
-			return comment;
 		} catch (error) {
 			throw error;
 		}

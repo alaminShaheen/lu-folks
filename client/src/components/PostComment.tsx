@@ -1,26 +1,81 @@
-import { useRef, useState } from "react";
-import UserAvatar from "@/components/UserAvatar.tsx";
-import Comment from "@/models/Comment.ts";
-import { formatTimeToNow } from "@/utils/DateFormatters.ts";
-import { Button } from "@/components/ui/button.tsx";
+import { clsx } from "clsx";
 import { Reply } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { Fragment, useCallback, useRef, useState } from "react";
+import Comment from "@/models/Comment.ts";
+import QueryKeys from "@/constants/QueryKeys.ts";
 import { Label } from "@/components/ui/label.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import UserAvatar from "@/components/UserAvatar.tsx";
+import handleError from "@/utils/handleError.ts";
 import { Textarea } from "@/components/ui/textarea.tsx";
-import CommentReactions from "@/components/CommentReactions.tsx";
 import ReactionType from "@/models/enums/ReactionType.ts";
+import CommentReactions from "@/components/CommentReactions.tsx";
+import useCreateComment from "@/hooks/comment/useCreateComment.tsx";
+import { useAppContext } from "@/context/AppContext.tsx";
+import { formatTimeToNow } from "@/utils/DateFormatters.ts";
+import useGetCommentReplies from "@/hooks/comment/useGetCommentReplies.tsx";
 
 type PostCommentProps = {
+	postId: string;
 	comment: Comment;
 	likeCount: number;
 	unlikeCount: number;
 	ownReaction?: ReactionType;
+	parentCommentId?: string;
 };
 
 const PostComment = (props: PostCommentProps) => {
-	const { comment, unlikeCount, ownReaction, likeCount } = props;
+	const { comment, unlikeCount, ownReaction, likeCount, postId, parentCommentId } = props;
 	const [isReplying, setIsReplying] = useState(false);
 	const commentRef = useRef<HTMLDivElement>(null);
-	// const {mutate: createComment} = useCreateComment({onSuccess: () => {}});
+	const { user } = useAppContext();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		reset,
+	} = useForm<{ comment: string }>({
+		defaultValues: {
+			comment: "",
+		},
+	});
+	const queryClient = useQueryClient();
+
+	const onCommentCreated = useCallback(async () => {
+		await queryClient.refetchQueries({
+			queryKey: [QueryKeys.GET_COMMENT_REPLIES, comment.id],
+		});
+		reset({ comment: "" });
+		setIsReplying(false);
+	}, [reset, queryClient, parentCommentId]);
+
+	const { mutate: createComment } = useCreateComment({
+		onSuccess: onCommentCreated,
+	});
+
+	const {
+		data: replies,
+		isLoading: isFetchingReplies,
+		isError: isFetchingReplyError,
+		error: fetchingReplyError,
+	} = useGetCommentReplies({ parentCommentId: comment.id });
+
+	const onReplyClicked = useCallback(
+		(data: { comment: string }) => {
+			createComment({
+				comment: data.comment,
+				postId,
+				replyToCommentId: comment.id,
+			});
+		},
+		[comment, createComment],
+	);
+
+	if (isFetchingReplyError) {
+		handleError(fetchingReplyError);
+	}
 
 	return (
 		<div ref={commentRef} className="flex flex-col">
@@ -51,28 +106,28 @@ const PostComment = (props: PostCommentProps) => {
 					ownReaction={ownReaction}
 				/>
 
-				<Reply
-					className="h-4 w-4 mr-1.5 cursor-pointer"
+				<Button
+					variant="ghost"
+					className="p-0 gap-2 hover:bg-transparent cursor-pointer"
 					onClick={() => {
 						setIsReplying(true);
 					}}
-				/>
-				{/*<Button*/}
-
-				{/*	}}*/}
-				{/*	variant="ghost"*/}
-				{/*	size="icon"*/}
-				{/*	className="p-0 m-0"*/}
-				{/*>*/}
-				{/*	/!*Reply*!/*/}
-				{/*</Button>*/}
+				>
+					<Reply
+						className={clsx(
+							"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",
+						)}
+					/>{" "}
+					{isFetchingReplies ? <div>Loading...</div> : replies ? replies.length : 0}
+				</Button>
 			</div>
 
 			{isReplying ? (
 				<div className="grid w-full gap-1.5">
 					<Label htmlFor="comment">Your Reply</Label>
-					<form className="mt-2">
+					<form className="mt-2" onSubmit={handleSubmit(onReplyClicked)}>
 						<Textarea
+							{...register("comment", { required: "Comment is required." })}
 							onFocus={(e) =>
 								e.currentTarget.setSelectionRange(
 									e.currentTarget.value.length,
@@ -85,6 +140,12 @@ const PostComment = (props: PostCommentProps) => {
 							placeholder="What are your thoughts?"
 						/>
 
+						{errors.comment?.message && (
+							<span className="text-xs text-red-500 my-2">
+								{errors.comment.message}
+							</span>
+						)}
+
 						<div className="mt-2 flex justify-end gap-2">
 							<Button
 								tabIndex={-1}
@@ -93,10 +154,45 @@ const PostComment = (props: PostCommentProps) => {
 							>
 								Cancel
 							</Button>
-							<Button onClick={() => {}}>Post</Button>
+							<Button type="submit">Post</Button>
 						</div>
 					</form>
 				</div>
+			) : null}
+
+			{/*Render replies */}
+			{isFetchingReplies ? (
+				<div>Loading...</div>
+			) : replies ? (
+				<Fragment>
+					{replies.map((reply) => {
+						const likes = comment.commentReactions?.filter(
+							(reaction) => reaction.type === ReactionType.LIKE,
+						).length;
+						const unlikes = comment.commentReactions?.filter(
+							(reaction) => reaction.type === ReactionType.UNLIKE,
+						).length;
+						const ownReaction = comment.commentReactions?.find(
+							(reaction) => reaction.userId === user?.id,
+						)?.type;
+
+						return (
+							<div
+								key={reply.id}
+								className="ml-2 py-2 pl-4 border-l-2 border-zinc-200"
+							>
+								<PostComment
+									comment={reply}
+									postId={postId}
+									parentCommentId={comment.id}
+									likeCount={likes}
+									unlikeCount={unlikes}
+									ownReaction={ownReaction}
+								/>
+							</div>
+						);
+					})}
+				</Fragment>
 			) : null}
 		</div>
 	);

@@ -1,6 +1,5 @@
-import CommentReaction from "@/models/CommentReaction.ts";
-import ReplyComment from "@/models/ReplyComment.ts";
 import User from "@/models/User.ts";
+import CommentReaction from "@/models/CommentReaction.ts";
 
 class Comment {
 	static EMPTY = new Comment("", "", "", "", "", User.EMPTY, "", [], [], "");
@@ -14,7 +13,7 @@ class Comment {
 		public commenter: User,
 		public postId: string,
 		public commentReactions: CommentReaction[],
-		public replies: ReplyComment[],
+		public replies: Comment[],
 		public replyToCommentId?: string,
 	) {}
 }
