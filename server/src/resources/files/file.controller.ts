@@ -28,7 +28,6 @@ class FileController extends Controller {
 						},
 					})
 						.middleware(({ req, res }) => {
-							console.log(req.params.userId);
 							return { userId: req.params.userId };
 						})
 						.onUploadComplete((data) => console.log("file", data)),

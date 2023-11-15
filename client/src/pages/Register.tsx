@@ -53,7 +53,6 @@ const Register = () => {
 		onSuccess: (data) => {
 			setAuthentication(data);
 			toast.dismiss();
-			console.log("hello");
 			toast.success("You have registered successfully!");
 			navigate(ROUTES.HOME);
 		},

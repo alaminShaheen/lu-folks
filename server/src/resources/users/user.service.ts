@@ -3,7 +3,6 @@ import { injectable } from "tsyringe";
 import IUserService from "@/models/interfaces/IUserService";
 import HttpException from "@/exceptions/httpException";
 import PostgresDatabase from "@/database/postgres.database";
-import * as console from "console";
 import { User } from "@prisma/client";
 import UserCreate from "@/models/types/UserCreate";
 import AuthenticatedUser from "@/models/types/AuthenticatedUser";
