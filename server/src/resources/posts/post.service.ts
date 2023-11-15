@@ -178,7 +178,7 @@ class PostService implements IPostService {
 		try {
 			await this.checkPostExistence(postId);
 			return await this.databaseInstance.commentRepository.findMany({
-				where: { postId },
+				where: { postId, replyToCommentId: null },
 				include: {
 					commentReactions: true,
 					commenter: true,

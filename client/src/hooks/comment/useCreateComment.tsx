@@ -1,12 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
-import QueryKeys from "@/constants/QueryKeys.ts";
-import { privateAxiosInstance } from "@/api/Axios.ts";
+import Comment from "@/models/Comment.ts";
 import APILinks from "@/constants/APILinks.ts";
-import CreateComment from "@/models/CreateComment.ts";
+import QueryKeys from "@/constants/QueryKeys.ts";
 import handleError from "@/utils/handleError.ts";
+import CreateComment from "@/models/CreateComment.ts";
+import { privateAxiosInstance } from "@/api/Axios.ts";
 
 interface UseCreateCommentProps {
-	onSuccess: () => void;
+	onSuccess: (data: Comment) => void;
 }
 
 const UseCreateComment = (props: UseCreateCommentProps) => {

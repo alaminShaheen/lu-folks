@@ -15,29 +15,7 @@ class GroupController extends Controller {
 		this.initialiseRoutes();
 	}
 
-	public getGroupMemberCount = async (
-		request: Request,
-		response: Response,
-		nextFunction: NextFunction,
-	) => {
-		try {
-			const result = await this.groupService.getGroupMemberCount(request.params.slug);
-			return response.status(httpStatus.OK).send(result);
-		} catch (error: any) {
-			if (error instanceof Error) nextFunction(error);
-			else {
-				nextFunction(
-					new HttpException(
-						httpStatus.INTERNAL_SERVER_ERROR,
-						"An unexpected error occurred.",
-					),
-				);
-			}
-		}
-	};
-
 	protected initialiseRoutes = (): void => {
-		console.log(this.path);
 		this.router
 			.route(this.path)
 			.post(verifyAuthentication, DtoValidator(CreateGroupDto), this.createGroup);
@@ -45,12 +23,6 @@ class GroupController extends Controller {
 		this.router
 			.route(`${this.path}/details/:slug`)
 			.get(verifyAuthentication, this.getGroupData);
-		this.router
-			.route(`${this.path}/is-member/:slug`)
-			.get(verifyAuthentication, this.isGroupMember);
-		this.router
-			.route(`${this.path}/member-count/:slug`)
-			.get(verifyAuthentication, this.getGroupMemberCount);
 		this.router.route(`${this.path}/join/:slug`).post(verifyAuthentication, this.joinGroup);
 		this.router.route(`${this.path}/leave/:slug`).delete(verifyAuthentication, this.leaveGroup);
 	};
@@ -153,30 +125,6 @@ class GroupController extends Controller {
 				request.user?.userId!,
 			);
 			return response.status(httpStatus.OK).send(group);
-		} catch (error: any) {
-			if (error instanceof Error) nextFunction(error);
-			else {
-				nextFunction(
-					new HttpException(
-						httpStatus.INTERNAL_SERVER_ERROR,
-						"An unexpected error occurred.",
-					),
-				);
-			}
-		}
-	};
-
-	private isGroupMember = async (
-		request: Request,
-		response: Response,
-		nextFunction: NextFunction,
-	) => {
-		try {
-			const result = await this.groupService.isGroupMember(
-				request.params.slug,
-				request.user?.userId!,
-			);
-			return response.status(httpStatus.OK).send(result);
 		} catch (error: any) {
 			if (error instanceof Error) nextFunction(error);
 			else {

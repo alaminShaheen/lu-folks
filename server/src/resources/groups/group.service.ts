@@ -7,7 +7,6 @@ import HttpException from "@/exceptions/httpException";
 import IGroupService from "@/models/interfaces/IGroupService";
 import CreateGroupDto from "@/dtos/createGroup.dto";
 import PostgresDatabase from "@/database/postgres.database";
-import GroupMemberCount from "@/models/types/GroupMemberCount";
 import IsMemberResponse from "@/models/types/IsMemberResponse";
 import FieldValidationException from "@/exceptions/fieldValidationException";
 
@@ -15,9 +14,26 @@ import FieldValidationException from "@/exceptions/fieldValidationException";
 class GroupService implements IGroupService {
 	constructor(private readonly databaseInstance: PostgresDatabase) {}
 
+	public checkGroupExistence = async (slug: string): Promise<Group> => {
+		try {
+			const group = await this.databaseInstance.groupRepository.findFirst({
+				where: { id: slug },
+			});
+
+			if (!group) {
+				console.log("Group does not exist.");
+				throw new HttpException(httpStatus.BAD_REQUEST, "The group does not exist");
+			}
+
+			return group;
+		} catch (error) {
+			throw error;
+		}
+	};
+
 	public getGroupInfo = async (slug: string, userId: string): Promise<GroupInfo> => {
 		try {
-			await this.checkGroupExistence(slug);
+			const groupExists = await this.checkGroupExistence(slug);
 
 			const group = await this.databaseInstance.groupRepository.findFirst({
 				where: { id: slug },
@@ -121,34 +137,9 @@ class GroupService implements IGroupService {
 		}
 	};
 
-	public getGroupMemberCount = async (slug: string): Promise<GroupMemberCount> => {
-		try {
-			await this.checkGroupExistence(slug);
-
-			const groupInfo = await this.databaseInstance.groupRepository.findUnique({
-				where: { id: slug },
-				include: {
-					_count: {
-						select: {
-							groupMembers: true,
-						},
-					},
-				},
-			});
-
-			if (!groupInfo) {
-				console.log("Group not found");
-				throw new HttpException(httpStatus.BAD_REQUEST, "The group does not exist.");
-			}
-			return { count: groupInfo?._count.groupMembers || 0 };
-		} catch (error: any) {
-			throw error;
-		}
-	};
-
 	public isGroupMember = async (slug: string, userId: string): Promise<IsMemberResponse> => {
 		try {
-			const group = await this.databaseInstance.groupRepository.findUniqueOrThrow({
+			const group = await this.databaseInstance.groupRepository.findUnique({
 				where: { id: slug, groupMembers: { some: { id: userId } } },
 			});
 			return { isMember: !!group };
@@ -218,23 +209,6 @@ class GroupService implements IGroupService {
 				},
 			});
 		} catch (error: any) {
-			throw error;
-		}
-	};
-
-	public checkGroupExistence = async (slug: string): Promise<Group> => {
-		try {
-			const group = await this.databaseInstance.groupRepository.findFirst({
-				where: { id: slug },
-			});
-
-			if (!group) {
-				console.log("Group does not exist.");
-				throw new HttpException(httpStatus.BAD_REQUEST, "The group does not exist");
-			}
-
-			return group;
-		} catch (error) {
 			throw error;
 		}
 	};

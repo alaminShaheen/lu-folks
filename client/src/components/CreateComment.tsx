@@ -1,11 +1,13 @@
 import { useForm } from "react-hook-form";
 import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import Comment from "@/models/Comment.ts";
 import QueryKeys from "@/constants/QueryKeys.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Textarea } from "@/components/ui/textarea";
+import ExtendedPost from "@/models/ExtendedPost.ts";
 import useCreateComment from "@/hooks/comment/useCreateComment.tsx";
-import { useQueryClient } from "@tanstack/react-query";
 
 type CreateCommentProps = {
 	postId: string;
@@ -26,11 +28,32 @@ const CreateComment = (props: CreateCommentProps) => {
 	const currentComment = watch("comment");
 	const queryClient = useQueryClient();
 
-	const onCommentPosted = useCallback(async () => {
-		reset({ comment: "" });
-		await queryClient.refetchQueries({ queryKey: [QueryKeys.GET_POST, postId] });
-		await queryClient.refetchQueries({ queryKey: [QueryKeys.GET_POST_COMMENTS, postId] });
-	}, [queryClient]);
+	const onCommentPosted = useCallback(
+		(comment: Comment) => {
+			reset({ comment: "" });
+
+			queryClient.setQueryData<ExtendedPost>([QueryKeys.GET_POST, postId], (oldData) => {
+				if (oldData) {
+					return {
+						...oldData,
+						comments: [...oldData.comments, comment],
+					};
+				}
+				return oldData;
+			});
+
+			queryClient.setQueryData<Comment[]>(
+				[QueryKeys.GET_POST_COMMENTS, postId],
+				(oldData) => {
+					if (oldData) {
+						return [...oldData, comment];
+					}
+					return oldData;
+				},
+			);
+		},
+		[queryClient],
+	);
 
 	const { mutate: submitComment, isPending } = useCreateComment({ onSuccess: onCommentPosted });
 

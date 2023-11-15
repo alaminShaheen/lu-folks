@@ -64,11 +64,7 @@ const Post = (props: PostProps) => {
 					unlikeCount={unlikeCount}
 					ownReaction={ownReaction}
 				/>
-				<Link
-					to={"/"}
-					// href={`/r/${subredditName}/post/${post.id}`}
-					className="w-fit flex items-center gap-2"
-				>
+				<Link to={`/post/${post.id}`} className="w-fit flex items-center gap-2">
 					<MessageSquare
 						className={clsx(
 							"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",

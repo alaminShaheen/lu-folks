@@ -2,8 +2,6 @@ import IPostReactionService from "@/models/interfaces/IPostReactionService";
 import PostgresDatabase from "@/database/postgres.database";
 import PostService from "@/resources/posts/post.service";
 import PostReactionDto from "@/dtos/postReaction.dto";
-import AppConstants from "@/constants/AppConstants";
-import CachedPost from "@/models/types/CachedPost";
 import { injectable } from "tsyringe";
 import { ReactionType, User } from "@prisma/client";
 
@@ -52,7 +50,6 @@ class PostReactionService implements IPostReactionService {
 				},
 			});
 
-			let userVote = 0;
 			if (alreadyReacted) {
 				if (alreadyReacted.type === postReactionInfo.reaction) {
 					await this.databaseInstance.postReactionRepository.delete({
@@ -64,7 +61,6 @@ class PostReactionService implements IPostReactionService {
 							},
 						},
 					});
-					userVote -= 1;
 				} else {
 					await this.databaseInstance.postReactionRepository.update({
 						where: {
@@ -76,7 +72,6 @@ class PostReactionService implements IPostReactionService {
 						},
 						data: { type: postReactionInfo.reaction },
 					});
-					userVote += 0;
 				}
 			} else {
 				await this.databaseInstance.postReactionRepository.create({
@@ -86,18 +81,6 @@ class PostReactionService implements IPostReactionService {
 						type: postReactionInfo.reaction,
 					},
 				});
-				userVote += 1;
-			}
-
-			if (post._count.postReactions + userVote >= AppConstants.CACHED_POSTS_COUNT) {
-				const cachedPost: CachedPost = {
-					id: post.id,
-					content: post.content,
-					title: post.title,
-					createdAt: post.createdAt,
-					creatorUsername: post.creator.username,
-					currentUserReaction: postReactionInfo.reaction,
-				};
 			}
 			return;
 		} catch (error) {

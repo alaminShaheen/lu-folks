@@ -23,13 +23,11 @@ type PostCommentProps = {
 	likeCount: number;
 	unlikeCount: number;
 	ownReaction?: ReactionType;
-	parentCommentId?: string;
 	groupId: string;
 };
 
 const PostComment = (props: PostCommentProps) => {
-	const { comment, unlikeCount, ownReaction, likeCount, postId, groupId, parentCommentId } =
-		props;
+	const { comment, unlikeCount, ownReaction, likeCount, postId, groupId } = props;
 	const [isReplying, setIsReplying] = useState(false);
 	const commentRef = useRef<HTMLDivElement>(null);
 	const { user } = useAppContext();
@@ -45,13 +43,22 @@ const PostComment = (props: PostCommentProps) => {
 	});
 	const queryClient = useQueryClient();
 
-	const onCommentCreated = useCallback(async () => {
-		await queryClient.refetchQueries({
-			queryKey: [QueryKeys.GET_COMMENT_REPLIES, comment.id],
-		});
-		reset({ comment: "" });
-		setIsReplying(false);
-	}, [reset, queryClient, parentCommentId]);
+	const onCommentCreated = useCallback(
+		async (newComment: Comment) => {
+			queryClient.setQueryData<Comment[]>(
+				[QueryKeys.GET_COMMENT_REPLIES, comment.id],
+				(oldData) => {
+					if (oldData) {
+						return [...oldData, newComment];
+					}
+					return oldData;
+				},
+			);
+			reset({ comment: "" });
+			setIsReplying(false);
+		},
+		[reset, queryClient, comment.id],
+	);
 
 	const { mutate: createComment } = useCreateComment({
 		onSuccess: onCommentCreated,
@@ -188,7 +195,6 @@ const PostComment = (props: PostCommentProps) => {
 									groupId={groupId}
 									comment={reply}
 									postId={postId}
-									parentCommentId={comment.id}
 									likeCount={likes}
 									unlikeCount={unlikes}
 									ownReaction={ownReaction}

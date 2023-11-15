@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
-import { useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils.ts";
 import APILinks from "@/constants/APILinks.ts";
@@ -14,6 +14,8 @@ import useUploadFile from "@/hooks/useUploadFile.tsx";
 import useCreatePost from "@/hooks/post/useCreatePost.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import RichWYSIWYGEditor, { EditorHandle } from "@/components/ui/wysiwygEditor.tsx";
+import ExtendedPost from "@/models/ExtendedPost.ts";
+import AppConstants from "@/constants/AppConstants.ts";
 
 type CreatePostEditorType = {
 	groupSlug: string;
@@ -69,13 +71,59 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 		[setError, uploadFiles, user?.id],
 	);
 
-	const onPostCreated = useCallback(async () => {
-		await queryClient.refetchQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
-		await queryClient.refetchQueries({ queryKey: [QueryKeys.FETCH_INFINITE_POST] });
-		toast.dismiss();
-		toast.success("Your post has been published.");
-		navigate(`/group/${groupSlug}`);
-	}, [groupSlug, navigate, queryClient]);
+	const onPostCreated = useCallback(
+		async (data: ExtendedPost) => {
+			queryClient.setQueryData<ExtendedPost[]>([QueryKeys.INITIAL_FEED_POSTS], (oldData) => {
+				if (oldData) {
+					if (oldData.length < AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH) {
+						oldData.push(data);
+					}
+					return oldData.sort((a, b) => {
+						return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+					});
+				}
+				return oldData;
+			});
+
+			queryClient.setQueryData<InfiniteData<ExtendedPost[], number>>(
+				[QueryKeys.FETCH_INFINITE_POST],
+				(oldData) => {
+					if (oldData) {
+						return {
+							...oldData,
+							pages: oldData.pages
+								.flatMap((pages) => pages)
+								.sort((a, b) => {
+									return (
+										new Date(b.createdAt).getTime() -
+										new Date(a.createdAt).getTime()
+									);
+								})
+								.reduce<ExtendedPost[][]>(
+									(paginatedPosts, currentPost, currentIndex) => {
+										const chunkIndex = Math.floor(
+											currentIndex /
+												AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH,
+										);
+										if (!paginatedPosts[chunkIndex]) {
+											paginatedPosts.push([]);
+										}
+										paginatedPosts[paginatedPosts.length - 1].push(currentPost);
+										return paginatedPosts;
+									},
+									[],
+								),
+						};
+					}
+					return oldData;
+				},
+			);
+			toast.dismiss();
+			toast.success("Your post has been published.");
+			navigate(`/group/${groupSlug}`);
+		},
+		[groupSlug, navigate, queryClient],
+	);
 
 	const { mutate, isPending } = useCreatePost({ setError, onSuccess: onPostCreated });
 

@@ -1,14 +1,16 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { clsx } from "clsx";
 import { usePrevious } from "@mantine/hooks";
-import { Button } from "@/components/ui/button.tsx";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { InfiniteData, useQueryClient } from "@tanstack/react-query";
+import { Fragment, useCallback, useEffect, useState } from "react";
+import QueryKeys from "@/constants/QueryKeys.ts";
+import { Button } from "@/components/ui/button.tsx";
+import handleError from "@/utils/handleError.ts";
+import ExtendedPost from "@/models/ExtendedPost.ts";
 import ReactionType from "@/models/enums/ReactionType.ts";
 import usePostReact from "@/hooks/post/usePostReaction.tsx";
+import { useAppContext } from "@/context/AppContext.tsx";
 import CreatePostReaction from "@/models/CreatePostReaction.ts";
-import handleError from "@/utils/handleError.ts";
-import { clsx } from "clsx";
-import QueryKeys from "@/constants/QueryKeys.ts";
-import { useQueryClient } from "@tanstack/react-query";
 
 type PostReactionsProps = {
 	postId: string;
@@ -25,6 +27,7 @@ const PostReactions = (props: PostReactionsProps) => {
 	const [ownPostReaction, setOwnPostReaction] = useState<ReactionType | undefined>(ownReaction);
 	const previousUserPostReaction = usePrevious(ownPostReaction);
 	const queryClient = useQueryClient();
+	const { user } = useAppContext();
 
 	const onReactionError = useCallback(
 		(error: any, reactionInfo: CreatePostReaction) => {
@@ -59,16 +62,149 @@ const PostReactions = (props: PostReactionsProps) => {
 				}
 				setOwnPostReaction(reactionInfo.reaction);
 			}
+
+			queryClient.setQueryData<ExtendedPost[]>([QueryKeys.INITIAL_FEED_POSTS], (oldData) => {
+				if (oldData) {
+					return oldData.map((post) => {
+						if (post.id === reactionInfo.postSlug) {
+							const alreadyReactedPost = post.postReactions.find((reaction) => {
+								return (
+									reaction.postId === reactionInfo.postSlug &&
+									reaction.userId === user?.id!
+								);
+							});
+
+							if (!alreadyReactedPost) {
+								post.postReactions.push({
+									postId: reactionInfo.postSlug,
+									userId: user?.id!,
+									type: reactionInfo.reaction,
+								});
+								return post;
+							} else {
+								const sameReaction =
+									alreadyReactedPost.type === reactionInfo.reaction;
+								if (sameReaction) {
+									return {
+										...post,
+										postReactions: post.postReactions.filter((reaction) => {
+											return !(
+												reaction.postId === reactionInfo.postSlug &&
+												reaction.userId === user?.id! &&
+												reaction.type === reactionInfo.reaction
+											);
+										}),
+									};
+								} else {
+									post.postReactions = post.postReactions.filter((reaction) => {
+										return !(
+											reaction.postId === reactionInfo.postSlug &&
+											reaction.userId === user?.id! &&
+											reaction.type !== reactionInfo.reaction
+										);
+									});
+									post.postReactions.push({
+										type: reactionInfo.reaction,
+										userId: user?.id!,
+										postId: reactionInfo.postSlug,
+									});
+
+									return { ...post };
+								}
+							}
+						}
+						return post;
+					});
+				}
+				return oldData;
+			});
+
+			queryClient.setQueryData<InfiniteData<ExtendedPost[], number>>(
+				[QueryKeys.FETCH_INFINITE_POST],
+				(oldData) => {
+					if (oldData) {
+						return {
+							...oldData,
+							pages: oldData.pages.map((page) => {
+								const targetPost = page.find((post) => post.id === postId);
+
+								if (!targetPost) {
+									console.log("something is wrong");
+									return page;
+								}
+
+								const userReaction = targetPost.postReactions.find(
+									(reaction) => reaction.userId === user?.id!,
+								);
+
+								if (!userReaction) {
+									return page.map((post) => {
+										if (post.id === targetPost.id) {
+											post.postReactions.push({
+												postId: reactionInfo.postSlug,
+												type: reactionInfo.reaction,
+												userId: user?.id!,
+											});
+										}
+										return post;
+									});
+								} else {
+									if (userReaction.type === reactionInfo.reaction) {
+										return page.map((post) => {
+											if (post.id === targetPost.id) {
+												post.postReactions = post.postReactions.filter(
+													(reaction) => {
+														return !(
+															reaction.postId ===
+																reactionInfo.postSlug &&
+															reaction.userId === user?.id! &&
+															reaction.type === reactionInfo.reaction
+														);
+													},
+												);
+											}
+											return post;
+										});
+									} else {
+										return page.map((post) => {
+											if (post.id === targetPost.id) {
+												post.postReactions = post.postReactions.filter(
+													(reaction) => {
+														return !(
+															reaction.postId ===
+																reactionInfo.postSlug &&
+															reaction.userId === user?.id! &&
+															reaction.type !== reactionInfo.reaction
+														);
+													},
+												);
+
+												post.postReactions.push({
+													postId: reactionInfo.postSlug,
+													type: reactionInfo.reaction,
+													userId: user?.id!,
+												});
+											}
+											return post;
+										});
+									}
+								}
+							}),
+						};
+					}
+					return oldData;
+				},
+			);
 		},
-		[ownPostReaction],
+		[ownPostReaction, queryClient, groupId],
 	);
 
 	const { mutate: reactToPost } = usePostReact({
 		onError: onReactionError,
 		onMutate,
 		onSuccess: async () => {
-			await queryClient.refetchQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
-			await queryClient.refetchQueries({ queryKey: [QueryKeys.FETCH_INFINITE_POST] });
+			// await queryClient.refetchQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
+			// await queryClient.refetchQueries({ queryKey: [QueryKeys.FETCH_INFINITE_POST] });
 		},
 	});
 

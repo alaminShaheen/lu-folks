@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import APILinks from "@/constants/APILinks.ts";
+import GroupInfo from "@/models/GroupInfo.ts";
 import QueryKeys from "@/constants/QueryKeys.ts";
 import { Button } from "@/components/ui/button.tsx";
 import handleError from "@/utils/handleError.ts";
@@ -26,8 +27,16 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 		onSuccess: async () => {
 			toast.dismiss();
 			toast.success(`You have joined the group: ${groupTitle}`);
-			await queryClient.invalidateQueries({
-				queryKey: [QueryKeys.GROUP_INFO],
+			queryClient.setQueryData<GroupInfo>([QueryKeys.GROUP_INFO, groupId], (oldData) => {
+				if (oldData) {
+					return {
+						...oldData,
+						groupMemberCount: oldData.groupMemberCount + 1,
+						isMember: true,
+						updatedAt: new Date().toDateString(),
+					};
+				}
+				return oldData;
 			});
 		},
 		onError: (error: any) => handleError(error),
@@ -42,14 +51,17 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 		onSuccess: async () => {
 			toast.dismiss();
 			toast.success(`You have left the group: ${groupTitle}`);
-			await queryClient.invalidateQueries({
-				queryKey: [QueryKeys.GROUP_DETAILS],
-			});
-			await queryClient.invalidateQueries({
-				queryKey: [QueryKeys.GROUP_MEMBER_COUNT],
-			});
-			await queryClient.invalidateQueries({
-				queryKey: [QueryKeys.IS_GROUP_MEMBER],
+
+			queryClient.setQueryData<GroupInfo>([QueryKeys.GROUP_INFO, groupId], (oldData) => {
+				if (oldData) {
+					return {
+						...oldData,
+						groupMemberCount: oldData.groupMemberCount - 1,
+						isMember: false,
+						updatedAt: new Date().toDateString(,
+					};
+				}
+				return oldData;
 			});
 		},
 		onError: (error: any) => handleError(error),
