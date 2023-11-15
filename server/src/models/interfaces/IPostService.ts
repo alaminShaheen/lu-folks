@@ -1,4 +1,4 @@
-import { Post } from "@prisma/client";
+import { Comment, Post } from "@prisma/client";
 import CreatePostDto from "@/dtos/createPost.dto";
 
 interface IPostService {
@@ -8,6 +8,7 @@ interface IPostService {
 		page: number,
 		groupSlug?: string,
 	) => Promise<Post[]>;
+	getPostComments: (postId: string) => Promise<Comment[]>;
 	getPost: (userId: string, postSlug: string) => Promise<Post>;
 	getInitialFeedPosts: (userId: string) => Promise<Post[]>;
 	createPost: (userId: string, postInfo: CreatePostDto) => Promise<Post>;

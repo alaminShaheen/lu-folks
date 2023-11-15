@@ -10,7 +10,7 @@ type UseGetPostProp = {
 const UseGetPost = (props: UseGetPostProp) => {
 	const { postSlug } = props;
 	return useQuery({
-		queryKey: [QueryKeys.GET_POST],
+		queryKey: [QueryKeys.GET_POST, postSlug],
 		queryFn: async () => {
 			const { data } = await privateAxiosInstance.get<ExtendedPost>(
 				APILinks.getPost(postSlug),

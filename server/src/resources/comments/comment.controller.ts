@@ -8,7 +8,7 @@ import ICommentService from "@/models/interfaces/ICommentService";
 
 @injectable()
 class CommentController extends Controller {
-	constructor(@inject("IPostService") private readonly commentService: ICommentService) {
+	constructor(@inject("ICommentService") private readonly commentService: ICommentService) {
 		super("/comment");
 		this.initialiseRoutes();
 	}

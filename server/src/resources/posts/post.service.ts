@@ -1,7 +1,7 @@
 import axios from "axios";
 import httpStatus from "http-status";
 import { injectable } from "tsyringe";
-import { Post } from "@prisma/client";
+import { Comment, Post } from "@prisma/client";
 import AppConstants from "@/constants/AppConstants";
 import IPostService from "@/models/interfaces/IPostService";
 import GroupService from "@/resources/groups/group.service";
@@ -166,8 +166,20 @@ class PostService implements IPostService {
 					creator: true,
 					group: true,
 					postReactions: true,
-					comments: true,
+					comments: { where: { replyTo: undefined } },
 				},
+			});
+		} catch (error) {
+			throw error;
+		}
+	};
+
+	public getPostComments = async (postId: string): Promise<Comment[]> => {
+		try {
+			await this.checkPostExistence(postId);
+			return await this.databaseInstance.commentRepository.findMany({
+				where: { postId },
+				include: { commentReactions: true, commenter: true ,
 			});
 		} catch (error) {
 			throw error;

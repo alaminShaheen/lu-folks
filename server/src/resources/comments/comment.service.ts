@@ -72,7 +72,7 @@ class CommentService implements ICommentService {
 		}
 	};
 
-	private checkCommentExistence = async (commentId: string) => {
+	public checkCommentExistence = async (commentId: string) => {
 		try {
 			const comment = await this.databaseInstance.commentRepository.findUnique({
 				where: { id: commentId },
@@ -89,4 +89,4 @@ class CommentService implements ICommentService {
 	};
 }
 
-export default PostService;
+export default CommentService;

@@ -25,7 +25,23 @@ class PostController extends Controller {
 		this.router.route(this.path).delete(this.deletePost);
 		this.router.route(this.path).get(verifyAuthentication, this.getPosts);
 		this.router.route(`${this.path}/feed`).get(verifyAuthentication, this.getInitialFeedPosts);
+		this.router
+			.route(`${this.path}/:slug/comments`)
+			.get(verifyAuthentication, this.getPostComments);
 		this.router.route(`${this.path}/:slug`).get(verifyAuthentication, this.getPost);
+	};
+
+	private getPostComments = async (
+		request: Request,
+		response: Response,
+		nextFunction: Nextunction,
+	) => {
+		try {
+			const comments = await this.postService.getPostComments(request.params.slug);
+			return response.status(httpStatus.OK).send(comments);
+		} catch (error: unknown) {
+			errorHandler(error as any, request, response, nextFunction);
+		}
 	};
 
 	private getPosts = async (request: Request, response: Response, nextFunction: NextFunction) => {

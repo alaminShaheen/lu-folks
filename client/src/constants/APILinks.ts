@@ -17,10 +17,13 @@ export const APILinks = {
 	getPosts: (limit: number, page: number, slug?: string) =>
 		`/post?limit=${limit}&page=${page}${slug ? `&slug=${slug}` : ""}`,
 	reactToPost: () => `/reaction`,
+	reactToComment: () => `/comment-reaction`,
 	getPostLikeReactors: (postSlug: string) => `/reaction/likes/${postSlug}`,
 	getPostDislikeReactors: (postSlug: string) => `/reaction/dislikes/${postSlug}`,
 	getInitialFeedPosts: () => `/post/feed`,
 	getPost: (slug: string) => `/post/${slug}`,
+	createComment: () => `comment`,
+	getPostComments: (postId: string) => `post/${postId}/comments`,
 };
 
 export default APILinks;
