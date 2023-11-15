@@ -7,20 +7,24 @@ import usePostReact from "@/hooks/post/usePostReaction.tsx";
 import CreatePostReaction from "@/models/CreatePostReaction.ts";
 import handleError from "@/utils/handleError.ts";
 import { clsx } from "clsx";
+import QueryKeys from "@/constants/QueryKeys.ts";
+import { useQueryClient } from "@tanstack/react-query";
 
 type PostReactionsProps = {
 	postId: string;
 	likeCount: number;
 	unlikeCount: number;
+	groupId: string;
 	ownReaction?: ReactionType;
 };
 
 const PostReactions = (props: PostReactionsProps) => {
-	const { likeCount, unlikeCount, ownReaction, postId } = props;
+	const { likeCount, unlikeCount, ownReaction, postId, groupId } = props;
 	const [postLikeCount, setPostLikeCount] = useState(likeCount);
 	const [postUnlikeCount, setPostUnlikeCount] = useState(unlikeCount);
 	const [ownPostReaction, setOwnPostReaction] = useState<ReactionType | undefined>(ownReaction);
 	const previousUserPostReaction = usePrevious(ownPostReaction);
+	const queryClient = useQueryClient();
 
 	const onReactionError = useCallback(
 		(error: any, reactionInfo: CreatePostReaction) => {
@@ -62,7 +66,10 @@ const PostReactions = (props: PostReactionsProps) => {
 	const { mutate: reactToPost } = usePostReact({
 		onError: onReactionError,
 		onMutate,
-		onSuccess: () => {},
+		onSuccess: async () => {
+			await queryClient.refetchQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
+			await queryClient.refetchQueries({ queryKey: [QueryKeys.FETCH_INFINITE_POST] });
+		},
 	});
 
 	const likePost = useCallback(() => {

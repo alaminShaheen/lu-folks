@@ -7,7 +7,7 @@ type LoadingSpinnerProps = {
 
 const LoadingSpinner = (props: LoadingSpinnerProps) => {
 	const { className } = props;
-	return <Shell className={cn("mr-2 h-4 w-4 animate-spin", className && className)} />;
+	return <Shell className={cn("h-4 w-4 animate-spin", className && className)} />;
 };
 
 export default LoadingSpinner;

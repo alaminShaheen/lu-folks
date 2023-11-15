@@ -3,16 +3,17 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import TextareaAutosize from "react-textarea-autosize";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils.ts";
 import APILinks from "@/constants/APILinks.ts";
+import QueryKeys from "@/constants/QueryKeys.ts";
+import { Button } from "@/components/ui/button.tsx";
 import PostCreate from "@/models/form/PostCreate";
 import handleError from "@/utils/handleError.ts";
 import useUploadFile from "@/hooks/useUploadFile.tsx";
 import useCreatePost from "@/hooks/post/useCreatePost.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import RichWYSIWYGEditor, { EditorHandle } from "@/components/ui/wysiwygEditor.tsx";
-import QueryKeys from "@/constants/QueryKeys.ts";
 
 type CreatePostEditorType = {
 	groupSlug: string;
@@ -69,10 +70,6 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 	);
 
 	const onPostCreated = useCallback(async () => {
-		// await queryClient.invalidateQueries({ queryKey: [groupSlug] });
-		// await queryClient.invalidateQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
-		// await queryClient.invalidateQueries({ queryKey: [QueryKeys.FETCH_INFINITE_POST] });
-		// await queryClient.invalidateQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
 		await queryClient.refetchQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
 		await queryClient.refetchQueries({ queryKey: [QueryKeys.FETCH_INFINITE_POST] });
 		toast.dismiss();
@@ -80,7 +77,7 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 		navigate(`/group/${groupSlug}`);
 	}, [groupSlug, navigate, queryClient]);
 
-	const { mutate } = useCreatePost({ setError, onSuccess: onPostCreated });
+	const { mutate, isPending } = useCreatePost({ setError, onSuccess: onPostCreated });
 
 	const onSubmit = useCallback(
 		async (formData: PostCreate) => {
@@ -99,39 +96,55 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 	}, []);
 
 	return (
-		<div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
-			<form id="subreddit-post-form" className="w-full" onSubmit={handleSubmit(onSubmit)}>
-				<div className="prose prose-stone dark:prose-invert w-full">
-					<TextareaAutosize
-						ref={(e) => {
-							titleRef(e);
-							// @ts-ignore
-							_titleRef.current = e;
-						}}
-						{...rest}
-						placeholder="Title"
-						className={cn(
-							"w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none",
-							errors.title?.message ? "border border-red-500" : "",
+		<Fragment>
+			<div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
+				<form id="subreddit-post-form" className="w-full" onSubmit={handleSubmit(onSubmit)}>
+					<div className="prose prose-stone dark:prose-invert w-full">
+						<TextareaAutosize
+							{...rest}
+							ref={(e) => {
+								titleRef(e);
+								// @ts-ignore
+								_titleRef.current = e;
+							}}
+							placeholder="Title"
+							className={cn(
+								"w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none",
+								errors.title?.message ? "border border-red-500" : "",
+							)}
+						/>
+						{errors.title?.message && (
+							<span className="text-xs text-red-500 my-2">
+								{errors.title.message}
+							</span>
 						)}
-					/>
-					{errors.title?.message && (
-						<span className="text-xs text-red-500 my-2">{errors.title.message}</span>
-					)}
-					<RichWYSIWYGEditor
-						ref={richTextEditorRef}
-						authentication={authentication}
-						editorBlockId="post-editor"
-						uploadImage={imageUploader}
-					/>
-					<p className="text-sm text-gray-500">
-						Use{" "}
-						<kbd className="rounded-md border bg-muted px-1 text-xs uppercase">Tab</kbd>{" "}
-						to open the command menu.
-					</p>
-				</div>
-			</form>
-		</div>
+						<RichWYSIWYGEditor
+							ref={richTextEditorRef}
+							authentication={authentication}
+							editorBlockId="post-editor"
+							uploadImage={imageUploader}
+						/>
+						<p className="text-sm text-gray-500">
+							Use{" "}
+							<kbd className="rounded-md border bg-muted px-1 text-xs uppercase">
+								Tab
+							</kbd>{" "}
+							to open the command menu.
+						</p>
+					</div>
+				</form>
+			</div>
+			<div className="w-full flex justify-end">
+				<Button
+					loading={isPending}
+					type="submit"
+					className="w-full"
+					form="subreddit-post-form"
+				>
+					Post
+				</Button>
+			</div>
+		</Fragment>
 	);
 };
 

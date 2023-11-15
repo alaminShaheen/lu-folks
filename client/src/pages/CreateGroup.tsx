@@ -92,9 +92,11 @@ const CreateGroup = () => {
 						Cancel
 					</Button>
 					<Button
-						disabled={groupTitle.length === 0 || isPending}
+						disabled={groupTitle.length === 0}
+						loading={isPending}
 						form="create-group-form"
 						onSubmit={handleSubmit(onSubmit)}
+						className="w-32"
 					>
 						Create Group
 					</Button>

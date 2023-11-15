@@ -7,10 +7,11 @@ import useGetPostComments from "@/hooks/comment/useGetPostComments.tsx";
 
 type CommentsSectionProps = {
 	postId: string;
+	groupId: string;
 };
 
 const CommentsSection = (props: CommentsSectionProps) => {
-	const { postId } = props;
+	const { postId, groupId } = props;
 	const { user } = useAppContext();
 
 	const {
@@ -58,6 +59,7 @@ const CommentsSection = (props: CommentsSectionProps) => {
 												unlikeCount={unlikes}
 												ownReaction={ownReaction}
 												comment={topLevelComment}
+												groupId={groupId}
 											/>
 										</div>
 									</div>

@@ -13,10 +13,11 @@ type CommentReactionsProps = {
 	likeCount: number;
 	unlikeCount: number;
 	ownReaction?: ReactionType;
+	groupId: string;
 };
 
 const CommentReactions = (props: CommentReactionsProps) => {
-	const { likeCount, unlikeCount, ownReaction, commentId } = props;
+	const { likeCount, unlikeCount, ownReaction, commentId, groupId } = props;
 	const [commentLikeCount, setCommentLikeCount] = useState(likeCount);
 	const [commentUnlikeCount, setCommentUnlikeCount] = useState(unlikeCount);
 	const [ownCommentReaction, setOwnCommentReaction] = useState<ReactionType | undefined>(
@@ -64,7 +65,7 @@ const CommentReactions = (props: CommentReactionsProps) => {
 	const { mutate: reactToComment } = useCommentReaction({
 		onError: onReactionError,
 		onMutate,
-		onSuccess: () => {},
+		onSuccess: async () => {},
 	});
 
 	const likeComment = useCallback(() => {

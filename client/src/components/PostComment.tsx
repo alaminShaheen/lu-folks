@@ -24,10 +24,12 @@ type PostCommentProps = {
 	unlikeCount: number;
 	ownReaction?: ReactionType;
 	parentCommentId?: string;
+	groupId: string;
 };
 
 const PostComment = (props: PostCommentProps) => {
-	const { comment, unlikeCount, ownReaction, likeCount, postId, parentCommentId } = props;
+	const { comment, unlikeCount, ownReaction, likeCount, postId, groupId, parentCommentId } =
+		props;
 	const [isReplying, setIsReplying] = useState(false);
 	const commentRef = useRef<HTMLDivElement>(null);
 	const { user } = useAppContext();
@@ -100,6 +102,7 @@ const PostComment = (props: PostCommentProps) => {
 
 			<div className="flex gap-2 items-center">
 				<CommentReactions
+					groupId={groupId}
 					commentId={comment.id}
 					likeCount={likeCount}
 					unlikeCount={unlikeCount}
@@ -182,6 +185,7 @@ const PostComment = (props: PostCommentProps) => {
 								className="ml-2 py-2 pl-4 border-l-2 border-zinc-200"
 							>
 								<PostComment
+									groupId={groupId}
 									comment={reply}
 									postId={postId}
 									parentCommentId={comment.id}

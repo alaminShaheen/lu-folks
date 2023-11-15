@@ -75,6 +75,7 @@ const PostDetails = () => {
 
 					<div className="text-sm flex items-center gap-3 w-full bg-white pt-3">
 						<PostReactions
+							groupId={post.group.id}
 							postId={post.id}
 							likeCount={likes}
 							unlikeCount={unlikes}
@@ -93,7 +94,7 @@ const PostDetails = () => {
 							{/*{commentCount === 1 ? "comment" : "comments"}*/}
 						</Button>
 					</div>
-					<CommentsSection postId={params.postSlug!} />
+					<CommentsSection postId={params.postSlug!} groupId={post.group.id} />
 				</div>
 			</div>
 		);

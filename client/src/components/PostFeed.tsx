@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useIntersection } from "@mantine/hooks";
 import Post from "@/components/Post.tsx";
 import ExtendedPost from "@/models/ExtendedPost.ts";
@@ -56,21 +56,19 @@ const PostFeed = (props: PostFeedProps) => {
 						(reaction) => reaction.userId === user?.id,
 					)?.type;
 					return (
-						<Fragment>
-							<li
-								key={post.id}
-								ref={index === posts.length - 1 ? lastPostRef : undefined}
-							>
-								<Post
-									post={post}
-									likeCount={likes}
-									unlikeCount={unlikes}
-									commentCount={post.comments.length}
-									groupInfo={post.group}
-									ownReaction={ownReaction}
-								/>
-							</li>
-						</Fragment>
+						<li
+							key={post.id}
+							ref={index === posts.length - 1 ? lastPostRef : undefined}
+						>
+							<Post
+								post={post}
+								likeCount={likes}
+								unlikeCount={unlikes}
+								commentCount={post.comments.length}
+								groupInfo={post.group}
+								ownReaction={ownReaction}
+							/>
+						</li>
 					);
 				})
 			) : (
@@ -78,7 +76,7 @@ const PostFeed = (props: PostFeedProps) => {
 			)}
 
 			{isFetchingNextPage &&
-				new Array(2).fill(<ListPostSkeleton />).map((skeleton) => skeleton)}
+				new Array(2).fill(0).map((_, index) => <ListPostSkeleton key={index} />)}
 		</ul>
 	);
 };

@@ -58,6 +58,7 @@ const Post = (props: PostProps) => {
 
 			<div className="bg-gray-50 z-20 text-sm px-4 py-4 sm:px-6 flex items-center gap-3">
 				<PostReactions
+					groupId={post.group.id}
 					postId={post.id}
 					likeCount={likeCount}
 					unlikeCount={unlikeCount}

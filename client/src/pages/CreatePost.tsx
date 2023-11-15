@@ -1,5 +1,4 @@
 import { Link, useParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import handleError from "@/utils/handleError.ts";
 import CreatePostEditor from "@/components/CreatePostEditor.tsx";
 import useFetchGroupInfo from "@/hooks/group/useFetchGroupInfo.tsx";
@@ -34,12 +33,6 @@ const CreatePost = () => {
 			</div>
 			{/* form */}
 			<CreatePostEditor groupSlug={groupInfo.id} />
-
-			<div className="w-full flex justify-end">
-				<Button type="submit" className="w-full" form="subreddit-post-form">
-					Post
-				</Button>
-			</div>
 		</div>
 	);
 };
