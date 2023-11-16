@@ -79,7 +79,7 @@ const SearchBar = () => {
 									return (
 										<CommandItem
 											onSelect={() => {
-												navigate(`post/${post.id}`);
+												navigate(`/group/${post.groupId}/post/${post.id}`);
 												setSearchTerm("");
 												// router.refresh()
 											}}

@@ -81,7 +81,7 @@ class CommentController extends Controller {
 		try {
 			const updatedComment = await this.commentService.updateComment(
 				request.body,
-				request.user?.userId,
+				request.user?.userId!,
 			);
 			return response.status(httpStatus.OK).send(updatedComment);
 		} catch (error: unknown) {

@@ -84,7 +84,7 @@ class CommentService implements ICommentService {
 
 	public updateComment = async (
 		commentInfo: UpdateCommentDto,
-		userId: strig,
+		userId: string,
 	): Promise<Comment> => {
 		try {
 			const comment = await this.checkCommentExistence(commentInfo.commentId);
@@ -109,7 +109,7 @@ class CommentService implements ICommentService {
 		try {
 			const comment = await this.databaseInstance.commentRepository.findUnique({
 				where: { id: commentId },
-				include: { commenter: true ,
+				include: { commenter: true },
 			});
 
 			if (!comment) {

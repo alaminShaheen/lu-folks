@@ -44,6 +44,7 @@ class SearchService implements ISearchService {
 				select: {
 					title: true,
 					id: true,
+					groupId: true,
 				},
 				take: AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH,
 			});
