@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { Link } from "react-router-dom";
+import { Link, useMatch } from "react-router-dom";
 import { useRef } from "react";
 import { MessageSquare } from "lucide-react";
 import GroupInfo from "@/models/GroupInfo.ts";
@@ -8,6 +8,7 @@ import EditorOutput from "@/components/EditorOutput.tsx";
 import ReactionType from "@/models/enums/ReactionType.ts";
 import PostReactions from "@/components/PostReactions.tsx";
 import { formatTimeToNow } from "@/utils/DateFormatters.ts";
+import ROUTES from "@/constants/Routes.ts";
 
 type PostProps = {
 	post: ExtendedPost;
@@ -21,6 +22,7 @@ type PostProps = {
 const Post = (props: PostProps) => {
 	const { commentCount, likeCount, unlikeCount, post, ownReaction, groupInfo } = props;
 	const paragraphBlurRef = useRef<HTMLParagraphElement>(null);
+	const homeRouteMatch = useMatch(ROUTES.HOME);
 
 	return (
 		<div className="rounded-md bg-white shadow">
@@ -37,7 +39,13 @@ const Post = (props: PostProps) => {
 						<span>Posted by {post.creator.username}</span>{" "}
 						{formatTimeToNow(new Date(post.createdAt))}
 					</div>
-					<Link to={`/post/${post.id}`}>
+					<Link
+						to={
+							homeRouteMatch
+								? `/group/${groupInfo.id}/post/${post.id}`
+								: `post/${post.id}`
+						}
+					>
 						<h1 className="text-lg font-semibold py-2 leading-6 text-blue-500">
 							{post.title}
 						</h1>
@@ -65,7 +73,7 @@ const Post = (props: PostProps) => {
 					ownReaction={ownReaction}
 				/>
 				<span className="w-fit flex items-center gap-2">
-					<Link to={`/post/${post.id}`} className="">
+					<Link to={`post/${post.id}`} className="">
 						<MessageSquare
 							className={clsx(
 								"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",

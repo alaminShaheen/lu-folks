@@ -67,7 +67,7 @@ const PostDetails = () => {
 						Posted by {post.creator.username}{" "}
 						{formatTimeToNow(new Date(post.createdAt))}
 					</p>
-					<h1 className="text-xl font-semibold py-2 leading-6 text-gray-900">
+					<h1 className="text-3xl font-semibold py-2 leading-6 text-gray-900">
 						{post.title}
 					</h1>
 

@@ -63,8 +63,11 @@ class CommentController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
-			await this.commentService.deleteComment(request.params.commentSlug);
-			return response.sendStatus(httpStatus.NO_CONTENT);
+			const deletedComment = await this.commentService.deleteComment(
+				request.params.commentSlug,
+				request.user?.userId!,
+			);
+			return response.status(httpStatus.OK).send(deletedComment);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);
 		}
@@ -76,7 +79,10 @@ class CommentController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const updatedComment = await this.commentService.updateComment(request.body);
+			const updatedComment = await this.commentService.updateComment(
+				request.body,
+				request.user?.userId,
+			);
 			return response.status(httpStatus.OK).send(updatedComment);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);

@@ -8,7 +8,7 @@ type UseGetPostCommentsProps = {
 	postId: string;
 };
 
-const UseGetPostComments = (props: UseGetPostCommentsProps) => {
+const UseGetPostTopLevelComments = (props: UseGetPostCommentsProps) => {
 	const { postId } = props;
 	return useQuery({
 		queryKey: [QueryKeys.GET_POST_COMMENTS, postId],
@@ -21,4 +21,4 @@ const UseGetPostComments = (props: UseGetPostCommentsProps) => {
 	});
 };
 
-export default UseGetPostComments;
+export default UseGetPostTopLevelComments;

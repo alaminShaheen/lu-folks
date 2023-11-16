@@ -60,7 +60,7 @@ const SearchBar = () => {
 								{searchResults?.groups.map((group) => {
 									return (
 										<CommandItem
-											onSelect={(e) => {
+											onSelect={() => {
 												navigate(`/group/${group.id}`);
 												setSearchTerm("");
 												// router.refresh()
@@ -78,8 +78,8 @@ const SearchBar = () => {
 								{searchResults?.posts.map((post) => {
 									return (
 										<CommandItem
-											onSelect={(e) => {
-												navigate(`/post/${post.id}`);
+											onSelect={() => {
+												navigate(`post/${post.id}`);
 												setSearchTerm("");
 												// router.refresh()
 											}}
@@ -97,7 +97,7 @@ const SearchBar = () => {
 								{searchResults?.users.map((user) => {
 									return (
 										<CommandItem
-											onSelect={(e) => {
+											onSelect={() => {
 												navigate(`/group/${user.id}`);
 												setSearchTerm("");
 												// router.refresh()

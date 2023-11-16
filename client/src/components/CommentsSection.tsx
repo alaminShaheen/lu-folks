@@ -3,7 +3,7 @@ import PostComment from "@/components/PostComment.tsx";
 import ReactionType from "@/models/enums/ReactionType.ts";
 import CreateComment from "@/components/CreateComment.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
-import useGetPostComments from "@/hooks/comment/useGetPostComments.tsx";
+import useGetPostComments from "@/hooks/comment/useGetPostTopLevelComments.tsx";
 
 type CommentsSectionProps = {
 	postId: string;
@@ -15,7 +15,7 @@ const CommentsSection = (props: CommentsSectionProps) => {
 	const { user } = useAppContext();
 
 	const {
-		data: comments,
+		data: topLevelPostComments,
 		isLoading: isFetchingComments,
 		isError: isFetchCommentError,
 		error: fetchCommentError,
@@ -27,17 +27,17 @@ const CommentsSection = (props: CommentsSectionProps) => {
 
 	if (isFetchingComments) {
 		return <div className="rounded-md bg-white shadow rounded">Loading....</div>;
-	} else if (comments) {
+	} else if (topLevelPostComments) {
 		return (
 			<div className="flex flex-col gap-y-4 w-full bg-white">
 				<hr className="w-full h-px my-4" />
 
 				<CreateComment postId={postId} />
-				{isFetchingComments || !comments ? (
+				{isFetchingComments || !topLevelPostComments ? (
 					<div>Loading...</div>
 				) : (
 					<div className="flex flex-col gap-y-6 mt-4">
-						{comments
+						{topLevelPostComments
 							.filter((comment) => !comment.replyToCommentId)
 							.map((topLevelComment) => {
 								const likes = topLevelComment.commentReactions?.filter(

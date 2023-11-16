@@ -6,8 +6,9 @@ const ROUTES = {
 	GROUP: {
 		BASE: "/group/:slug",
 		CREATE_POST: "create-post",
+		POST_DETAILS: "post/:postSlug",
 	},
-	POST_DETAILS: "/post/:postSlug",
+	USER_PROFILE: "/profile",
 };
 
 export default ROUTES;

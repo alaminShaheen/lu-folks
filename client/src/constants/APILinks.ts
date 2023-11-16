@@ -14,16 +14,18 @@ export const APILinks = {
 	createPost: () => `/post`,
 	getPosts: (limit: number, page: number, slug?: string) =>
 		`/post?limit=${limit}&page=${page}${slug ? `&slug=${slug}` : ""}`,
-	reactToPost: () => `/reaction`,
-	reactToComment: () => `/comment-reaction`,
-	getPostLikeReactors: (postSlug: string) => `/reaction/likes/${postSlug}`,
-	getPostDislikeReactors: (postSlug: string) => `/reaction/dislikes/${postSlug}`,
 	getInitialFeedPosts: () => `/post/feed`,
 	getPost: (slug: string) => `/post/${slug}`,
-	createComment: () => `comment`,
 	getPostComments: (postId: string) => `post/${postId}/comments`,
+	getPostLikeReactors: (postSlug: string) => `/reaction/likes/${postSlug}`,
+	getPostDislikeReactors: (postSlug: string) => `/reaction/dislikes/${postSlug}`,
+	reactToPost: () => `/reaction`,
+	reactToComment: () => `/comment-reaction`,
+	createComment: () => `comment`,
+	deleteComment: (commentId: string) => `/comment/${commentId}`,
+	updateComment: (commentId: string) => `/comment/${commentId}`,
 	getCommentReplies: (parentCommentId: string) => `/comment/${parentCommentId}/replies`,
-	searchGroups: (searchTerm: string) => `/search?searchTerm=${searchTerm}`,
+	search: (searchTerm: string) => `/search?searchTerm=${searchTerm}`,
 };
 
 export default APILinks;

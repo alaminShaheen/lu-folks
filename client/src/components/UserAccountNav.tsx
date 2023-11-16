@@ -66,6 +66,10 @@ export function UserAccountNav(props: UserAccountNavProps) {
 					<Link to={ROUTES.CREATE_GROUP}>Create Group</Link>
 				</DropdownMenuItem>
 
+				<DropdownMenuItem asChild>
+					<Link to={ROUTES.USER_PROFILE}>Profile</Link>
+				</DropdownMenuItem>
+
 				{/*<DropdownMenuItem asChild>*/}
 				{/*	<Link to={ROUTES}>Settings</Link>*/}
 				{/*</DropdownMenuItem>*/}

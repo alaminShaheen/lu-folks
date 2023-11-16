@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Outlet, useParams } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
 import ROUTES from "@/constants/Routes.ts";
 import ButtonLink from "@/components/ui/ButtonLink.tsx";
 import handleError from "@/utils/handleError.ts";
@@ -8,6 +8,8 @@ import useFetchGroupInfo from "@/hooks/group/useFetchGroupInfo.tsx";
 import GroupLayoutSkeleton from "@/components/skeletons/GroupLayoutSkeleton.tsx";
 import useRelativeRouteMatch from "@/hooks/useRelativeRouteMatch.tsx";
 import ToggleSubscriptionButton from "@/components/ToggleSubscriptionButton.tsx";
+import { ChevronLeft } from "lucide-react";
+import { useCallback } from "react";
 
 const GroupLayout = () => {
 	const { user } = useAppContext();
@@ -19,15 +21,36 @@ const GroupLayout = () => {
 		error: fetchGroupError,
 	} = useFetchGroupInfo(params.slug!);
 	const createPostRouteMatch = useRelativeRouteMatch(ROUTES.GROUP.CREATE_POST);
+	const postDetailsRouteMatch = useRelativeRouteMatch(ROUTES.GROUP.POST_DETAILS);
+	const groupBaseRouteMatch = useRelativeRouteMatch(ROUTES.GROUP.BASE);
+
+	const getCorrectPath = useCallback(() => {
+		if (postDetailsRouteMatch) {
+			return `/group/${params.slug}`;
+		} else {
+			return `/home`;
+		}
+	}, [postDetailsRouteMatch, params.slug]);
 
 	if (fetchGroupIsError) {
 		handleError(fetchGroupError);
 	}
 
 	return (
-		<div className="sm:container max-w-7xl mx-auto h-full pt-12">
+		<div className="sm:container max-w-7xl mx-auto h-full">
 			<div>
 				{/*<ToFeedButton />*/}
+				<Link
+					to={getCorrectPath()}
+					className="flex items-center text-sm w-fit hover:underline"
+				>
+					<ChevronLeft className="h-4 w-4 mr-1" />
+					{postDetailsRouteMatch
+						? "Back to group"
+						: groupBaseRouteMatch
+						? "Back to home"
+						: ""}
+				</Link>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6">
 					<ul className="flex flex-col col-span-2 space-y-6">{<Outlet />}</ul>

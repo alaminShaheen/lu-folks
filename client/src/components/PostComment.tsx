@@ -12,6 +12,7 @@ import handleError from "@/utils/handleError.ts";
 import ExtendedPost from "@/models/ExtendedPost.ts";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import ReactionType from "@/models/enums/ReactionType.ts";
+import CommentOptions from "@/components/CommentOptions.tsx";
 import CommentReactions from "@/components/CommentReactions.tsx";
 import useCreateComment from "@/hooks/comment/useCreateComment.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
@@ -25,10 +26,12 @@ type PostCommentProps = {
 	unlikeCount: number;
 	ownReaction?: ReactionType;
 	groupId: string;
+	parentCommentId?: string;
 };
 
 const PostComment = (props: PostCommentProps) => {
-	const { comment, unlikeCount, ownReaction, likeCount, postId, groupId } = props;
+	const { comment, unlikeCount, ownReaction, likeCount, postId, groupId, parentCommentId } =
+		props;
 	const [isReplying, setIsReplying] = useState(false);
 	const commentRef = useRef<HTMLDivElement>(null);
 	const { user } = useAppContext();
@@ -46,6 +49,7 @@ const PostComment = (props: PostCommentProps) => {
 
 	const onCommentCreated = useCallback(
 		async (newComment: Comment) => {
+			// here comment.id is the parentId of newComment
 			queryClient.setQueryData<Comment[]>(
 				[QueryKeys.GET_COMMENT_REPLIES, comment.id],
 				(oldData) => {
@@ -56,6 +60,7 @@ const PostComment = (props: PostCommentProps) => {
 				},
 			);
 
+			// Update post comment count in post details
 			queryClient.setQueryData<ExtendedPost>([QueryKeys.GET_POST, postId], (oldData) => {
 				if (oldData) {
 					return {
@@ -71,6 +76,7 @@ const PostComment = (props: PostCommentProps) => {
 		[queryClient, postId, reset],
 	);
 
+	// create replies of comment.id
 	const { mutate: createComment } = useCreateComment({
 		onSuccess: onCommentCreated,
 	});
@@ -113,6 +119,13 @@ const PostComment = (props: PostCommentProps) => {
 					<p className="max-h-40 truncate text-xs text-zinc-500">
 						{formatTimeToNow(new Date(comment.createdAt))}
 					</p>
+					{comment.commenterId === user?.id! && (
+						<CommentOptions
+							commentId={comment.id}
+							parentCommentId={parentCommentId}
+							currentCommentText={comment.comment}
+						/>
+					)}
 				</div>
 			</div>
 
@@ -203,6 +216,7 @@ const PostComment = (props: PostCommentProps) => {
 								className="ml-2 py-2 pl-4 border-l-2 border-zinc-200"
 							>
 								<PostComment
+									parentCommentId={comment.id}
 									groupId={groupId}
 									comment={reply}
 									postId={postId}

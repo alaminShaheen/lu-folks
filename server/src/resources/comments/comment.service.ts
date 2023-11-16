@@ -51,9 +51,20 @@ class CommentService implements ICommentService {
 		}
 	};
 
-	public deleteComment = async (commentId: string): Promise<void> => {
+	public deleteComment = async (commentId: string, userId: string): Promise<Comment> => {
 		try {
-			await this.databaseInstance.commentRepository.delete({ where: { id: commentId } });
+			const comment = await this.checkCommentExistence(commentId);
+
+			if (comment.commenterId !== userId) {
+				throw new HttpException(
+					httpStatus.BAD_REQUEST,
+					"You do not have permission to delete the comment",
+				);
+			}
+
+			return await this.databaseInstance.commentRepository.delete({
+				where: { id: commentId },
+			});
 		} catch (error) {
 			throw error;
 		}
@@ -71,9 +82,19 @@ class CommentService implements ICommentService {
 		}
 	};
 
-	public updateComment = async (commentInfo: UpdateCommentDto): Promise<Comment> => {
+	public updateComment = async (
+		commentInfo: UpdateCommentDto,
+		userId: strig,
+	): Promise<Comment> => {
 		try {
-			await this.checkCommentExistence(commentInfo.commentId);
+			const comment = await this.checkCommentExistence(commentInfo.commentId);
+
+			if (comment.commenterId !== userId) {
+				throw new HttpException(
+					httpStatus.BAD_REQUEST,
+					"You do not have permission to delete the comment",
+				);
+			}
 
 			return await this.databaseInstance.commentRepository.update({
 				data: { comment: commentInfo.comment },
@@ -88,6 +109,7 @@ class CommentService implements ICommentService {
 		try {
 			const comment = await this.databaseInstance.commentRepository.findUnique({
 				where: { id: commentId },
+				include: { commenter: true ,
 			});
 
 			if (!comment) {

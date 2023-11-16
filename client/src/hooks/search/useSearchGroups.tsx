@@ -14,7 +14,7 @@ const UseSearchGroups = (props: UseSearchGroupsProps) => {
 		queryKey: [QueryKeys.SEARCH_GROUPS],
 		queryFn: async () => {
 			const { data } = await privateAxiosInstance.get<SearchResult>(
-				APILinks.searchGroups(searchTerm),
+				APILinks.search(searchTerm),
 			);
 			return data;
 		},

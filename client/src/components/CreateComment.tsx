@@ -32,6 +32,7 @@ const CreateComment = (props: CreateCommentProps) => {
 		(comment: Comment) => {
 			reset({ comment: "" });
 
+			// update post details comment count
 			queryClient.setQueryData<ExtendedPost>([QueryKeys.GET_POST, postId], (oldData) => {
 				if (oldData) {
 					return {
@@ -42,6 +43,7 @@ const CreateComment = (props: CreateCommentProps) => {
 				return oldData;
 			});
 
+			// update post top level comment
 			queryClient.setQueryData<Comment[]>(
 				[QueryKeys.GET_POST_COMMENTS, postId],
 				(oldData) => {
@@ -55,6 +57,7 @@ const CreateComment = (props: CreateCommentProps) => {
 		[queryClient],
 	);
 
+	// create top level comments of posts
 	const { mutate: submitComment, isPending } = useCreateComment({ onSuccess: onCommentPosted });
 
 	const onSubmit = useCallback(
