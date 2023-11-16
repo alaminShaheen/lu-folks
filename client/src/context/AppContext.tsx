@@ -73,7 +73,7 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 				const previousRequestConfig = error?.config;
 				if (
 					[httpStatus.FORBIDDEN, httpStatus.UNAUTHORIZED].includes(
-						error?.response?.statu,
+						error?.response?.status,
 					) &&
 					!previousRequestConfig?.sent
 				) {
