@@ -68,7 +68,7 @@ const PostComment = (props: PostCommentProps) => {
 			reset({ comment: "" });
 			setIsReplying(false);
 		},
-		[queryClient, postId, reset,
+		[queryClient, postId, reset],
 	);
 
 	const { mutate: createComment } = useCreateComment({
