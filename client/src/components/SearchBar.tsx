@@ -16,7 +16,7 @@ import { useOnClickOutside } from "@/hooks/useOnClickOutside.tsx";
 const SearchBar = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const commandRef = useRef<HTMLDivElement>(null);
-	const { data: searchResults, isFetched, isLoading, refetch } = useSearchGroups({ searchTerm });
+	const { data: searchResults, isFetched, refetch } = useSearchGroups({ searchTerm });
 	const navigate = useNavigate();
 	useOnClickOutside(commandRef, () => {
 		setSearchTerm("");

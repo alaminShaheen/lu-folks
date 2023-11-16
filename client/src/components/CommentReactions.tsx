@@ -17,7 +17,7 @@ type CommentReactionsProps = {
 };
 
 const CommentReactions = (props: CommentReactionsProps) => {
-	const { likeCount, unlikeCount, ownReaction, commentId, groupId } = props;
+	const { likeCount, unlikeCount, ownReaction, commentId } = props;
 	const [commentLikeCount, setCommentLikeCount] = useState(likeCount);
 	const [commentUnlikeCount, setCommentUnlikeCount] = useState(unlikeCount);
 	const [ownCommentReaction, setOwnCommentReaction] = useState<ReactionType | undefined>(

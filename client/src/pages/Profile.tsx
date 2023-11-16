@@ -26,7 +26,7 @@ const Profile = () => {
 		},
 	});
 
-	const onSubmit = useCallback((data: ProfileForm) => {}, []);
+	const onSubmit = useCallback((_: ProfileForm) => {}, []);
 
 	return (
 		<div className="max-w-4xl mx-auto py-12">
