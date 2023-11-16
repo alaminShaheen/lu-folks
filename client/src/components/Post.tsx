@@ -69,6 +69,7 @@ const Post = (props: PostProps) => {
 						<MessageSquare
 							className={clsx(
 								"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",
+								commentCount > 0 ? "text-teal-500" : "",
 							)}
 						/>{" "}
 					</Link>

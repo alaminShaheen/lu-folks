@@ -203,8 +203,6 @@ const PostReactions = (props: PostReactionsProps) => {
 		onError: onReactionError,
 		onMutate,
 		onSuccess: async () => {
-			// await queryClient.refetchQueries({ queryKey: [QueryKeys.INITIAL_FEED_POSTS] });
-			// await queryClient.refetchQueries({ queryKey: [QueryKeys.FETCH_INFINITE_POST] });
 		},
 	});
 

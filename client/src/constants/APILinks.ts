@@ -23,6 +23,7 @@ export const APILinks = {
 	createComment: () => `comment`,
 	getPostComments: (postId: string) => `post/${postId}/comments`,
 	getCommentReplies: (parentCommentId: string) => `/comment/${parentCommentId}/replies`,
+	searchGroups: (searchTerm: string) => `/search?searchTerm=${searchTerm}`,
 };
 
 export default APILinks;

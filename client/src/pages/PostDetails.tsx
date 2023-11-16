@@ -88,9 +88,10 @@ const PostDetails = () => {
 							<MessageSquare
 								className={clsx(
 									"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",
+									post.comments.length > 0 ? "text-teal-500" : "",
 								)}
 							/>{" "}
-							{post.comments.filter((comment) => !comment.replyToCommentId).length}{" "}
+							{post.comments.length}{" "}
 							{/*{commentCount === 1 ? "comment" : "comments"}*/}
 						</Button>
 					</div>

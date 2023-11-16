@@ -4,6 +4,7 @@ import AppLogo from "@/components/AppLogo.tsx";
 import ButtonLink from "@/components/ui/ButtonLink.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import { UserAccountNav } from "@/components/UserAccountNav.tsx";
+import SearchBar from "@/components/SearchBar.tsx";
 
 const Navbar = () => {
 	const { user } = useAppContext();
@@ -17,7 +18,7 @@ const Navbar = () => {
 				</Link>
 
 				{/* search bar */}
-				{/*<SearchBar />*/}
+				<SearchBar />
 
 				{/* actions */}
 				{user ? (

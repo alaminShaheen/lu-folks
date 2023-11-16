@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import UserAvatar from "@/components/UserAvatar.tsx";
 import handleError from "@/utils/handleError.ts";
+import ExtendedPost from "@/models/ExtendedPost.ts";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import ReactionType from "@/models/enums/ReactionType.ts";
 import CommentReactions from "@/components/CommentReactions.tsx";
@@ -54,10 +55,20 @@ const PostComment = (props: PostCommentProps) => {
 					return oldData;
 				},
 			);
+
+			queryClient.setQueryData<ExtendedPost>([QueryKeys.GET_POST, postId], (oldData) => {
+				if (oldData) {
+					return {
+						...oldData,
+						comments: [...oldData.comments, newComment],
+					};
+				}
+				return oldData;
+			});
 			reset({ comment: "" });
 			setIsReplying(false);
 		},
-		[reset, queryClient, comment.id],
+		[queryClient, postId, reset,
 	);
 
 	const { mutate: createComment } = useCreateComment({

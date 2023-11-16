@@ -58,7 +58,7 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 						...oldData,
 						groupMemberCount: oldData.groupMemberCount - 1,
 						isMember: false,
-						updatedAt: new Date().toDateString(,
+						updatedAt: new Date().toDateString(),
 					};
 				}
 				return oldData;
