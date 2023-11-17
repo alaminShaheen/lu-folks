@@ -5,7 +5,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger
+	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
 import useDeleteComment from "@/hooks/comment/useDeleteComment.tsx";
 import ConfirmationModal from "@/components/ConfirmationModal.tsx";
@@ -41,7 +41,7 @@ const CommentOptions = (props: CommentOptionsProps) => {
 			} else {
 				// if deleted comment is a top level comment of a post
 				await queryClient.refetchQueries({
-					queryKey: [QueryKeys.GET_POST_COMMENTS, deletedComment.postId,
+					queryKey: [QueryKeys.GET_POST_COMMENTS, deletedComment.postId],
 				});
 			}
 			await queryClient.refetchQueries({
