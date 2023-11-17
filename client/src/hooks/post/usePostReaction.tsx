@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import QueryKeys from "@/constants/QueryKeys.ts";
 import CreatePostReaction from "@/models/CreatePostReaction.ts";
 import { privateAxiosInstance } from "@/api/Axios.ts";
 import APILinks from "@/constants/APILinks.ts";
@@ -13,7 +12,6 @@ interface UsePostReactProps {
 const UsePostReaction = (props: UsePostReactProps) => {
 	const { onError, onSuccess, onMutate } = props;
 	return useMutation({
-		mutationKey: [QueryKeys.POST_REACTION],
 		mutationFn: async (reactionInfo: CreatePostReaction) => {
 			const { data } = await privateAxiosInstance.patch<void>(
 				APILinks.reactToPost(),

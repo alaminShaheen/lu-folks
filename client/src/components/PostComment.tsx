@@ -30,8 +30,7 @@ type PostCommentProps = {
 };
 
 const PostComment = (props: PostCommentProps) => {
-	const { comment, unlikeCount, ownReaction, likeCount, postId, groupId, parentCommentId } =
-		props;
+	const { comment, unlikeCount, ownReaction, likeCount, postId, groupId } = props;
 	const [isReplying, setIsReplying] = useState(false);
 	const commentRef = useRef<HTMLDivElement>(null);
 	const { user } = useAppContext();
@@ -122,7 +121,6 @@ const PostComment = (props: PostCommentProps) => {
 					{comment.commenterId === user?.id! && (
 						<CommentOptions
 							commentId={comment.id}
-							parentCommentId={parentCommentId}
 							currentCommentText={comment.comment}
 						/>
 					)}

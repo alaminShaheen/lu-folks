@@ -7,7 +7,6 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import ROUTES from "@/constants/Routes.ts";
 import AppLogo from "@/components/AppLogo.tsx";
 import APILinks from "@/constants/APILinks.ts";
-import QueryKeys from "@/constants/QueryKeys.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import LoginForm from "@/models/form/LoginForm.ts";
@@ -39,7 +38,6 @@ const Login = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [showPassword, setShowPassword] = useState(false);
 	const { mutate: onLoginFormSubmit, isPending: isLoading } = useMutation({
-		mutationKey: [QueryKeys.LOGIN],
 		mutationFn: async (formData: LoginForm) => {
 			const { data } = await axiosInstance.post<Authentication>(APILinks.login(), formData);
 			return data;

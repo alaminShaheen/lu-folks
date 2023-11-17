@@ -7,7 +7,6 @@ import { useCallback, useEffect, useState } from "react";
 import ROUTES from "@/constants/Routes.ts";
 import AppLogo from "@/components/AppLogo.tsx";
 import APILinks from "@/constants/APILinks.ts";
-import QueryKeys from "@/constants/QueryKeys.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -42,7 +41,6 @@ const Register = () => {
 	const { setAuthentication, publicAxiosInstance: axiosInstance } = useAppContext();
 	const navigate = useNavigate();
 	const { mutate: onRegisterFormSubmit, isPending: isLoading } = useMutation({
-		mutationKey: [QueryKeys.REGISTER],
 		mutationFn: async (formData: RegisterForm) => {
 			const { data } = await axiosInstance.post<Authentication>(
 				APILinks.register(),

@@ -19,7 +19,6 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 	const queryClient = useQueryClient();
 
 	const { mutate: joinGroup, isPending: joiningGroup } = useMutation({
-		mutationKey: [QueryKeys.JOIN_GROUP],
 		mutationFn: async () => {
 			const { data } = await privateAxiosInstance.post<void>(APILinks.joinGroup(groupId), {});
 			return data;
@@ -43,7 +42,6 @@ const ToggleSubscriptionButton = (props: ToggleSubscriptionButtonProps) => {
 	});
 
 	const { mutate: leaveGroup, isPending: leavingGroup } = useMutation({
-		mutationKey: [QueryKeys.LEAVE_GROUP],
 		mutationFn: async () => {
 			const { data } = await privateAxiosInstance.delete<void>(APILinks.leaveGroup(groupId));
 			return data;

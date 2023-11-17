@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import QueryKeys from "@/constants/QueryKeys.ts";
 import { privateAxiosInstance } from "@/api/Axios.ts";
 import APILinks from "@/constants/APILinks.ts";
 import CreateCommentReaction from "@/models/CreateCommentReaction.ts";
@@ -13,7 +12,6 @@ interface UsePostReactProps {
 const UseCommentReaction = (props: UsePostReactProps) => {
 	const { onError, onSuccess, onMutate } = props;
 	return useMutation({
-		mutationKey: [QueryKeys.COMMENT_REACTION],
 		mutationFn: async (reactionInfo: CreateCommentReaction) => {
 			const { data } = await privateAxiosInstance.patch<void>(
 				APILinks.reactToComment(),

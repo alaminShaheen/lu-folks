@@ -1,84 +1,55 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Fragment, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { MoreHorizontal, PenSquare, Trash2 } from "lucide-react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import useDeleteComment from "@/hooks/comment/useDeleteComment.tsx";
 import ConfirmationModal from "@/components/ConfirmationModal.tsx";
-import { AlertDialogTrigger } from "@/components/ui/alert-dialog.tsx";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog.tsx";
 import Comment from "@/models/Comment.ts";
 import QueryKeys from "@/constants/QueryKeys.ts";
-import ExtendedPost from "@/models/ExtendedPost.ts";
 import { toast } from "react-toastify";
 import CommentUpdateModal from "@/components/CommentUpdateModal.tsx";
 import useUpdateComment from "@/hooks/comment/useUpdateComment.tsx";
 import UpdateComment from "@/models/form/UpdateComment.ts";
 
-type CommentOptions = {
+type CommentOptionsProps = {
 	commentId: string;
-	parentCommentId?: string;
 	currentCommentText: string;
 };
 
-const CommentOptions = (props: CommentOptions) => {
-	const { commentId, parentCommentId, currentCommentText } = props;
+const CommentOptions = (props: CommentOptionsProps) => {
+	const { commentId, currentCommentText } = props;
 	const queryClient = useQueryClient();
 	const [commentUpdateModalOpen, setCommentUpdateModalOpen] = useState(false);
-
 	const closeModal = useCallback(() => {
 		setCommentUpdateModalOpen(false);
 	}, []);
 
 	const onCommentDeletionSuccess = useCallback(
-		(deletedComment: Comment) => {
+		async (deletedComment: Comment) => {
 			// if deleted comment is a reply
-			if (parentCommentId) {
+			if (deletedComment.replyToCommentId) {
 				// update replies of parent comment
-				queryClient.setQueryData<Comment[]>(
-					[QueryKeys.GET_COMMENT_REPLIES, parentCommentId],
-					(oldData) => {
-						if (oldData) {
-							return oldData.filter((comment) => comment.id !== deletedComment.id);
-						}
-						return oldData;
-					},
-				);
+				await queryClient.refetchQueries({
+					queryKey: [QueryKeys.GET_COMMENT_REPLIES, deletedComment.replyToCommentId],
+				});
 			} else {
 				// if deleted comment is a top level comment of a post
-				queryClient.setQueryData<Comment[]>(
-					[QueryKeys.GET_POST_COMMENTS, deletedComment.postId],
-					(oldData) => {
-						if (oldData) {
-							return oldData.filter((comment) => comment.id !== deletedComment.id);
-						}
-						return oldData;
-					},
-				);
+				await queryClient.refetchQueries({
+					queryKey: [QueryKeys.GET_POST_COMMENTS, deletedComment.postId,
+				});
 			}
-
-			// update comment count of post detail
-			queryClient.setQueryData<ExtendedPost>(
-				[QueryKeys.GET_POST, deletedComment.postId],
-				(oldData) => {
-					if (oldData) {
-						return {
-							...oldData,
-							comments: oldData.comments.filter(
-								(comment) => comment.id !== deletedComment.id,
-							),
-						};
-					}
-					return oldData;
-				},
-			);
-
+			await queryClient.refetchQueries({
+				queryKey: [QueryKeys.GET_POST, deletedComment.postId]
+			});
 			toast.success("The comment has been deleted.");
 		},
-		[queryClient, parentCommentId],
+		[queryClient]
 	);
 
 	const onCommentUpdateSuccess = useCallback(
@@ -87,7 +58,7 @@ const CommentOptions = (props: CommentOptions) => {
 			if (updatedComment.replyToCommentId) {
 				// update replies of parent comment
 				queryClient.setQueryData<Comment[]>(
-					[QueryKeys.GET_COMMENT_REPLIES, parentCommentId],
+					[QueryKeys.GET_COMMENT_REPLIES, updatedComment.replyToCommentId],
 					(oldData) => {
 						if (oldData) {
 							return oldData.map((comment) => {
@@ -126,7 +97,7 @@ const CommentOptions = (props: CommentOptions) => {
 
 			closeModal();
 		},
-		[queryClient, parentCommentId],
+		[queryClient]
 	);
 
 	const { mutate: deleteComment, isPending: isDeletingComment } = useDeleteComment({
@@ -151,7 +122,7 @@ const CommentOptions = (props: CommentOptions) => {
 	);
 
 	return (
-		<Fragment>
+		<AlertDialog>
 			<DropdownMenu>
 				<DropdownMenuTrigger>
 					<MoreHorizontal className="h-4 w-4 text-xs text-zinc-500" />
@@ -195,7 +166,7 @@ const CommentOptions = (props: CommentOptions) => {
 				description="Make changes to your comment here. Click save when you're done."
 				currentComment={currentCommentText}
 			/>
-		</Fragment>
+		</AlertDialog>
 	);
 };
 
