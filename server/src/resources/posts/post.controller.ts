@@ -1,7 +1,6 @@
 import httpStatus from "http-status";
 import { inject, injectable } from "tsyringe";
 import { NextFunction, Request, Response } from "express";
-import { Post } from "@prisma/client";
 import Controller from "@/abstracts/controller";
 import errorHandler from "@/middlewares/errorHandler";
 import DtoValidator from "@/middlewares/dtoValidator";
@@ -20,15 +19,19 @@ class PostController extends Controller {
 		this.router.route(`${this.path}/unfurl-link`).get(verifyAuthentication, this.unfurlLink);
 		this.router
 			.route(this.path)
-			.post(verifyAuthentication, DtoValidator(CreatePostDto), this.createPost);
-		this.router.route(this.path).put(this.updatePost);
-		this.router.route(this.path).delete(this.deletePost);
-		this.router.route(this.path).get(verifyAuthentication, this.getPosts);
+			.all(verifyAuthentication)
+			.post(DtoValidator(CreatePostDto), this.createPost)
+			.get(this.getPosts);
 		this.router.route(`${this.path}/feed`).get(verifyAuthentication, this.getInitialFeedPosts);
 		this.router
 			.route(`${this.path}/:slug/comments`)
 			.get(verifyAuthentication, this.getPostComments);
-		this.router.route(`${this.path}/:slug`).get(verifyAuthentication, this.getPost);
+		this.router
+			.route(`${this.path}/:slug`)
+			.all(verifyAuthentication)
+			.get(this.getPost)
+			.patch(this.updatePost)
+			.delete(this.deletePost);
 	};
 
 	private getPostComments = async (
@@ -114,9 +117,14 @@ class PostController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const newUser = await this.postService.updatePost(request.body as Partial<Post>);
-			return response.status(httpStatus.OK).send(newUser);
+			const updatedPost = await this.postService.updatePost(
+				request.user?.userId!,
+				request.params.slug,
+				request.body,
+			);
+			return response.status(httpStatus.OK).send(updatedPost);
 		} catch (error: unknown) {
+			console.log(error);
 			errorHandler(error as any, request, response, nextFunction);
 		}
 	};
@@ -127,8 +135,11 @@ class PostController extends Controller {
 		nextFunction: NextFunction,
 	) => {
 		try {
-			const newUser = await this.postService.deletePost(request.body.postId as string);
-			return response.sendStatus(httpStatus.NO_CONTENT);
+			const deletedPost = await this.postService.deletePost(
+				request.user?.userId!,
+				request.params.slug as string,
+			);
+			return response.status(httpStatus.OK).send(deletedPost);
 		} catch (error: unknown) {
 			errorHandler(error as any, request, response, nextFunction);
 		}

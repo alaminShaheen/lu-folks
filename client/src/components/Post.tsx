@@ -9,6 +9,7 @@ import ReactionType from "@/models/enums/ReactionType.ts";
 import PostReactions from "@/components/PostReactions.tsx";
 import { formatTimeToNow } from "@/utils/DateFormatters.ts";
 import ROUTES from "@/constants/Routes.ts";
+import { useAppContext } from "@/context/AppContext.tsx";
 
 type PostProps = {
 	post: ExtendedPost;
@@ -23,6 +24,7 @@ const Post = (props: PostProps) => {
 	const { commentCount, likeCount, unlikeCount, post, ownReaction, groupInfo } = props;
 	const paragraphBlurRef = useRef<HTMLParagraphElement>(null);
 	const homeRouteMatch = useMatch(ROUTES.HOME);
+	const { user } = useAppContext();
 
 	return (
 		<div className="rounded-md bg-white shadow">
@@ -36,7 +38,9 @@ const Post = (props: PostProps) => {
 							{groupInfo.title}
 						</Link>
 						<span className="px-1">•</span>
-						<span>Posted by {post.creator.username}</span>{" "}
+						<span>
+							Posted by {post.creator.id === user?.id ? "You" : post.creator.username}
+						</span>{" "}
 						{formatTimeToNow(new Date(post.createdAt))}
 					</div>
 					<Link

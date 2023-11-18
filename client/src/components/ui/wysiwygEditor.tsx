@@ -1,16 +1,9 @@
-import {
-	forwardRef,
-	memo,
-	useCallback,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from "react";
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useRef } from "react";
 import Authentication from "@/models/Authentication.ts";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import APILinks from "@/constants/APILinks.ts";
+import { cn } from "@/lib/utils.ts";
 
 export type EditorHandle = {
 	save: () => Promise<OutputData>;
@@ -21,6 +14,7 @@ type WYSIWYGEditorProps = {
 	editorBlockId: string;
 	authentication: Authentication;
 	uploadImage: (files: File) => Promise<{ success: number; file: { url: string } } | undefined>;
+	editorClassName?: string;
 };
 
 const WYSIWYGEditor = forwardRef((props: WYSIWYGEditorProps, ref) => {
@@ -29,9 +23,10 @@ const WYSIWYGEditor = forwardRef((props: WYSIWYGEditorProps, ref) => {
 		editorBlockId,
 		authentication,
 		uploadImage,
+		editorClassName = "min-h-[500px]",
 	} = props;
 	const editorRef = useRef<EditorJS>();
-	const [isComponentMounted, setIsComponentMounted] = useState(false);
+	// const [isComponentMounted, setIsComponentMounted] = useState(false);
 
 	const initializeEditor = useCallback(async () => {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -100,18 +95,18 @@ const WYSIWYGEditor = forwardRef((props: WYSIWYGEditorProps, ref) => {
 		},
 	}));
 
-	useEffect(() => {
-		if (typeof window !== "undefined") {
-			setIsComponentMounted(true);
-		}
-	}, []);
+	// useEffect(() => {
+	// 	if (typeof window !== "undefined") {
+	// 		setIsComponentMounted(true);
+	// 	}
+	// }, []);
 
 	useEffect(() => {
 		const init = async () => {
 			await initializeEditor();
 		};
 
-		if (isComponentMounted) {
+		if (window) {
 			void init();
 
 			return () => {
@@ -119,9 +114,9 @@ const WYSIWYGEditor = forwardRef((props: WYSIWYGEditorProps, ref) => {
 				editorRef.current = undefined;
 			};
 		}
-	}, [initializeEditor, isComponentMounted]);
+	}, [initializeEditor, window]);
 
-	return <div id={editorBlockId} className="min-h-[500px]" />;
+	return <div id={editorBlockId} className={cn(editorClassName)} />;
 });
 
 const RichWYSIWYGEditor = memo(WYSIWYGEditor);

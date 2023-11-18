@@ -17,6 +17,8 @@ export const APILinks = {
 	getPosts: (cursorId?: string, slug?: string) =>
 		`/post?${cursorId ? `&cursor=${cursorId}` : ""}${slug ? `&slug=${slug}` : ""}`,
 	getPost: (slug: string) => `/post/${slug}`,
+	updatePost: (slug: string) => `/post/${slug}`,
+	deletePost: (slug: string) => `/post/${slug}`,
 	getPostComments: (postId: string) => `post/${postId}/comments`,
 	getPostLikeReactors: (postSlug: string) => `/reaction/likes/${postSlug}`,
 	getPostDislikeReactors: (postSlug: string) => `/reaction/dislikes/${postSlug}`,

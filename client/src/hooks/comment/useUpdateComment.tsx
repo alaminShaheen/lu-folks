@@ -4,12 +4,12 @@ import APILinks from "@/constants/APILinks.ts";
 import Comment from "@/models/Comment.ts";
 import UpdateComment from "@/models/form/UpdateComment.ts";
 
-type UserUpdateCommentProps = {
+type UseUpdateCommentProps = {
 	commentId: string;
 	onSuccess: (data: Comment) => void;
 };
 
-const UserUpdateComment = (props: UserUpdateCommentProps) => {
+const UseUpdateComment = (props: UseUpdateCommentProps) => {
 	const { commentId, onSuccess } = props;
 	return useMutation({
 		mutationFn: async (commentInfo: UpdateComment) => {
@@ -23,4 +23,4 @@ const UserUpdateComment = (props: UserUpdateCommentProps) => {
 	});
 };
 
-export default UserUpdateComment;
+export default UseUpdateComment;

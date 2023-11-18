@@ -15,8 +15,6 @@ import UpdateComment from "@/models/form/UpdateComment.ts";
 import ModalProps from "@/models/ModalProps.ts";
 
 type CommentUpdateModalProps = {
-	title: string;
-	description: string;
 	currentComment: string;
 	onAction: (data: UpdateComment) => void;
 	commentId: string;
@@ -27,7 +25,8 @@ type CommentUpdateForm = {
 };
 
 const CommentUpdateModal = (props: CommentUpdateModalProps) => {
-	const { description, title, currentComment, onAction, commentId, open, toggle } = props;
+	const { modalDescription, modalTitle, currentComment, onAction, commentId, open, toggle } =
+		props;
 	const {
 		register,
 		handleSubmit,
@@ -49,8 +48,8 @@ const CommentUpdateModal = (props: CommentUpdateModalProps) => {
 		<Dialog open={open}>
 			<DialogContent onClose={toggle}>
 				<DialogHeader>
-					<DialogTitle>{title}</DialogTitle>
-					<DialogDescription>{description}</DialogDescription>
+					<DialogTitle>{modalTitle}</DialogTitle>
+					<DialogDescription>{modalDescription}</DialogDescription>
 				</DialogHeader>
 				<form
 					className="grid gap-4 py-4"

@@ -4,6 +4,7 @@ import { MessageSquare } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button.tsx";
 import useGetPost from "@/hooks/post/useGetPost.tsx";
+import PostOptions from "@/components/PostOptions.tsx";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import EditorOutput from "@/components/EditorOutput.tsx";
 import ReactionType from "@/models/enums/ReactionType.ts";
@@ -56,7 +57,7 @@ const PostDetails = () => {
 		return (
 			<div className="h-full flex flex-col sm:flex-col items-center sm:items-start justify-between shadow rounded">
 				<div className="w-full flex-1 bg-white p-4 rounded-sm">
-					<p className="max-h-40 mt-1 truncate text-xs text-gray-500">
+					<p className="max-h-40 mt-1 truncate text-xs text-gray-500 flex items-center">
 						<Link
 							to={`/group/${post.group.id}`}
 							className="underline text-blue-500 text-sm underline-offset-2"
@@ -64,8 +65,11 @@ const PostDetails = () => {
 							{post.group.title}
 						</Link>
 						<span className="px-1">•</span>
-						Posted by {post.creator.username}{" "}
+						Posted by {post.creator.id === user?.id
+							? "You"
+							: post.creator.username}{" "}
 						{formatTimeToNow(new Date(post.createdAt))}
+						{post.creator.id === user?.id! && <PostOptions post={post} />}
 					</p>
 					<h1 className="text-3xl font-semibold py-2 leading-6 text-gray-900">
 						{post.title}

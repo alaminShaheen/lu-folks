@@ -162,8 +162,8 @@ const CommentOptions = (props: CommentOptionsProps) => {
 				open={commentUpdateModalOpen}
 				commentId={commentId}
 				onAction={updateClicked}
-				title="Edit comment"
-				description="Make changes to your comment here. Click save when you're done."
+				modalTitle="Edit comment"
+				modalDescription="Make changes to your comment here. Click save when you're done."
 				currentComment={currentCommentText}
 			/>
 		</AlertDialog>

@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import { UseFormSetError } from "react-hook-form";
 import APILinks from "@/constants/APILinks.ts";
 import PostCreate from "@/models/form/PostCreate.ts";
 import handleError from "@/utils/handleError.ts";
@@ -7,12 +6,10 @@ import ExtendedPost from "@/models/ExtendedPost.ts";
 import ServiceHookCommonProps from "@/models/ServiceHookCommonProps.ts";
 import { privateAxiosInstance } from "@/api/Axios.ts";
 
-interface UseCreatePostProps extends ServiceHookCommonProps<ExtendedPost> {
-	setError: UseFormSetError<PostCreate>;
-}
+interface UseCreatePostProps extends ServiceHookCommonProps<ExtendedPost> {}
 
 const UseCreatePost = (props: UseCreatePostProps) => {
-	const { setError, onSuccess } = props;
+	const { onSuccess } = props;
 
 	return useMutation({
 		mutationFn: async (formData: PostCreate) => {
@@ -23,7 +20,7 @@ const UseCreatePost = (props: UseCreatePostProps) => {
 			return data;
 		},
 		onSuccess,
-		onError: (error) => handleError(error, setError),
+		onError: (error) => handleError(error),
 	});
 };
 

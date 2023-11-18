@@ -17,10 +17,16 @@ function ErrorHandler(
 			validationErrors: error.validationErrors,
 			message: error.message,
 		});
-	} else {
+	} else if (error instanceof HttpException) {
 		return response.status(error.status || httpStatus.INTERNAL_SERVER_ERROR).send({
 			type: ApiErrorType.GENERAL,
 			message: error.message,
+		});
+	} else {
+		console.log(error);
+		return response.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+			type: ApiErrorType.GENERAL,
+			message: "An unexpected error occurred",
 		});
 	}
 }

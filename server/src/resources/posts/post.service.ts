@@ -21,7 +21,19 @@ class PostService implements IPostService {
 
 	public createPost = async (userId: string, postData: CreatePostDto): Promise<Post> => {
 		try {
-			await this.groupService.checkGroupExistence(postData.groupSlug);
+			const group = await this.databaseInstance.groupRepository.findUnique({
+				where: {
+					id: postData.groupSlug,
+					groupMembers: { some: { id: userId } },
+				},
+			});
+
+			if (!group) {
+				throw new HttpException(
+					httpStatus.BAD_REQUEST,
+					"You do not have permission to create post",
+				);
+			}
 
 			return await this.databaseInstance.postRepository.create({
 				data: {
@@ -79,9 +91,23 @@ class PostService implements IPostService {
 		}
 	};
 
-	deletePost(postId: string): Promise<void> {
-		return Promise.resolve(undefined);
-	}
+	public deletePost = async (userId: string, postId: string): Promise<Post> => {
+		try {
+			await this.checkPostExistence(postId, userId);
+
+			return await this.databaseInstance.postRepository.delete({
+				where: { id: postId },
+				include: {
+					creator: true,
+					postReactions: true,
+					comments: true,
+					group: tue,
+				},
+			});
+		} catch (error) {
+			throw error;
+		}
+	};
 
 	public getPost = async (userId: string, postSlug: string): Promise<Post> => {
 		try {
@@ -198,9 +224,26 @@ class PostService implements IPostService {
 		}
 	};
 
-	updatePost(postInfo: Partial<Post>): Promise<void> {
-		return Promise.resolve(undefined);
-	}
+	public updatePost = async (
+		userId: string,
+		postId: string,
+		postInfo: UpdatePostDt,
+	): Promise<Post> => {
+		try {
+			await this.checkPostExistence(postId, userId);
+
+			return await this.databaseInstance.postRepository.update({
+				where: { id: postId },
+				data: {
+					content: postInfo.content,
+					title: postInfo.titl,
+				},
+				include: { creator: true, group: true ,
+			});
+		} catch (error) {
+			throw error;
+		}
+	};
 
 	public checkPostExistence = async (slug: string, userId?: string) => {
 		try {
@@ -217,6 +260,11 @@ class PostService implements IPostService {
 			if (!post) {
 				console.log("Post does not exist.");
 				throw new HttpException(httpStatus.BAD_REQUEST, "The post does not exist");
+			} else if (userId && post.creator.id !== userId) {
+				throw new HttpException(
+					httpStatus.BAD_REQUEST,
+					"You do not have permission to do this operation"
+				);
 			}
 			return post;
 		} catch (error) {
