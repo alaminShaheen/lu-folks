@@ -21,7 +21,7 @@ const UseFetchPaginatedPosts = (props: UseFetchPaginatedPostsProps) => {
 			return data;
 		},
 		initialPageParam: undefined,
-		getNextPageParam: (lastPage) => lastPage.nextId ?? undefine,
+		getNextPageParam: (lastPage) => lastPage.nextId ?? undefined,
 	});
 };
 
