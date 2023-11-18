@@ -101,7 +101,7 @@ class PostService implements IPostService {
 					creator: true,
 					postReactions: true,
 					comments: true,
-					group: tue,
+					group: true,
 				},
 			});
 		} catch (error) {
@@ -236,7 +236,7 @@ class PostService implements IPostService {
 				where: { id: postId },
 				data: {
 					content: postInfo.content,
-					title: postInfo.titl,
+					title: postInfo.title,
 				},
 				include: { creator: true, group: true ,
 			});
