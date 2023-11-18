@@ -10,6 +10,7 @@ import RedisDatabase from "@/database/redis.database";
 import HttpException from "@/exceptions/httpException";
 import PostgresDatabase from "@/database/postgres.database";
 import PaginatedResponse from "@/models/PaginatedResponse";
+import UpdatePostDto from "@/dtos/updatePost.dto";
 
 @injectable()
 class PostService implements IPostService {
@@ -227,7 +228,7 @@ class PostService implements IPostService {
 	public updatePost = async (
 		userId: string,
 		postId: string,
-		postInfo: UpdatePostDt,
+		postInfo: UpdatePostDto,
 	): Promise<Post> => {
 		try {
 			await this.checkPostExistence(postId, userId);
@@ -238,7 +239,7 @@ class PostService implements IPostService {
 					content: postInfo.content,
 					title: postInfo.title,
 				},
-				include: { creator: true, group: true ,
+				include: { creator: true, group: tru },
 			});
 		} catch (error) {
 			throw error;
@@ -263,7 +264,7 @@ class PostService implements IPostService {
 			} else if (userId && post.creator.id !== userId) {
 				throw new HttpException(
 					httpStatus.BAD_REQUEST,
-					"You do not have permission to do this operation"
+					"You do not have permission to do this operation",
 				);
 			}
 			return post;
