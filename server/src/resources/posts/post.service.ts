@@ -239,7 +239,7 @@ class PostService implements IPostService {
 					content: postInfo.content,
 					title: postInfo.title,
 				},
-				include: { creator: true, group: tru },
+				include: { creator: true, group: true },
 			});
 		} catch (error) {
 			throw error;
