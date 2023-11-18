@@ -176,7 +176,7 @@ class PostService implements IPostService {
 					posts.length === AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH
 						? posts[posts.length - 1].id
 						: undefined,
-				data: poss,
+				data: posts,
 			};
 		} catch (error) {
 			throw error;
