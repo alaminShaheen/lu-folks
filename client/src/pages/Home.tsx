@@ -3,19 +3,14 @@ import { Home as HomeIcon } from "lucide-react";
 import ROUTES from "@/constants/Routes.ts";
 import PostFeed from "@/components/PostFeed.tsx";
 import ButtonLink from "@/components/ui/ButtonLink.tsx";
-import useGetInitialFeedPosts from "@/hooks/post/useGetInitialFeedPosts.tsx";
 import SuggestedGroups from "@/components/SuggestedGroups.tsx";
 
 const Home = () => {
-	const { data: posts, isFetching } = useGetInitialFeedPosts();
-
 	return (
 		<Fragment>
 			<h1 className="font-bold text-3xl md:text-4xl">Your feed</h1>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 md:gap-x-4 py-6">
-				{isFetching || !posts ? <div>Loading...</div> : <PostFeed initialPosts={posts} />}
-				{/*<h1 className="">You news feed</h1>*/}
-				{/* group info */}
+				<PostFeed />
 				<div className="space-y-6">
 					<div className="overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last">
 						<div className="bg-emerald-100 px-6 py-4">

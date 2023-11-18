@@ -9,6 +9,7 @@ import CreatePostDto from "@/dtos/createPost.dto";
 import RedisDatabase from "@/database/redis.database";
 import HttpException from "@/exceptions/httpException";
 import PostgresDatabase from "@/database/postgres.database";
+import PaginatedResponse from "@/models/PaginatedResponse";
 
 @injectable()
 class PostService implements IPostService {
@@ -129,10 +130,9 @@ class PostService implements IPostService {
 
 	public getUserPosts = async (
 		userId: string,
-		limit: number,
-		page: number,
+		cursor?: string,
 		groupSlug?: string,
-	): Promise<Post[]> => {
+	): Promise<PaginatedResponse<Post>> => {
 		try {
 			let where = {};
 			if (groupSlug) {
@@ -155,20 +155,29 @@ class PostService implements IPostService {
 				where = { group: { id: { in: followedGroupIds } } };
 			}
 
-			return await this.databaseInstance.postRepository.findMany({
+			const posts = await this.databaseInstance.postRepository.findMany({
 				where,
-				take: limit,
-				skip: (page - 1) * limit,
-				orderBy: {
-					createdAt: "desc",
-				},
 				include: {
 					creator: true,
 					group: true,
 					postReactions: true,
 					comments: { where: { replyTo: undefined } },
 				},
+				orderBy: {
+					createdAt: "desc",
+				},
+				take: AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH,
+				skip: cursor ? 1 : undefined,
+				cursor: cursor ? { id: cursor } : undefined,
 			});
+
+			return {
+				nextId:
+					posts.length === AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH
+						? posts[posts.length - 1].id
+						: undefined,
+				data: poss,
+			};
 		} catch (error) {
 			throw error;
 		}

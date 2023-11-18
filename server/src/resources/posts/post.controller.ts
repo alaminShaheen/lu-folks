@@ -46,13 +46,11 @@ class PostController extends Controller {
 
 	private getPosts = async (request: Request, response: Response, nextFunction: NextFunction) => {
 		try {
-			const limit = Number(request.query.limit);
-			const page = Number(request.query.page);
+			const cursorId = request.query.cursor as string | undefined;
 			const groupSlug: string | undefined = request.query.slug as string | undefined;
 			const posts = await this.postService.getUserPosts(
 				request.user?.userId!,
-				limit,
-				page,
+				cursorId,
 				groupSlug,
 			);
 			return response.status(httpStatus.OK).send(posts);

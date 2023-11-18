@@ -1,13 +1,13 @@
 import { Comment, Post } from "@prisma/client";
 import CreatePostDto from "@/dtos/createPost.dto";
+import PaginatedResponse from "@/models/PaginatedResponse";
 
 interface IPostService {
 	getUserPosts: (
 		userId: string,
-		limit: number,
-		page: number,
+		cursorId?: string,
 		groupSlug?: string,
-	) => Promise<Post[]>;
+	) => Promise<PaginatedResponse<Post>>;
 	getPostComments: (postId: string) => Promise<Comment[]>;
 	getPost: (userId: string, postSlug: string) => Promise<Post>;
 	getInitialFeedPosts: (userId: string) => Promise<Post[]>;

@@ -6,7 +6,6 @@ const QueryKeys = {
 	GROUP_SUGGESTIONS: "group-suggestions",
 
 	GET_POST: "get-post",
-	INITIAL_FEED_POSTS: "initial-feed-posts",
 	FETCH_INFINITE_POST: "fetch-infinite-post",
 
 	GET_POST_COMMENTS: "get-post-comments",

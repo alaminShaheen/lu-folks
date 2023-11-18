@@ -4,7 +4,7 @@ import PostFeed from "@/components/PostFeed.tsx";
 import handleError from "@/utils/handleError.ts";
 import { Skeleton } from "@/components/ui/skeleton.tsx";
 import MiniCreatePost from "@/components/MiniCreatePost.tsx";
-import useFetchGroupDetails from "@/hooks/group/useFetchGroupDetails.tsx";
+import useFetchGroupInfo from "@/hooks/group/useFetchGroupInfo.tsx";
 
 const GroupFeed = () => {
 	const params = useParams<"slug">();
@@ -13,7 +13,7 @@ const GroupFeed = () => {
 		isFetching: fetchingGroup,
 		isError: fetchGroupIsError,
 		error: fetchGroupError,
-	} = useFetchGroupDetails(params.slug!);
+	} = useFetchGroupInfo(params.slug!);
 
 	if (fetchGroupIsError) {
 		handleError(fetchGroupError);
@@ -30,11 +30,7 @@ const GroupFeed = () => {
 			<MiniCreatePost />
 			{/*	Show posts*/}
 
-			{fetchingGroup || !group ? (
-				<div>Loading...</div>
-			) : (
-				<PostFeed initialPosts={group.posts} groupSlug={group.id} />
-			)}
+			{fetchingGroup || !group ? <div>Loading...</div> : <PostFeed groupSlug={group.id} />}
 		</Fragment>
 	);
 };

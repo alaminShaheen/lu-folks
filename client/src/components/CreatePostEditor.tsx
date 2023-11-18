@@ -16,6 +16,7 @@ import { useAppContext } from "@/context/AppContext.tsx";
 import RichWYSIWYGEditor, { EditorHandle } from "@/components/ui/wysiwygEditor.tsx";
 import ExtendedPost from "@/models/ExtendedPost.ts";
 import AppConstants from "@/constants/AppConstants.ts";
+import PaginatedResponse from "@/models/PaginatedResponse.ts";
 
 type CreatePostEditorType = {
 	groupSlug: string;
@@ -73,51 +74,85 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 
 	const onPostCreated = useCallback(
 		async (data: ExtendedPost) => {
-			queryClient.setQueryData<ExtendedPost[]>([QueryKeys.INITIAL_FEED_POSTS], (oldData) => {
+			queryClient.setQueryData<
+				InfiniteData<PaginatedResponse<ExtendedPost>, undefined | string>
+			>([QueryKeys.FETCH_INFINITE_POST, data.group.id], (oldData) => {
 				if (oldData) {
-					if (oldData.length < AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH) {
-						oldData.push(data);
-					}
-					return oldData.sort((a, b) => {
-						return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-					});
+					return {
+						...oldData,
+						pages: [...oldData.pages.flatMap((pages) => pages.data), data]
+							.sort((a, b) => {
+								return (
+									new Date(b.createdAt).getTime() -
+									new Date(a.createdAt).getTime()
+								);
+							})
+							.reduce<PaginatedResponse<ExtendedPost>[]>(
+								(paginatedPosts, currentPost, currentIndex) => {
+									const chunkIndex = Math.floor(
+										currentIndex /
+											AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH,
+									);
+									if (!paginatedPosts[chunkIndex]) {
+										paginatedPosts.push({ data: [], nextId: undefined });
+									}
+									paginatedPosts[paginatedPosts.length - 1].data.push(
+										currentPost,
+									);
+									if (
+										paginatedPosts[paginatedPosts.length - 1].data.length ===
+										AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH
+									) {
+										paginatedPosts[paginatedPosts.length - 1].nextId =
+											currentPost.id;
+									}
+									return paginatedPosts;
+								},
+								[],
+							),
+					};
 				}
 				return oldData;
 			});
 
-			queryClient.setQueryData<InfiniteData<ExtendedPost[], number>>(
-				[QueryKeys.FETCH_INFINITE_POST],
-				(oldData) => {
-					if (oldData) {
-						return {
-							...oldData,
-							pages: oldData.pages
-								.flatMap((pages) => pages)
-								.sort((a, b) => {
-									return (
-										new Date(b.createdAt).getTime() -
-										new Date(a.createdAt).getTime()
+			queryClient.setQueryData<
+				InfiniteData<PaginatedResponse<ExtendedPost>, undefined | string>
+			>([QueryKeys.FETCH_INFINITE_POST, null], (oldData) => {
+				if (oldData) {
+					return {
+						...oldData,
+						pages: [...oldData.pages.flatMap((pages) => pages.data), data]
+							.sort((a, b) => {
+								return (
+									new Date(b.createdAt).getTime() -
+									new Date(a.createdAt).getTime()
+								);
+							})
+							.reduce<PaginatedResponse<ExtendedPost>[]>(
+								(paginatedPosts, currentPost, currentIndex) => {
+									const chunkIndex = Math.floor(
+										currentIndex /
+											AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_ENGTH,
 									);
-								})
-								.reduce<ExtendedPost[][]>(
-									(paginatedPosts, currentPost, currentIndex) => {
-										const chunkIndex = Math.floor(
-											currentIndex /
-												AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH,
-										);
-										if (!paginatedPosts[chunkIndex]) {
-											paginatedPosts.push([]);
-										}
-										paginatedPosts[paginatedPosts.length - 1].push(currentPost);
-										return paginatedPosts;
-									},
-									[],
-								),
-						};
-					}
-					return oldData;
-				},
-			);
+									if (!paginatedPosts[chunkIndex]) {
+										paginatedPosts.push({ data: [], nextId: undefined });
+									}
+									paginatedPosts[paginatedPosts.length - 1].data.push(curretPost);
+									if (
+										paginatedPosts[paginatedPosts.length - 1].data.length ===
+										AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH
+									) {
+										paginatedPosts[paginatedPosts.length - 1].nextId =
+											currentPost.id;
+									}
+									return paginatedPosts;
+								},
+								[],
+							),
+					};
+				}
+				return oldData;
+			});
 			toast.dismiss();
 			toast.success("Your post has been published.");
 			navigate(`/group/${groupSlug}`);

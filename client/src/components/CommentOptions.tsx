@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { MoreHorizontal, PenSquare, Trash2 } from "lucide-react";
@@ -5,17 +6,16 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger
+	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
-import useDeleteComment from "@/hooks/comment/useDeleteComment.tsx";
-import ConfirmationModal from "@/components/ConfirmationModal.tsx";
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog.tsx";
 import Comment from "@/models/Comment.ts";
 import QueryKeys from "@/constants/QueryKeys.ts";
-import { toast } from "react-toastify";
-import CommentUpdateModal from "@/components/CommentUpdateModal.tsx";
-import useUpdateComment from "@/hooks/comment/useUpdateComment.tsx";
 import UpdateComment from "@/models/form/UpdateComment.ts";
+import useDeleteComment from "@/hooks/comment/useDeleteComment.tsx";
+import useUpdateComment from "@/hooks/comment/useUpdateComment.tsx";
+import ConfirmationModal from "@/components/ConfirmationModal.tsx";
+import CommentUpdateModal from "@/components/CommentUpdateModal.tsx";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog.tsx";
 
 type CommentOptionsProps = {
 	commentId: string;
@@ -49,7 +49,7 @@ const CommentOptions = (props: CommentOptionsProps) => {
 			});
 			toast.success("The comment has been deleted.");
 		},
-		[queryClient,
+		[queryClient],
 	);
 
 	const onCommentUpdateSuccess = useCallback(

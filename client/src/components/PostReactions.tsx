@@ -10,6 +10,7 @@ import ExtendedPost from "@/models/ExtendedPost.ts";
 import ReactionType from "@/models/enums/ReactionType.ts";
 import usePostReact from "@/hooks/post/usePostReaction.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
+import PaginatedResponse from "@/models/PaginatedResponse.ts";
 import CreatePostReaction from "@/models/CreatePostReaction.ts";
 
 type PostReactionsProps = {
@@ -63,82 +64,28 @@ const PostReactions = (props: PostReactionsProps) => {
 				setOwnPostReaction(reactionInfo.reaction);
 			}
 
-			queryClient.setQueryData<ExtendedPost[]>([QueryKeys.INITIAL_FEED_POSTS], (oldData) => {
+			queryClient.setQueryData<
+				InfiniteData<PaginatedResponse<ExtendedPost>, undefined | string>
+			>([QueryKeys.FETCH_INFINITE_POST], (oldData) => {
 				if (oldData) {
-					return oldData.map((post) => {
-						if (post.id === reactionInfo.postSlug) {
-							const alreadyReactedPost = post.postReactions.find((reaction) => {
-								return (
-									reaction.postId === reactionInfo.postSlug &&
-									reaction.userId === user?.id!
-								);
-							});
+					return {
+						...oldData,
+						pages: oldData.pages.map((page) => {
+							const targetPost = page.data.find((post) => post.id === postId);
 
-							if (!alreadyReactedPost) {
-								post.postReactions.push({
-									postId: reactionInfo.postSlug,
-									userId: user?.id!,
-									type: reactionInfo.reaction,
-								});
-								return post;
-							} else {
-								const sameReaction =
-									alreadyReactedPost.type === reactionInfo.reaction;
-								if (sameReaction) {
-									return {
-										...post,
-										postReactions: post.postReactions.filter((reaction) => {
-											return !(
-												reaction.postId === reactionInfo.postSlug &&
-												reaction.userId === user?.id! &&
-												reaction.type === reactionInfo.reaction
-											);
-										}),
-									};
-								} else {
-									post.postReactions = post.postReactions.filter((reaction) => {
-										return !(
-											reaction.postId === reactionInfo.postSlug &&
-											reaction.userId === user?.id! &&
-											reaction.type !== reactionInfo.reaction
-										);
-									});
-									post.postReactions.push({
-										type: reactionInfo.reaction,
-										userId: user?.id!,
-										postId: reactionInfo.postSlug,
-									});
-
-									return { ...post };
-								}
+							if (!targetPost) {
+								console.log("something is wrong");
+								return page;
 							}
-						}
-						return post;
-					});
-				}
-				return oldData;
-			});
 
-			queryClient.setQueryData<InfiniteData<ExtendedPost[], number>>(
-				[QueryKeys.FETCH_INFINITE_POST],
-				(oldData) => {
-					if (oldData) {
-						return {
-							...oldData,
-							pages: oldData.pages.map((page) => {
-								const targetPost = page.find((post) => post.id === postId);
+							const userReaction = targetPost.postReactions.find(
+								(reaction) => reaction.userId === user?.id!,
+							);
 
-								if (!targetPost) {
-									console.log("something is wrong");
-									return page;
-								}
-
-								const userReaction = targetPost.postReactions.find(
-									(reaction) => reaction.userId === user?.id!,
-								);
-
-								if (!userReaction) {
-									return page.map((post) => {
+							if (!userReaction) {
+								return {
+									...page,
+									data: page.data.map((post) => {
 										if (post.id === targetPost.id) {
 											post.postReactions.push({
 												postId: reactionInfo.postSlug,
@@ -147,10 +94,13 @@ const PostReactions = (props: PostReactionsProps) => {
 											});
 										}
 										return post;
-									});
-								} else {
-									if (userReaction.type === reactionInfo.reaction) {
-										return page.map((post) => {
+									}),
+								};
+							} else {
+								if (userReaction.type === reactionInfo.reaction) {
+									return {
+										...page,
+										data: page.data.map((post) => {
 											if (post.id === targetPost.id) {
 												post.postReactions = post.postReactions.filter(
 													(reaction) => {
@@ -164,9 +114,12 @@ const PostReactions = (props: PostReactionsProps) => {
 												);
 											}
 											return post;
-										});
-									} else {
-										return page.map((post) => {
+										}),
+									};
+								} else {
+									return {
+										...page,
+										data: page.data.map((post) => {
 											if (post.id === targetPost.id) {
 												post.postReactions = post.postReactions.filter(
 													(reaction) => {
@@ -186,15 +139,15 @@ const PostReactions = (props: PostReactionsProps) => {
 												});
 											}
 											return post;
-										});
-									}
+										}),
+									};
 								}
-							}),
-						};
-					}
-					return oldData;
-				},
-			);
+							}
+						}),
+					};
+				}
+				return oldData;
+			});
 		},
 		[ownPostReaction, queryClient, groupId],
 	);
@@ -202,8 +155,7 @@ const PostReactions = (props: PostReactionsProps) => {
 	const { mutate: reactToPost } = usePostReact({
 		onError: onReactionError,
 		onMutate,
-		onSuccess: async () => {
-		},
+		onSuccess: async () => {},
 	});
 
 	const likePost = useCallback(() => {

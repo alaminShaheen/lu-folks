@@ -1,18 +1,16 @@
 import { useEffect, useRef } from "react";
 import { useIntersection } from "@mantine/hooks";
 import Post from "@/components/Post.tsx";
-import ExtendedPost from "@/models/ExtendedPost.ts";
 import ReactionType from "@/models/enums/ReactionType.ts";
 import ListPostSkeleton from "@/components/skeletons/ListPostSkeleton.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import useFetchPaginatedPosts from "@/hooks/post/useFetchPaginatedPosts.tsx";
 
 type PostFeedProps = {
-	initialPosts: ExtendedPost[];
 	groupSlug?: string;
 };
 const PostFeed = (props: PostFeedProps) => {
-	const { initialPosts, groupSlug } = props;
+	const { groupSlug } = props;
 	const { user } = useAppContext();
 	const lastPostContainerRef = useRef<HTMLLIElement>(null);
 	const { ref: lastPostRef, entry } = useIntersection({
@@ -25,7 +23,7 @@ const PostFeed = (props: PostFeedProps) => {
 		fetchNextPage,
 		isFetchingNextPage,
 		isLoading,
-	} = useFetchPaginatedPosts({ initialPosts, groupSlug });
+	} = useFetchPaginatedPosts({ groupSlug });
 
 	useEffect(() => {
 		if (entry?.isIntersecting) {
@@ -33,13 +31,10 @@ const PostFeed = (props: PostFeedProps) => {
 		}
 	}, [entry, fetchNextPage]);
 
-	const posts =
-		postData && postData.pages.flatMap.length > 0
-			? postData.pages.flatMap((page) => page)
-			: initialPosts;
+	const posts = postData?.pages.flatMap((paginatedPosts) => paginatedPosts.data) ?? [];
 
 	if (isLoading) {
-		return new Array(5).fill(<ListPostSkeleton />).map((skeleton) => skeleton);
+		return new Array(5).fill(0).map((_, index) => <ListPostSkeleton key={index} />);
 	}
 
 	return (
