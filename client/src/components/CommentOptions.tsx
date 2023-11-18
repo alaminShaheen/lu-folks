@@ -5,7 +5,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
+	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import useDeleteComment from "@/hooks/comment/useDeleteComment.tsx";
 import ConfirmationModal from "@/components/ConfirmationModal.tsx";
@@ -45,11 +45,11 @@ const CommentOptions = (props: CommentOptionsProps) => {
 				});
 			}
 			await queryClient.refetchQueries({
-				queryKey: [QueryKeys.GET_POST, deletedComment.postId]
+				queryKey: [QueryKeys.GET_POST, deletedComment.postId],
 			});
 			toast.success("The comment has been deleted.");
 		},
-		[queryClient]
+		[queryClient,
 	);
 
 	const onCommentUpdateSuccess = useCallback(
@@ -152,7 +152,7 @@ const CommentOptions = (props: CommentOptionsProps) => {
 			<ConfirmationModal
 				onAction={deleteClicked}
 				title="Are you sure you want to delete this comment?"
-				description="This action cannot be undone and will permanently delete your comment."
+				description="This action cannot be undone and will permanently delete your comment and all its replies."
 				actionButtonVariant="destructive"
 				actonButtonText="Delete"
 			/>

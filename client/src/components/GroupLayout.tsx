@@ -39,13 +39,12 @@ const GroupLayout = () => {
 	return (
 		<div className="sm:container max-w-7xl mx-auto h-full">
 			<div>
-				{/*<ToFeedButton />*/}
 				<Link
 					to={getCorrectPath()}
 					className="flex items-center text-sm w-fit hover:underline"
 				>
 					<ChevronLeft className="h-4 w-4 mr-1" />
-					{postDetailsRouteMatch
+					{postDetailsRouteMatch || createPostRouteMatch
 						? "Back to group"
 						: groupBaseRouteMatch
 						? "Back to home"

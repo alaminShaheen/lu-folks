@@ -19,12 +19,40 @@ class GroupController extends Controller {
 		this.router
 			.route(this.path)
 			.post(verifyAuthentication, DtoValidator(CreateGroupDto), this.createGroup);
+		this.router
+			.route(`${this.path}/suggestions`)
+			.get(verifyAuthentication, this.groupSuggestions);
 		this.router.route(`${this.path}/:slug`).get(verifyAuthentication, this.getGroupInfo);
 		this.router
 			.route(`${this.path}/details/:slug`)
 			.get(verifyAuthentication, this.getGroupData);
 		this.router.route(`${this.path}/join/:slug`).post(verifyAuthentication, this.joinGroup);
 		this.router.route(`${this.path}/leave/:slug`).delete(verifyAuthentication, this.leaveGroup);
+	};
+
+	private groupSuggestions = async (
+		request: Request,
+		response: Response,
+		nextFunction: NextFunction,
+	) => {
+		try {
+			const cursorId = request.query.cursor as string | undefined;
+			const groups = await this.groupService.groupSuggestions(
+				request.user?.userId!,
+				cursorId,
+			);
+			return response.status(httpStatus.OK).send(groups);
+		} catch (error: any) {
+			if (error instanceof Error) nextFunction(error);
+			else {
+				nextFunction(
+					new HttpException(
+						httpStatus.INTERNAL_SERVER_ERROR,
+						"An error occurred while fetching groups.",
+					),
+				);
+			}
+		}
 	};
 
 	private joinGroup = async (

@@ -3,6 +3,7 @@ const QueryKeys = {
 
 	GROUP_INFO: "group-info",
 	GROUP_DETAILS: "group-details",
+	GROUP_SUGGESTIONS: "group-suggestions",
 
 	GET_POST: "get-post",
 	INITIAL_FEED_POSTS: "initial-feed-posts",

@@ -9,10 +9,47 @@ import CreateGroupDto from "@/dtos/createGroup.dto";
 import PostgresDatabase from "@/database/postgres.database";
 import IsMemberResponse from "@/models/types/IsMemberResponse";
 import FieldValidationException from "@/exceptions/fieldValidationException";
+import * as console from "console";
+import SuggestedGroupInfo from "@/models/types/SuggestedGroupInfo";
+import PaginatedResponse from "@/models/PaginatedResponse";
 
 @injectable()
 class GroupService implements IGroupService {
 	constructor(private readonly databaseInstance: PostgresDatabase) {}
+
+	public groupSuggestions = async (
+		userId: string,
+		cursorId?: string,
+	): Promise<PaginatedResponse<SuggestedGroupInfo>> => {
+		try {
+			const groups = await this.databaseInstance.groupRepository.findMany({
+				where: { groupMembers: { none: { id: userId } } },
+				include: {
+					_count: { select: { groupMembers: true } },
+				},
+				cursor: cursorId ? { id: cursorId } : undefined,
+				skip: cursorId ? 1 : undefined,
+				take: AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH,
+			});
+
+			return {
+				nextId:
+					groups.length === AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH
+						? groups[groups.length - 1].id
+						: undefined,
+				data: groups.map((group) => ({
+					title: group.title,
+					id: group.id,
+					groupMemberCount: group._count.groupMembers,
+					updatedAt: group.updatedAt,
+					creatorId: group.creatorId,
+					createdAt: group.createdAt,
+				})),
+			};
+		} catch (error) {
+			throw error;
+		}
+	};
 
 	public checkGroupExistence = async (slug: string): Promise<Group> => {
 		try {

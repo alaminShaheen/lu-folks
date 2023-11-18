@@ -59,7 +59,7 @@ model Post {
   updatedAt     DateTime       @updatedAt()
   creator       User           @relation(fields: [creatorId], references: [id]) // n -> 1
   creatorId     String
-  group         Group          @relation(fields: [groupId], references: [id]) // n -> 1
+  group         Group          @relation(fields: [groupId], references: [id], onDelete: Cascade) // n -> 1
   groupId       String
   comments      Comment[] // 1 -> n
   postReactions PostReaction[] // n -> n
