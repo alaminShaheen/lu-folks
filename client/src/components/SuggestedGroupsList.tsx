@@ -33,13 +33,11 @@ const SuggestedGroupsList = () => {
 					key={groupSuggestion.id}
 				>
 					<div className="flex items-center gap-4">
-						<span>
-							<Users2 className="h-5 w-5 dark:text-zinc-400" />
-						</span>
+						<Users2 className="h-5 w-5 dark:text-zinc-400 hidden md:block" />
 						<div>
 							<Link
 								to={`/group/${groupSuggestion.id}`}
-								className="font-bold text-blue-500 dark:text-blue-400 text-sm"
+								className="font-bold text-blue-500 dark:text-blue-400 text-sm truncate"
 							>
 								{groupSuggestion.title}
 							</Link>
@@ -52,6 +50,7 @@ const SuggestedGroupsList = () => {
 					<ButtonLink
 						to={`/group/${groupSuggestion.id}`}
 						buttonClass={cn(buttonVariants({ size: "sm" }), "my-4")}
+						className="hidden lg:block"
 					>
 						Visit Group
 					</ButtonLink>

@@ -24,9 +24,9 @@ function App() {
 		<BrowserRouter>
 			<Toast />
 			<QueryClientProvider client={queryClient}>
-				<ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-					<ReactQueryDevtools />
-					<AppContextProvider>
+				<ReactQueryDevtools />
+				<AppContextProvider>
+					<ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
 						<Routes>
 							<Route index element={<LandingPage />} />
 							<Route path={ROUTES.LOGIN} element={<Login />} />
@@ -48,8 +48,8 @@ function App() {
 								<Route path={ROUTES.USER_PROFILE} element={<Profile />} />
 							</Route>
 						</Routes>
-					</AppContextProvider>
-				</ThemeProvider>
+					</ThemeProvider>
+				</AppContextProvider>
 			</QueryClientProvider>
 		</BrowserRouter>
 	);

@@ -74,7 +74,7 @@ const PostEditorForm = forwardRef<EditorHandle, PostEditorProps>((props, richTex
 
 	return (
 		<Fragment>
-			<div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
+			<div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200 dark:border-zinc-400 dark:bg-slate-700">
 				<form id={formId} className="w-full" onSubmit={handleSubmit(onSubmit)}>
 					<div className="prose prose-stone dark:prose-invert w-full">
 						<TextareaAutosize

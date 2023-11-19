@@ -301,7 +301,7 @@ const PostOptions = (props: PostOptionsProps) => {
 				<DropdownMenuTrigger className="ml-2">
 					<MoreHorizontal className="h-4 w-4 text-xs text-zinc-500" />
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className="bg-white" align="end">
+				<DropdownMenuContent align="end">
 					<DropdownMenuItem asChild>
 						<span className="gap-2 w-full" onClick={() => setPostUpdateModalOpen(true)}>
 							<PenSquare className="h-4 w-4 text-xs text-zinc-500" />
