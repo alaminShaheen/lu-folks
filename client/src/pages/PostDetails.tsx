@@ -56,7 +56,7 @@ const PostDetails = () => {
 
 		return (
 			<div className="h-full flex flex-col sm:flex-col items-center sm:items-start justify-between shadow rounded">
-				<div className="w-full flex-1 bg-white p-4 rounded-sm">
+				<div className="w-full flex-1 bg-white dark:bg-secondary p-4 rounded-sm">
 					<p className="max-h-40 mt-1 truncate text-xs text-gray-500 flex items-center">
 						<Link
 							to={`/group/${post.group.id}`}
@@ -71,13 +71,13 @@ const PostDetails = () => {
 						{formatTimeToNow(new Date(post.createdAt))}
 						{post.creator.id === user?.id! && <PostOptions post={post} />}
 					</p>
-					<h1 className="text-3xl font-semibold py-2 leading-6 text-gray-900">
+					<h1 className="text-2xl font-semibold py-2 leading-6 text-gray-900 dark:text-gray-300">
 						{post.title}
 					</h1>
 
 					<EditorOutput postContent={JSON.parse(post.content)} />
 
-					<div className="text-sm flex items-center gap-3 w-full bg-white pt-3">
+					<div className="text-sm flex items-center gap-3 w-full bg-white dark:bg-secondary pt-3">
 						<PostReactions
 							groupId={post.group.id}
 							postId={post.id}

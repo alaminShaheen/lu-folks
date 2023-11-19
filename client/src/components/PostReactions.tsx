@@ -181,8 +181,10 @@ const PostReactions = (props: PostReactionsProps) => {
 			>
 				<ThumbsUp
 					className={clsx(
-						"h-4 w-4 hover:text-blue-700 cursor-pointer hover:scale-125 transform transition duration-100",
-						ownPostReaction === ReactionType.LIKE ? "text-blue-700" : "text-gray-500",
+						"h-4 w-4 hover:text-blue-700 dark:hover:text-blue-500 cursor-pointer hover:scale-125 transform transition duration-100",
+						ownPostReaction === ReactionType.LIKE
+							? "text-blue-700 dark:text-blue-500"
+							: "text-gray-500 dark:text-gray-400",
 					)}
 				/>{" "}
 				{postLikeCount} {/*{likeCount === 1 ? "like" : "likes"}*/}
@@ -194,8 +196,10 @@ const PostReactions = (props: PostReactionsProps) => {
 			>
 				<ThumbsDown
 					className={clsx(
-						"h-4 w-4 hover:text-red-500 cursor-pointer hover:scale-125 transform transition duration-100",
-						ownPostReaction === ReactionType.UNLIKE ? "text-red-500" : "text-gray-500",
+						"h-4 w-4 hover:text-red-500 dark:hover:text-red-500 cursor-pointer hover:scale-125 transform transition duration-100",
+						ownPostReaction === ReactionType.UNLIKE
+							? "text-red-500"
+							: "textgray-500 dark:text-gray-400",
 					)}
 				/>{" "}
 				{postUnlikeCount} {/*{unlikeCount === 1 ? "unlike" : "unlikes"}*/}

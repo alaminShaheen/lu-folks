@@ -12,7 +12,10 @@ import {
 import User from "@/models/User";
 import ROUTES from "@/constants/Routes.ts";
 import APILinks from "@/constants/APILinks.ts";
+import { Label } from "@/components/ui/label.tsx";
+import { Switch } from "@/components/ui/switch.tsx";
 import UserAvatar from "@/components/UserAvatar.tsx";
+import { useTheme } from "@/context/ThemeContext.tsx";
 import { useAppContext } from "@/context/AppContext.tsx";
 import { privateAxiosInstance } from "@/api/Axios.ts";
 
@@ -23,6 +26,7 @@ interface UserAccountNavProps extends HTMLAttributes<HTMLDivElement> {
 export function UserAccountNav(props: UserAccountNavProps) {
 	const { user } = props;
 	const { clearAuthentication } = useAppContext();
+	const { setTheme, theme } = useTheme();
 	const navigate = useNavigate();
 
 	const logout = useCallback(async () => {
@@ -62,6 +66,31 @@ export function UserAccountNav(props: UserAccountNavProps) {
 					<Link to={ROUTES.HOME}>Feed</Link>
 				</DropdownMenuItem>
 
+				<DropdownMenuItem
+					asChild
+					onClick={(event) => {
+						event.preventDefault();
+					}}
+				>
+					<div
+						className="flex items-center space-x-2 justify-between"
+						onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+					>
+						<Label htmlFor="airplane-mode">
+							{theme === "dark" ? "Light mode" : "Dark mode"}
+						</Label>
+						<Switch
+							id="theme"
+							checked={theme === "dark"}
+							onCheckedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+						/>
+					</div>
+				</DropdownMenuItem>
+
+				{/*<DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>*/}
+				{/*<DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>*/}
+				{/*<DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>*/}
+
 				<DropdownMenuItem asChild>
 					<Link to={ROUTES.CREATE_GROUP}>Create Group</Link>
 				</DropdownMenuItem>
@@ -70,9 +99,6 @@ export function UserAccountNav(props: UserAccountNavProps) {
 					<Link to={ROUTES.USER_PROFILE}>Profile</Link>
 				</DropdownMenuItem>
 
-				{/*<DropdownMenuItem asChild>*/}
-				{/*	<Link to={ROUTES}>Settings</Link>*/}
-				{/*</DropdownMenuItem>*/}
 				<DropdownMenuSeparator />
 				<DropdownMenuItem className="cursor-pointer" onSelect={logout}>
 					Sign out

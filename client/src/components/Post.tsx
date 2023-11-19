@@ -27,13 +27,13 @@ const Post = (props: PostProps) => {
 	const { user } = useAppContext();
 
 	return (
-		<div className="rounded-md bg-white shadow">
+		<div className="rounded-t-md bg-white dark:bg-zinc-800 text-foreground shadow">
 			<div className="px-6 py-4 flex justify-between">
 				<div className="w-0 flex-1">
-					<div className="max-h-40 mt-1 text-xs text-gray-500">
+					<div className="max-h-40 mt-1 text-xs text-gray-500 dark:text-gray-400">
 						<Link
 							to={`/group/${groupInfo.id}`}
-							className="underline text-blue-500 text-sm underline-offset-2"
+							className="underline text-blue-500 dark:text-blue-400 text-sm underline-offset-2"
 						>
 							{groupInfo.title}
 						</Link>
@@ -50,7 +50,7 @@ const Post = (props: PostProps) => {
 								: `post/${post.id}`
 						}
 					>
-						<h1 className="text-lg font-semibold py-2 leading-6 text-blue-500">
+						<h1 className="text-lg font-semibold py-2 leading-6 text-blue-500 dark:text-blue-400">
 							{post.title}
 						</h1>
 					</Link>
@@ -68,7 +68,7 @@ const Post = (props: PostProps) => {
 				</div>
 			</div>
 
-			<div className="bg-gray-50 z-20 text-sm px-4 py-4 sm:px-6 flex items-center gap-3">
+			<div className="bg-gray-50 dark:bg-zinc-700 z-20 text-sm p-1 sm:px-6 flex items-center gap-3 rounded-b-md">
 				<PostReactions
 					groupId={post.group.id}
 					postId={post.id}
@@ -86,8 +86,10 @@ const Post = (props: PostProps) => {
 					>
 						<MessageSquare
 							className={clsx(
-								"h-4 w-4 hover:text-teal-500 hover:scale-125 transform transition duration-100",
-								commentCount > 0 ? "text-teal-500" : "",
+								"h-4 w-4 hover:text-teal-500 dark:hover:text-teal-500 hover:scale-125 transform transition duration-100",
+								commentCount > 0
+									? "text-teal-500"
+									: "text-gray-500 dark:text-gray-400",
 							)}
 						/>{" "}
 					</Link>

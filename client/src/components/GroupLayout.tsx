@@ -9,7 +9,8 @@ import GroupLayoutSkeleton from "@/components/skeletons/GroupLayoutSkeleton.tsx"
 import useRelativeRouteMatch from "@/hooks/useRelativeRouteMatch.tsx";
 import ToggleSubscriptionButton from "@/components/ToggleSubscriptionButton.tsx";
 import { ChevronLeft } from "lucide-react";
-import { useCallback } from "react";
+import { Fragment, useCallback } from "react";
+import SideSectionWrapper from "@/components/SideSectionWrapper.tsx";
 
 const GroupLayout = () => {
 	const { user } = useAppContext();
@@ -56,49 +57,55 @@ const GroupLayout = () => {
 					{fetchingGroup || !groupInfo ? (
 						<GroupLayoutSkeleton />
 					) : (
-						<div className="overflow-hidden h-fit rounded-lg border border-gray-200 order-first md:order-last">
-							<div className="px-6 py-4">
-								<p className="font-semibold py-3">About {groupInfo.title}</p>
-							</div>
-							<dl className="divide-y divide-gray-100 px-6 py-4 text-sm leading-6 bg-white">
-								<div className="flex justify-between gap-x-4 py-3 items-center">
-									<dt className="text-gray-500">Created</dt>
-									<dd className="text-gray-700">
-										<time dateTime={groupInfo.createdAt}>
-											{format(new Date(groupInfo.createdAt), "MMMM d, yyyy")}
-										</time>
-									</dd>
-								</div>
-								<div className="flex justify-between gap-x-4 py-3">
-									<dt className="text-gray-500">Members</dt>
-									<dd className="flex items-start gap-x-2">
-										<div className="text-gray-900">
-											{groupInfo.groupMemberCount}
-										</div>
-									</dd>
-								</div>
-								{groupInfo.creatorId === user?.id && (
-									<div className="flex justify-between gap-x-4 py-3">
-										<dt className="text-gray-500">
-											You created this community
+						<Fragment>
+							<SideSectionWrapper title={`About ${groupInfo.title}`}>
+								<dl className="divide-y divide-gray-100 dark:divide-gray-500 px-6 py-4 text-sm leading-6">
+									<div className="flex justify-between gap-x-4 py-3 items-center">
+										<dt className="text-gray-500 dark:text-gray-400">
+											Created
 										</dt>
+										<dd className="text-gray-700 dark:text-gray-400">
+											<time dateTime={groupInfo.createdAt}>
+												{format(
+													new Date(groupInfo.createdAt),
+													"MMMM d, yyyy",
+												)}
+											</time>
+										</dd>
 									</div>
-								)}
+									<div className="flex justify-between gap-x-4 py-3">
+										<dt className="text-gray-500 dark:text-gray-400">
+											Members
+										</dt>
+										<dd className="flex items-start gap-x-2">
+											<div className="text-gray-700 dark:text-gray-400">
+												{groupInfo.groupMemberCount}
+											</div>
+										</dd>
+									</div>
+									{groupInfo.creatorId === user?.id && (
+										<div className="flex justify-between gap-x-4 py-3">
+											<dt className="text-gray-500 dark:text-gray-400">
+												You created this community
+											</dt>
+										</div>
+									)}
 
-								{groupInfo.creatorId !== user?.id && (
-									<ToggleSubscriptionButton
-										isGroupMember={groupInfo.isMember}
-										groupId={groupInfo.id}
-										groupTitle={groupInfo.title}
-									/>
-								)}
-								{!createPostRouteMatch && groupInfo.isMember && (
-									<ButtonLink to={ROUTES.GROUP.CREATE_POST}>
-										Create Post
-									</ButtonLink>
-								)}
-							</dl>
-						</div>
+									{groupInfo.creatorId !== user?.id && (
+										<ToggleSubscriptionButton
+											isGroupMember={groupInfo.isMember}
+											groupId={groupInfo.id}
+											groupTitle={groupInfo.title}
+										/>
+									)}
+									{!createPostRouteMatch && groupInfo.isMember && (
+										<ButtonLink to={ROUTES.GROUP.CREATE_POST}>
+											Create Post
+										</ButtonLink>
+									)}
+								</dl>
+							</SideSectionWrapper>
+						</Fragment>
 					)}
 					{/* info sidebar */}
 				</div>

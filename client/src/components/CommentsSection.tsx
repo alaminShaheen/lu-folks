@@ -26,11 +26,11 @@ const CommentsSection = (props: CommentsSectionProps) => {
 	}
 
 	if (isFetchingComments) {
-		return <div className="rounded-md bg-white shadow rounded">Loading....</div>;
+		return <div className="bg-white dark:bg-secondary shadow rounded">Loading....</div>;
 	} else if (topLevelPostComments) {
 		return (
-			<div className="flex flex-col gap-y-4 w-full bg-white">
-				<hr className="w-full h-px my-4" />
+			<div className="flex flex-col gap-y-4 w-full bg-white dark:bg-secondary">
+				<hr className="w-full h-px my-4 dark:border-gray-500" />
 
 				<CreateComment postId={postId} />
 				{isFetchingComments || !topLevelPostComments ? (

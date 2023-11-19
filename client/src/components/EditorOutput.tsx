@@ -21,7 +21,6 @@ const EditorOutput = (props: EditorOutputProps) => {
 		<Suspense fallback={<div>Loading...</div>}>
 			<Output
 				style={style}
-				className="text-sm"
 				renderers={{ image: CustomImageRenderer, code: CustomCodeRenderer }}
 				data={postContent}
 			/>

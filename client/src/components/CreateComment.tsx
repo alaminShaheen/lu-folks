@@ -75,6 +75,7 @@ const CreateComment = (props: CreateCommentProps) => {
 					id="comment"
 					rows={1}
 					placeholder="What are your thoughts?"
+					className="dark:border-gray-500"
 					{...register("comment", { required: "Comment is required." })}
 				/>
 
