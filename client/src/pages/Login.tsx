@@ -103,7 +103,7 @@ const Login = () => {
 										{...register("email", {
 											required: "Email is required",
 										})}
-										className="bg-slate-800"
+										className="dark:bg-slate-800"
 										id="email"
 										placeholder="name@example.com"
 										type="email"
@@ -126,7 +126,7 @@ const Login = () => {
 											required: "Password is required",
 										})}
 										id="password"
-										className="bg-slate-800"
+										className="dark:bg-slate-800"
 										type={showPassword ? "text" : "password"}
 										autoCapitalize="none"
 										autoComplete="password"
