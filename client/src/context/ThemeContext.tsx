@@ -43,8 +43,7 @@ export function ThemeProvider({
 			return;
 		}
 
-		roo;
-		t.classList.add(theme);
+		root.classList.add(theme);
 	}, [theme]);
 
 	const value = {
