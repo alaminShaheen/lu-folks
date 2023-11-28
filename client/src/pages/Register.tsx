@@ -123,6 +123,7 @@ const Register = () => {
 								<div className="grid gap-1">
 									<Label htmlFor="email">Email</Label>
 									<Input
+										className="dark:bg-slate-800"
 										{...register("email", {
 											required: "Email is required",
 										})}
@@ -144,6 +145,7 @@ const Register = () => {
 								<div className="grid gap-1">
 									<Label htmlFor="username">Username</Label>
 									<Input
+										className="dark:bg-slate-800"
 										{...register("username", {
 											required: "Username is required",
 										})}
@@ -164,6 +166,7 @@ const Register = () => {
 								<div className="grid gap-1">
 									<Label htmlFor="password">Password</Label>
 									<InputWithIcon
+										className="dark:bg-slate-800"
 										{...register("password", {
 											required: "Password is required",
 										})}
@@ -197,6 +200,7 @@ const Register = () => {
 								<div className="grid gap-1">
 									<Label htmlFor="confirmPassword">Confirm Password</Label>
 									<InputWithIcon
+										className="dark:bg-slate-800"
 										{...register("confirmPassword", {
 											required: "Confirm password is required",
 											validate: (value) =>
@@ -246,7 +250,12 @@ const Register = () => {
 								</span>
 							</div>
 						</div>
-						<Button variant="outline" type="button" disabled={isLoading}>
+						<Button
+							variant="outline"
+							type="button"
+							disabled={isLoading}
+							className="dark:bg-zinc-600"
+						>
 							<a
 								href={generateGoogleOAuthConsentUrl(
 									AppConstants.GOOGLE_OAUTH_REGISTRATION_REDIRECT_URL,

@@ -169,7 +169,12 @@ const Login = () => {
 								</span>
 							</div>
 						</div>
-						<Button variant="outline" type="button" loading={isLoading}>
+						<Button
+							variant="outline"
+							type="button"
+							loading={isLoading}
+							className="dark:bg-zinc-600"
+						>
 							<a
 								href={generateGoogleOAuthConsentUrl(
 									AppConstants.GOOGLE_OAUTH_LOGIN_REDIRECT_URL,
