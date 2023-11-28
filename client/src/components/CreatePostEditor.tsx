@@ -88,7 +88,9 @@ const CreatePostEditor = (props: CreatePostEditorType) => {
 									if (!paginatedPosts[chunkIndex]) {
 										paginatedPosts.push({ data: [], nextId: undefined });
 									}
-									paginatedPosts[paginatedPosts.length - 1].data.push(currentPos);
+									paginatedPosts[paginatedPosts.length - 1].data.push(
+										currentPost,
+									);
 									if (
 										paginatedPosts[paginatedPosts.length - 1].data.length ===
 										AppConstants.INFINITE_SCROLL_PAGINATION_RESULT_LENGTH
