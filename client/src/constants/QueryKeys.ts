@@ -1,5 +1,6 @@
 const QueryKeys = {
 	CURRENT_USER: "current-user",
+	SINGLE_USER: "single-user",
 
 	GROUP_INFO: "group-info",
 	GROUP_DETAILS: "group-details",

@@ -87,16 +87,12 @@ export function UserAccountNav(props: UserAccountNavProps) {
 					</div>
 				</DropdownMenuItem>
 
-				{/*<DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>*/}
-				{/*<DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>*/}
-				{/*<DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>*/}
-
 				<DropdownMenuItem asChild>
 					<Link to={ROUTES.CREATE_GROUP}>Create Group</Link>
 				</DropdownMenuItem>
 
 				<DropdownMenuItem asChild>
-					<Link to={ROUTES.USER_PROFILE}>Profile</Link>
+					<Link to={`profile/${user.id}`}>Profile</Link>
 				</DropdownMenuItem>
 
 				<DropdownMenuSeparator />

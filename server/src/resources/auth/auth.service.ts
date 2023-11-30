@@ -82,11 +82,7 @@ class AuthService implements IAuthService {
 				String(process.env.REFRESH_TOKEN_SECRET),
 			) as TokenPayload;
 
-			if (
-				!decodedUserInfo ||
-				decodedUserInfo.userId !== dbUser.id ||
-				decodedUserInfo.username !== dbUser.username
-			) {
+			if (!decodedUserInfo || decodedUserInfo.userId !== dbUser.id) {
 				console.error("Refresh token tampered as not identical with user in db.");
 				throw new HttpException(httpStatus.UNAUTHORIZED, "User is unauthorized.");
 			}

@@ -8,7 +8,7 @@ const ROUTES = {
 		CREATE_POST: "create-post",
 		POST_DETAILS: "post/:postSlug",
 	},
-	USER_PROFILE: "/profile",
+	USER_PROFILE: "/profile/:userId",
 };
 
 export default ROUTES;

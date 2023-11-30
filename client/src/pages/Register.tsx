@@ -96,7 +96,7 @@ const Register = () => {
 	}, [navigate, searchParams, setAuthentication, setSearchParams]);
 
 	return (
-		<div className="container relative flex h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+		<div className="container relative flex h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0 dark:bg-zinc-800">
 			<div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex">
 				<div className="absolute inset-0 bg-zinc-900" />
 				<div className="relative z-20 flex items-center text-lg font-medium">
@@ -245,9 +245,7 @@ const Register = () => {
 								<span className="w-full border-t" />
 							</div>
 							<div className="relative flex justify-center text-xs uppercase">
-								<span className="bg-background px-2 text-muted-foreground">
-									Or continue with
-								</span>
+								<span className="px-2 text-muted-foreground">Or continue with</span>
 							</div>
 						</div>
 						<Button

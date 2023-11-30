@@ -49,7 +49,7 @@ const SearchBar = () => {
 			/>
 
 			{searchTerm.length > 0 && (
-				<CommandList className="absolute bg-white top-full inset-x-0 shadow rounded-b-md">
+				<CommandList className="absolute bg-background top-full inset-x-0 shadow rounded-b-md">
 					{isFetched && <CommandEmpty>No results found.</CommandEmpty>}
 					{((searchResults?.groups.length ||
 						searchResults?.posts.length ||
@@ -98,7 +98,7 @@ const SearchBar = () => {
 									return (
 										<CommandItem
 											onSelect={() => {
-												navigate(`/group/${user.id}`);
+												navigate(`/profile/${user.id}`);
 												setSearchTerm("");
 												// router.refresh()
 											}}
