@@ -80,7 +80,7 @@ class UserService implements IUserService {
 				imageUrl: currentUser.imageUrl || null,
 				email: currentUser.email,
 				id: currentUser.id,
-				authProvider: currentUser.authPovider,
+				authProvider: currentUser.authProvider,
 			};
 		} catch (error: any) {
 			if (error instanceof HttpException) throw error;
