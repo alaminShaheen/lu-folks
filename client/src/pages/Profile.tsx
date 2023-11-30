@@ -1,4 +1,11 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card.tsx";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -25,7 +32,7 @@ const Profile = () => {
 	} = useForm<ProfileForm>({
 		defaultValues: {
 			username: "",
-			email: ",
+			email: "",
 		},
 	});
 	const params = useParams<"userId">();
@@ -38,11 +45,11 @@ const Profile = () => {
 				if (oldUser) {
 					console.log({
 						...oldUser,
-						...updatedUser
+						...updatedUser,
 					});
 					return {
 						...oldUser,
-						...updatedUser
+						...updatedUser,
 					};
 				}
 				return oldUser;
@@ -58,7 +65,7 @@ const Profile = () => {
 		(formData: ProfileForm) => {
 			mutate(formData);
 		},
-		[mutate]
+		[mutate],
 	);
 
 	useEffect(() => {
@@ -100,7 +107,7 @@ const Profile = () => {
 														required: "Username is required",
 														onChange: () => {
 															setChanged(true);
-														}
+														},
 													})}
 												/>
 												{errors?.username && (
@@ -133,7 +140,7 @@ const Profile = () => {
 																required: "Email is required",
 																onChange: () => {
 																	setChanged(true);
-																}
+																},
 															})}
 														/>
 														{errors?.username && (
@@ -159,9 +166,7 @@ const Profile = () => {
 									<CardHeader>
 										<CardTitle>{user?.username}</CardTitle>
 									</CardHeader>
-									<CardContent>
-										{user?.email}
-									</CardContent>
+									<CardContent>{user?.email}</CardContent>
 								</Card>
 							</div>
 						)}
