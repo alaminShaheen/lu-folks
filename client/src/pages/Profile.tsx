@@ -38,11 +38,11 @@ const Profile = () => {
 				if (oldUser) {
 					console.log({
 						...oldUser,
-						...updatedUse,
+						...updatedUser
 					});
 					return {
 						...oldUser,
-						...updatedUse,
+						...updatedUser
 					};
 				}
 				return oldUser;
