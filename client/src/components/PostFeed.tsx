@@ -34,7 +34,13 @@ const PostFeed = (props: PostFeedProps) => {
 	const posts = postData?.pages.flatMap((paginatedPosts) => paginatedPosts.data) ?? [];
 
 	if (isLoading) {
-		return new Array(5).fill(0).map((_, index) => <ListPostSkeleton key={index} />);
+		return (
+			<ul className="flex flex-col col-span-2 space-y-6 list-none">
+				{new Array(5).fill(0).map((_, index) => (
+					<ListPostSkeleton key={index} />
+				))}
+			</ul>
+		);
 	}
 
 	return (

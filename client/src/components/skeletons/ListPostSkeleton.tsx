@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton.tsx";
 const ListPostSkeleton = () => {
 	return (
 		<li>
-			<div className="rounded-md bg-white shadow rounded">
+			<div className="rounded-md bg-white dark:bg-primary shadow rounded w-full">
 				<div className="px-6 py-4 flex justify-between flex-col">
 					<div className="w-full">
 						<Skeleton className="rounded h-4 w-2/5 mb-3" />
